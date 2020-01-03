@@ -4,3 +4,9 @@
 [submodule "submodules/dumpi_to_graph"]
 	path = submodules/dumpi_to_graph
 	url = git@github.com:TauferLab/Src_dumpi_to_graph.git
+[submodule "submodules/sst-dumpi"]
+	path = submodules/sst-dumpi
+	url = git@github.com:TauferLab/sst-dumpi.git
+[submodule "submodules/PnMPI"]
+	path = submodules/PnMPI
+	url = git@github.com:LLNL/PnMPI.git
