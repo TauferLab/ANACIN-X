@@ -6,46 +6,47 @@ Runtime non-determinism in High Performance Computing (HPC) applications present
 * `event_graph_analysis` - A collection of Python scripts for analyzing and visualizing event graphs both in isolation and in batches to recognize patterns in non-deterministic communication. 
 
 ## Installation
-We recommend installing ANACIN-X's dependencies with Spack. 
+Assuming all dependenices are installed, you should be able to build all of ANACIN-X's components by running the `setup.sh` script.
 
-### Installation: Spack
+Where possible, we recommend installing ANACIN-X's dependencies with Spack and Conda.
+
+### Spack:
 Spack is a package manager with good support for scientific/HPC software. To use Spack you will need Python. We recommend you install Spack *and* enable Spack's shell integration. 
 
-To install Spack:
-* git clone https://github.com/spack/spack.git
-* Throughout the rest of installation, we will refer to the location that Spack is cloned to as `$SPACK_ROOT`
+To install Spack, follow the instructions at: https://spack.readthedocs.io/en/latest/getting_started.html
 
-To enable Spack's shell integration (For bash/zsh users):
-* Add `$SPACK_ROOT/bin` to your `PATH`
-* Run `. $SPACK_ROOT/share/spack/setup-env.sh`
-* Run `spack bootstrap` 
-The last step will install environment-modules and allow software installed with Spack to be loaded and unloaded as environment modules. 
+In particular, make sure to follow the instructions under "Add Spack to the Shell". This step will allow software installed with Spack to be loaded and unloaded as [environment modules.](https://spack.readthedocs.io/en/latest/getting_started.html#installenvironmentmodules) 
 
-### Installation: dumpi\_to\_graph dependencies
+### Conda:
+Conda is a cross-language package, dependency, and environment manager. We use Conda to manage the dependencies of ANACIN-X's Python code. 
+
+To install Conda, follow the instructions at: https://conda.io/projects/conda/en/latest/user-guide/install/index.html
+
+
+## Dependencies:
+### Event Graph Construction:
 Our tool for building event graphs from trace files, `dumpi_to_graph`, has the following dependencies:
 * MPI
 * Boost
 * CMake
 * igraph
 
-### Installation: CSMPI dependencies
+### Call-Stack Tracing
 Our call-stack-tracing PMPI module, `CSMPI`, has the following dependencies:
 * MPI
 * Boost
 * Cmake
 * Libunwind
 
-### Installation: event_graph_analysis dependencies
+### Event Graph Analysis 
 We use the following Python modules:
 * numpy
 * igraph-python
 * matplotlib
 * graphkernels
 * ruptures
-* pyelftools
-
-We recommend installing these dependencies with Spack (with the possible exception of MPI). If you have set up Spack as described above, you may simply run the following scripts:
-* `install/install_dumpi_to_graph_dependencies.sh`
-* `install/install_csmpi_dependencies.sh`
-* `install/install_ega_dependencies.sh`
+* pyelftoolsS
+The graphkernels module depends on:
+* pkg-config
+* Eigen
 
