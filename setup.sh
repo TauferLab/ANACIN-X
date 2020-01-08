@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
+# Clean up previous installations
 rm -rf ./submodules/*
+rm -rf ./apps && mkdir apps
+rm ./anacin-x/base_vars.sh
 
 n_columns=$(stty size | awk '{print $2}')
 progress_delimiter=""
@@ -11,7 +14,7 @@ done
 
 # First, get all relevant submodules
 echo ${progress_delimiter}
-echo "fetching submodules..."
+echo "Fetching submodules..."
 echo ${progress_delimiter}
 echo
 git submodule update --init --recursive
@@ -75,3 +78,27 @@ echo ${progress_delimiter}
 echo "Done building graph constructor."
 echo ${progress_delimiter}
 
+# Install applications under study
+echo ${progress_delimiter}
+echo "Fetching non-deterministic MPI applications..."
+echo ${progress_delimiter}
+echo
+git clone git@github.com:TauferLab/miniAMR.git ./apps/miniAMR
+echo
+echo ${progress_delimiter}
+echo "Done fetching non-deterministic MPI applications."
+echo ${progress_delimiter}
+
+echo ${progress_delimiter}
+echo "Building miniAMR..."
+echo ${progress_delimiter}
+echo
+cd ./apps/miniAMR/ref && make -j && cd -
+echo
+echo ${progress_delimiter}
+echo "Done Building miniAMR."
+echo ${progress_delimiter}
+
+touch ./anacin-x/base_vars.sh
+echo "anacin_x_root=$(pwd)" >> ./anacin-x/base_vars.sh
+echo "ega_x_root=${anacin_x_root}/anacin-x/event_graph_analysis/" >> ./anacin-x/base_vars.sh
