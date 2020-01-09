@@ -1,9 +1,9 @@
 # ANACIN-X
 ## Project Overview
-Runtime non-determinism in High Performance Computing (HPC) applications presents steep challenges for computational reproducibility and correctness. These challenges are magnified in the context of complex scientific codes where the links between observable non-determinism and root causes are unclear. This repository contains a suite of tools for studying non-deterministic behavior in MPI applications. The core components of this tool suite include:
-* `dumpi_to_graph` - A tool for building event graphs (i.e., graph-structured models of inter-process or inter-thread communication during an execution) from sets of trace files. 
-* `CSMPI` - A PMPI module for tracing call-stacks of MPI function invocations. By tracing call-stacks in conjunction with a record of communication behavior, runtime non-determinism can be linked to its potential root-causes in source code. 
-* `event_graph_analysis` - A collection of Python scripts for analyzing and visualizing event graphs both in isolation and in batches to recognize patterns in non-deterministic communication. 
+Runtime non-determinism in High Performance Computing (HPC) applications presents steep challenges for computational reproducibility and correctness. These challenges are magnified in the context of complex scientific codes where the links between observable non-determinism and root causes are unclear. This repository contains a suite of tools for trace-based analysis of non-deterministic behavior in MPI applications. The core components of this tool suite are:
+* Tracing Modules: We use a stack of PMPI modules composed with [PnMPI](https://github.com/LLNL/PnMPI) to trace executions of non-deterministic MPI applications
+* Event Graph Construction: We convert each execution's traces into a graph-structured model of the interprocess communication that took place during the execution
+* Event Graph Analysis: We implement workflows for identifying root causes of non-deterministic behavior
 
 ## Installation
 Assuming all dependenices are installed, you should be able to build all of ANACIN-X's components by running the `setup.sh` script.
