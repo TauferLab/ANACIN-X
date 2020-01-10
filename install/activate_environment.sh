@@ -1,0 +1,1 @@
+conda activate "anacin-x"

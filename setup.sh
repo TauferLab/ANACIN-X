@@ -13,6 +13,7 @@ do
 done
 
 # First, get all relevant submodules
+echo
 echo ${progress_delimiter}
 echo "Fetching submodules..."
 echo ${progress_delimiter}
@@ -22,8 +23,10 @@ echo
 echo ${progress_delimiter}
 echo "Done fetching submodules."
 echo ${progress_delimiter}
+echo
 
 # Build tracing infrastructure (DUMPI, CSMPI, PnMPI)
+echo
 echo ${progress_delimiter}
 echo "Building SST-DUMPI..."
 echo ${progress_delimiter}
@@ -33,7 +36,9 @@ echo
 echo ${progress_delimiter}
 echo "Done building SST-DUMPI."
 echo ${progress_delimiter}
+echo
 
+echo
 echo ${progress_delimiter}
 echo "Building CSMPI..."
 echo ${progress_delimiter}
@@ -43,7 +48,9 @@ echo
 echo ${progress_delimiter}
 echo "Done building CSMPI."
 echo ${progress_delimiter}
+echo
 
+echo
 echo ${progress_delimiter}
 echo "Building PnMPI..."
 echo ${progress_delimiter}
@@ -53,8 +60,10 @@ echo
 echo ${progress_delimiter}
 echo "Done building PnMPI."
 echo ${progress_delimiter}
+echo
 
 # Patch tracing libraries for use with PnMPI
+echo
 echo ${progress_delimiter}
 echo "Patching tracing libraries for use with PnMPI..."
 echo ${progress_delimiter}
@@ -66,8 +75,10 @@ echo
 echo ${progress_delimiter}
 echo "Done patching tracing libraries for use with PnMPI..."
 echo ${progress_delimiter}
+echo
 
 # Build dumpi_to_graph
+echo
 echo ${progress_delimiter}
 echo "Building graph constructor..."
 echo ${progress_delimiter}
@@ -77,8 +88,10 @@ echo
 echo ${progress_delimiter}
 echo "Done building graph constructor."
 echo ${progress_delimiter}
+echo
 
 # Install applications under study
+echo
 echo ${progress_delimiter}
 echo "Fetching non-deterministic MPI applications..."
 echo ${progress_delimiter}
@@ -88,7 +101,9 @@ echo
 echo ${progress_delimiter}
 echo "Done fetching non-deterministic MPI applications."
 echo ${progress_delimiter}
+echo
 
+echo
 echo ${progress_delimiter}
 echo "Building miniAMR..."
 echo ${progress_delimiter}
@@ -98,7 +113,13 @@ echo
 echo ${progress_delimiter}
 echo "Done Building miniAMR."
 echo ${progress_delimiter}
+echo
 
+# Set vars for job script infrastructure
 touch ./anacin-x/base_vars.sh
 echo "anacin_x_root=$(pwd)" >> ./anacin-x/base_vars.sh
 echo "ega_x_root=${anacin_x_root}/anacin-x/event_graph_analysis/" >> ./anacin-x/base_vars.sh
+
+# Set up conda environment
+conda env create -f ./install/anacin-x-environment.yml
+source ./install/activate_environment.sh
