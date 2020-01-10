@@ -131,6 +131,9 @@ dependencies:
   - more-itertools=7.0.0=py37_0
   - mpc=1.1.0=h10f8cd9_1
   - mpfr=4.0.1=hdf1c602_3
+  - mpi=1.0=mpich
+  - mpi4py=3.0.3=py37h028fd6f_0
+  - mpich=3.3.2=hc856adb_0
   - mpmath=1.1.0=py37_0
   - msgpack-python=0.6.1=py37hfd86e86_1
   - multipledispatch=0.6.0=py37_0
