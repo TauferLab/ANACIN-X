@@ -12,28 +12,10 @@ import igraph
 
 import pprint
 
-from functools import wraps
-from time import time
-# A simple decorator for timing function calls
-def timer(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):                                                  
-        start = time()                                                             
-        result = f(*args, **kwargs)                                                
-        end = time()                                                               
-        print("{} - Elapsed time: {}".format(f, end-start))
-        return result                                                              
-    return wrapper
+from utilities import ( timer,
+                        read_graph
+                      )
 
-# Reads in a single graph file via igraph
-@timer
-def read_graph( graph_path ):
-    print("Reading in graph: {}".format(graph_path))
-    graph = igraph.read( graph_path )
-    return graph
-
-
-@timer 
 # Replaces all sequences of consecutive barrier vertices in all program orders
 # represented in the input graph with a single barrier vertex
 # Example:
@@ -79,7 +61,10 @@ def squash_barriers( graph ):
 
 
 def main( graph_path, output_path ):
+    # Read in event graph
     graph = read_graph( graph_path )    
+
+    # Generate a new event graph with consecutive barrier nodes merged
     new_graph = squash_barriers( graph ) 
 
     # If no output path is given, construct default output path
@@ -89,6 +74,7 @@ def main( graph_path, output_path ):
         output_graph_name = name + "_squashed"
         output_path = output_dir + "/" + output_graph_name + ext
 
+    # Write new graph out to file
     new_graph.write( output_path, format="graphml" )
 
 
