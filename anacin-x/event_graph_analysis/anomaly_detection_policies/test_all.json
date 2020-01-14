@@ -1,0 +1,24 @@
+{
+    "policies" :
+    [
+        { "name" : "increasing_median", 
+          "params" : { }
+        },
+        { "name" : "median_exceeds_threshold",
+          "params" : { "threshold" : 100 }
+        },
+        {
+          "name" : "ruptures_window_based",
+          "params" : { 
+                       "model" : "l2",
+                       "width" : 10,
+                       "n_change_points" : "unknown",
+                       "penalty" : true,
+                       "epsilon" : false
+                     }
+        },
+        { "name" : "random",
+          "params" : { "n_samples" : 100 }
+        }
+    ]
+}

@@ -1,0 +1,15 @@
+{
+    "policies" :
+    [
+        {
+          "name" : "ruptures_window_based",
+          "params" : { 
+                       "model" : "l2",
+                       "width" : 20,
+                       "n_change_points" : "unknown",
+                       "penalty" : true,
+                       "epsilon" : false
+                     }
+        }
+    ]
+}

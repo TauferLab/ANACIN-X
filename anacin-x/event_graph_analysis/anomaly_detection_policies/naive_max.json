@@ -1,0 +1,7 @@
+{
+    "policies" :
+    [
+        { "name" : "naive_max", "params" : { }
+        }
+    ]
+}
