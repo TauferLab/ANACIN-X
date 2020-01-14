@@ -1,0 +1,56 @@
+{
+    "kernels" : 
+    [
+        { 
+            "name" : "wlst", "params" : { 
+                                        "n_iters" : 5,
+                                        "label"   : "logical_time"
+                                      }
+        },
+        { 
+            "name" : "wlst", "params" : { 
+                                        "n_iters" : 5,
+                                        "label"   : "event_type"
+                                      }
+        },
+        { 
+            "name" : "wlst", "params" : { 
+                                        "n_iters" : 10,
+                                        "label"   : "logical_time"
+                                      }
+        },
+        { 
+            "name" : "wlst", "params" : { 
+                                        "n_iters" : 10,
+                                        "label"   : "event_type"
+                                      }
+        },
+        { 
+            "name" : "wlst", "params" : { 
+                                        "n_iters" : 20,
+                                        "label"   : "logical_time"
+                                      }
+        },
+        { 
+            "name" : "wlst", "params" : { 
+                                        "n_iters" : 20,
+                                        "label"   : "event_type"
+                                      }
+        },
+        { 
+            "name" : "eh", "params" : { 
+                                        "label"   : "logical_latency"
+                                      }
+        },
+        {
+            "name" : "vh", "params" : {
+                                        "label" : "logical_time"
+                                      }
+        },
+        {
+            "name" : "vh", "params" : {
+                                        "label" : "event_type"
+                                      }
+        }
+    ]
+}

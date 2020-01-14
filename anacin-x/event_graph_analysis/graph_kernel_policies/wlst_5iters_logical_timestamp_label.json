@@ -1,0 +1,12 @@
+{
+    "kernels" : 
+    [
+        { 
+            "name" : "wlst", 
+            "params" : { 
+                            "n_iters" : 5,
+                            "label"   : "logical_time"
+                       }
+        }
+    ]
+}
