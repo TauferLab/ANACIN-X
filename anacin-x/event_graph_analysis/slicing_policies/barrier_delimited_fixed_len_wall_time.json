@@ -1,0 +1,7 @@
+{
+    "policy" : "barrier_delimited_fixed_len",
+    "clock" : "wall",
+    "slice_len" : 0.1,
+    "ranks" : "all",
+    "include_endpoints" : true
+}

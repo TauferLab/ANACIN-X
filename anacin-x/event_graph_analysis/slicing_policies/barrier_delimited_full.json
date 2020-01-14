@@ -1,0 +1,5 @@
+{
+    "policy" : "barrier_delimited_full",
+    "ranks" : "all",
+    "include_endpoints" : true
+}

@@ -1,0 +1,8 @@
+{
+    "policy" : "fixed_len_overlapping",
+    "clock" : "wall",
+    "slice_len" : 0.1,
+    "slice_overlap" : 0.05,
+    "ranks" : "all",
+    "include_endpoints" : true
+}

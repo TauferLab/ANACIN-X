@@ -1,0 +1,5 @@
+{
+    "policy" : "barrier_delimited_fixed_num_vertices",
+    "n_vertices" : 256,
+    "ranks" : "all"
+}
