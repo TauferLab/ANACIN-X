@@ -32,14 +32,14 @@ def generate_trace_job( repo_root_dir,
     config_lines = [ "anacin_x_root=" + repo_root_dir,
                      "mini_amr_bin=${anacin_x_root}/apps/miniAMR/ref/ma.x",
                      "load_balancing_policy=" + str(load_balancing_policy),
-                     "load_balancing_threshold=" + str(load_balancing_threshold),
+                     "load_balancing_threshold=\"" + str(load_balancing_threshold) + "\"",
                      "refinement_policy=" + str(refinement_policy),
                      "refinement_frequency=" + str(refinement_frequency),
                      "pnmpi=${anacin_x_root}/submodules/PnMPI/build/lib/libpnmpi.so",
                      "pnmpi_lib_path=${anacin_x_root}/anacin-x/job_scripts/pnmpi_patched_libs/" ]
     if with_csmpi:
         config_lines += [ "pnmpi_conf=${anacin_x_root}/anacin-x/job_scripts/pnmpi_configs/dumpi_and_csmpi.conf",
-                          "csmpi_config=./default_glibc_tellico.json" ]
+                          "csmpi_config=" + trace_dir + "/csmpi_config.json" ]
     else:
         config_lines.append( "pnmpi_conf=${anacin_x_root}/anacin-x/job_scripts/pnmpi_configs/dumpi.conf" )
                      
@@ -78,6 +78,53 @@ def generate_trace_job( repo_root_dir,
         for line in launch_job_lines:
             outfile.write( line + "\n" )
 
+
+def generate_build_graph_job( repo_root_dir, trace_dir ):
+    script_path = os.getcwd() + "/build_graph.sh"
+
+    hashbang_line = [ "#!/usr/bin/env bash" ]
+    bsub_directive_lines = [ "#BSUB -n 16",
+                             "#BSUB -W 10",
+                             "#BSUB -R \"span[ptile=16]\"",
+                             "#BSUB -o build_graph_%J.out",
+                             "#BSUB -e build_graph_%J.err" ]
+
+    config_lines = [ "anacin_x_root=" + repo_root_dir,
+                     "dumpi_to_graph_bin=${anacin_x_root}/submodules/dumpi_to_graph/build/dumpi_to_graph",
+                     "dumpi_to_graph_config=${anacin_x_root}/submodules/dumpi_to_graph/config/dumpi_and_csmpi.json ",
+                     "trace_dir=" + trace_dir ]
+
+    launch_job_lines = [ "mpirun -np 16 ${dumpi_to_graph_bin} ${dumpi_to_graph_config} ${trace_dir}" ]
+
+    # Write the job script
+    with open( script_path, "w" ) as outfile:
+        outfile.write( hashbang_line[0] + "\n" )
+        for line in bsub_directive_lines:
+            outfile.write( line + "\n" )
+        for line in config_lines:
+            outfile.write( line + "\n" )
+        for line in launch_job_lines:
+            outfile.write( line + "\n" )
+
+
+def generate_merge_barriers_job( repo_root_dir, trace_dir ):
+    script_path = os.getcwd() + "/merge_barriers.sh"
+    hashbang_line = [ "#!/usr/bin/env bash" ]
+    bsub_directive_lines = [ "#BSUB -n 1",
+                             "#BSUB -W 10",
+                             "#BSUB -R \"span[ptile=1]\"",
+                             "#BSUB -o merge_barriers_%J.out",
+                             "#BSUB -e merge_barriers_%J.err" ]
+    merge_barriers_script = repo_root_dir + "/anacin-x/event_graph_analysis/merge_barriers.py"
+    launch_job_lines = [ merge_barriers_script + " ${trace_dir}/event_graph.graphml" ]
+    # Write the job script
+    with open( script_path, "w" ) as outfile:
+        outfile.write( hashbang_line[0] + "\n" )
+        for line in bsub_directive_lines:
+            outfile.write( line + "\n" )
+        for line in launch_job_lines:
+            outfile.write( line + "\n" )
+
 if __name__ == "__main__":
     desc = ""
     parser = argparse.ArgumentParser( description = desc )
@@ -95,15 +142,22 @@ if __name__ == "__main__":
     parser.add_argument("--with_csmpi", required=False, default=False, action="store_true")
     args = parser.parse_args()
 
-    generate_trace_job( args.repo_root_dir,
-                        args.trace_dir,
+    repo_root_dir = os.path.abspath( args.repo_root_dir )
+    trace_dir = os.path.abspath( args.trace_dir )
+
+    generate_trace_job( repo_root_dir,
+                        trace_dir,
                         args.load_balancing_policy,
                         args.load_balancing_threshold,
                         args.refinement_policy,
                         args.refinement_frequency,
                         args.multi_node,
                         args.with_csmpi )
+    
+    generate_build_graph_job( repo_root_dir, 
+                              trace_dir )
 
-
+    generate_merge_barriers_job( repo_root_dir, 
+                                 trace_dir )
 
 
