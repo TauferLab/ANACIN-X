@@ -12,6 +12,9 @@ run_idx_high=$3
 # Multi-node or single node runs?
 multi_node_runs=$4
 
+# Max number of processes that we'll run on a single node in this workflow
+n_procs_per_node=32
+
 # miniAMR executable location
 mini_amr_bin=${anacin_x_root}/apps/miniAMR/ref/ma.x
 
@@ -21,9 +24,10 @@ load_balancing_threshold="$6"
 refinement_policy=$7
 refinement_frequency=$8
 
-## Event graph slicing policy
+# Event graph slicing policy
 #slicing_policy=$9
-#
+slicing_policy=${anacin_x_root}/anacin-x/event_graph_analysis/slicing_policies/barrier_delimited_full.json
+
 ## Graph kernel parameters
 #graph_kernels=${10}
 #
@@ -32,29 +36,21 @@ refinement_frequency=$8
 
 # Create a directory to hold all of the results from these runs, and any data
 # derived from cross-run analysis (e.g., kernel distance time series)
+app_config="/lb_policy_${load_balancing_policy}_lb_thresh_${load_balancing_threshold}_ref_policy_${refinement_policy}_ref_freq_${refinement_frequency}/"
 if [ ${multi_node_runs} -eq 1 ]
 then
-    results_dir="${root_dir}/2_moving_spheres_16_procs/multi_node_runs/"
+    results_dir="${root_dir}/2_moving_spheres_16_procs/multi_node_runs/${app_config}"
 else
-    results_dir="${root_dir}/2_moving_spheres_16_procs/single_node_runs/"
+    results_dir="${root_dir}/2_moving_spheres_16_procs/single_node_runs/${app_config}"
 fi
 mkdir -p ${results_dir}
 
-# Locations of job scripts invoked in this workflow
+# Locations of job script and config file generation utilities
 job_script_dir="${anacin_x_root}/anacin-x/job_scripts/mini_amr/example_problems/2_moving_spheres_16_procs/lsf/"
 job_script_generator=${job_script_dir}/job_script_generator.py
 csmpi_config_generator=${anacin_x_root}/submodules/csmpi/config/generate_config.py
 csmpi_config_functions=${anacin_x_root}/submodules/csmpi/config/mpi_function_subsets/mini_amr.json
 
-#build_graph_job=${anacin_x_root}/anacin-x/tracing/mini_amr/example_problems/2_moving_spheres_16_procs/build_graph.sh
-
-#squash_barriers_job=${ega_root}/squash_barriers.py
-#extract_slices_job=${ega_root}/extract_slices.py
-#compute_kdts_job=${ega_root}/compute_kernel_distance_time_series.py
-#anomaly_detection_job=${ega_root}/anomaly_detection.py
-#callstack_analysis_job=${ega_root}/callstack_analysis.py
-#visualize_kdts_job=${ega_root}/visualization/visualize_kernel_distance_time_series.py
-#visualize_callstack_report_job=${ega_root}/visualization/visualize_callstack_report.py
 
 # Locations of PnMPI stuff for composing the various tracing modules 
 pnmpi=${anacin_x_root}/submodules/PnMPI/build/lib/libpnmpi.so
@@ -68,14 +64,6 @@ dumpi_to_graph_config=${anacin_x_root}/submodules/dumpi_to_graph/config/dumpi_an
 export pnmpi
 export pnmpi_lib_path
 export pnmpi_conf
-
-## Convenience function for making the dependency lists for the kernel distance
-## time series job
-#function join_by { local IFS="$1"; shift; echo "$*"; }
-#
-## Array to store all extract slices job IDs so that the kernel distance time 
-## series job does not start until all of the extract slices jobs are done
-#compute_kdts_job_dependencies=()
 
 # Execute the workflow
 for run_idx in `seq -f "%04g" ${run_idx_low} ${run_idx_high}`;
@@ -92,11 +80,20 @@ do
     # Generate the job scripts for this run
     ${job_script_generator} ${anacin_x_root} \
                             ${run_dir} \
+                            ${n_procs_per_node} \
                             ${load_balancing_policy} \
                             ${load_balancing_threshold} \
                             ${refinement_policy} \
                             ${refinement_frequency} \
-                            --with_csmpi
+                            ${slicing_policy} \
+                            --with_csmpi \
+                            --with_ninja \
+                            --transform_slices "comm_channel" \
+                            --trace_n_procs 16 \
+                            --build_graph_n_procs 16 \
+                            --extract_slices_n_procs 16 \
+                            --transform_slices_n_procs 16
+
 
     # Set location of tracing job
     if [ ${multi_node_runs} -eq 1 ]
@@ -114,25 +111,25 @@ do
     extract_slices_job=${run_dir}/extract_slices.sh
     transform_slices_job=${run_dir}/transform_slices.sh
 
-    # Trace the application
-    trace_job_stdout=$( bsub < ${trace_job} )
-    trace_job_id=$( echo ${trace_job_stdout} | sed 's/[^0-9]*//g' )
+    ## Trace the application
+    #trace_job_stdout=$( bsub < ${trace_job} )
+    #trace_job_id=$( echo ${trace_job_stdout} | sed 's/[^0-9]*//g' )
 
-    # Construct the event graph for this run
-    build_graph_job_stdout=$( bsub -w ${trace_job_id} < ${build_graph_job} )
-    build_graph_job_id=$( echo ${build_graph_job_stdout} | sed 's/[^0-9]*//g' )
-    
-    # Merge consecutive barrier nodes together in event graph
-    event_graph=${run_dir}/event_graph.graphml
-    merge_barriers_job_stdout=$( bsub -w ${build_graph_job_id} < ${merge_barriers_job} )
-    merge_barriers_job_id=$( echo ${squash_barriers_job_stdout} | sed 's/[^0-9]*//g' )
+    ## Construct the event graph for this run
+    #build_graph_job_stdout=$( bsub -w ${trace_job_id} < ${build_graph_job} )
+    #build_graph_job_id=$( echo ${build_graph_job_stdout} | sed 's/[^0-9]*//g' )
+    #
+    ## Merge consecutive barrier nodes together in event graph
+    #event_graph=${run_dir}/event_graph.graphml
+    #merge_barriers_job_stdout=$( bsub -w ${build_graph_job_id} < ${merge_barriers_job} )
+    #merge_barriers_job_id=$( echo ${merge_barriers_job_stdout} | sed 's/[^0-9]*//g' )
 
-    # Extract slices
-    event_graph=${run_dir}/event_graph_squashed.graphml
-    extract_slices_stdout=$( bsub -w ${merge_barriers_job_id} < ${extract_slices_job} )
-    extract_slices_job_id=$( echo ${extract_slices_stdout} | sed 's/[^0-9]*//g' )
+    ## Extract slices
+    #event_graph=${run_dir}/event_graph_squashed.graphml
+    #extract_slices_stdout=$( bsub -w ${merge_barriers_job_id} < ${extract_slices_job} )
+    #extract_slices_job_id=$( echo ${extract_slices_stdout} | sed 's/[^0-9]*//g' )
 
-    # Transform each slice from event graph representation to communication channel graph representation
-    transform_slices_stdout=$( bsub -w ${extract_slices_job_id} < ${transform_slices_job} )
-    transform_slices_job_id=$( echo ${transform_slices_stdout} | sed 's/[^0-9]*//g' )
+    ## Transform each slice from event graph representation to communication channel graph representation
+    #transform_slices_stdout=$( bsub -w ${extract_slices_job_id} < ${transform_slices_job} )
+    #transform_slices_job_id=$( echo ${transform_slices_stdout} | sed 's/[^0-9]*//g' )
 done
