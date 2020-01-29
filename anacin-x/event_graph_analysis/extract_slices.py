@@ -139,7 +139,7 @@ def get_endpoint_vertices( core_slice_vertices ):
             if s["process_id"] != v["process_id"]:
                 endpoint_vertices.append(s)
         for p in v.predecessors():
-            if ["process_id"] != v["process_id"]:
+            if p["process_id"] != v["process_id"]:
                 endpoint_vertices.append(p)
     return endpoint_vertices
 

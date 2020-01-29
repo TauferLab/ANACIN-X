@@ -111,25 +111,25 @@ do
     extract_slices_job=${run_dir}/extract_slices.sh
     transform_slices_job=${run_dir}/transform_slices.sh
 
-    ## Trace the application
-    #trace_job_stdout=$( bsub < ${trace_job} )
-    #trace_job_id=$( echo ${trace_job_stdout} | sed 's/[^0-9]*//g' )
+    # Trace the application
+    trace_job_stdout=$( bsub < ${trace_job} )
+    trace_job_id=$( echo ${trace_job_stdout} | sed 's/[^0-9]*//g' )
 
-    ## Construct the event graph for this run
-    #build_graph_job_stdout=$( bsub -w ${trace_job_id} < ${build_graph_job} )
-    #build_graph_job_id=$( echo ${build_graph_job_stdout} | sed 's/[^0-9]*//g' )
-    #
-    ## Merge consecutive barrier nodes together in event graph
-    #event_graph=${run_dir}/event_graph.graphml
-    #merge_barriers_job_stdout=$( bsub -w ${build_graph_job_id} < ${merge_barriers_job} )
-    #merge_barriers_job_id=$( echo ${merge_barriers_job_stdout} | sed 's/[^0-9]*//g' )
+    # Construct the event graph for this run
+    build_graph_job_stdout=$( bsub -w ${trace_job_id} < ${build_graph_job} )
+    build_graph_job_id=$( echo ${build_graph_job_stdout} | sed 's/[^0-9]*//g' )
+    
+    # Merge consecutive barrier nodes together in event graph
+    event_graph=${run_dir}/event_graph.graphml
+    merge_barriers_job_stdout=$( bsub -w ${build_graph_job_id} < ${merge_barriers_job} )
+    merge_barriers_job_id=$( echo ${merge_barriers_job_stdout} | sed 's/[^0-9]*//g' )
 
-    ## Extract slices
-    #event_graph=${run_dir}/event_graph_squashed.graphml
-    #extract_slices_stdout=$( bsub -w ${merge_barriers_job_id} < ${extract_slices_job} )
-    #extract_slices_job_id=$( echo ${extract_slices_stdout} | sed 's/[^0-9]*//g' )
+    # Extract slices
+    event_graph=${run_dir}/event_graph_squashed.graphml
+    extract_slices_stdout=$( bsub -w ${merge_barriers_job_id} < ${extract_slices_job} )
+    extract_slices_job_id=$( echo ${extract_slices_stdout} | sed 's/[^0-9]*//g' )
 
-    ## Transform each slice from event graph representation to communication channel graph representation
-    #transform_slices_stdout=$( bsub -w ${extract_slices_job_id} < ${transform_slices_job} )
-    #transform_slices_job_id=$( echo ${transform_slices_stdout} | sed 's/[^0-9]*//g' )
+    # Transform each slice from event graph representation to communication channel graph representation
+    transform_slices_stdout=$( bsub -w ${extract_slices_job_id} < ${transform_slices_job} )
+    transform_slices_job_id=$( echo ${transform_slices_stdout} | sed 's/[^0-9]*//g' )
 done
