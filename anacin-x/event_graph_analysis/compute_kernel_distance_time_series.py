@@ -9,6 +9,7 @@ import os
 import glob
 import pickle as pkl
 import json
+from pathlib import Path
 
 import igraph
 import graphkernels
@@ -29,9 +30,7 @@ from utilities import ( read_graphs_parallel,
                         merge_dicts
                       )
 
-from graph_kernel_preprocessing import ( relabel_for_wlst_kernel,
-                                         relabel_for_vh_kernel,
-                                         relabel_for_eh_kernel
+from graph_kernel_preprocessing import ( get_relabeled_graphs
                                        )
 
 from graph_kernel_postprocessing import ( convert_to_distance_matrix,
@@ -71,36 +70,6 @@ def get_slice_data( slice_dirs, slice_idx, kernel_params, callstacks_available )
     return slice_data
 
 
-#@timer
-def get_all_trace_dirs( traces_root_dir, 
-                        runs, 
-                        run_range_lower, 
-                        run_range_upper ):
-    all_trace_dirs = glob.glob( traces_root_dir + "/run*/" )
-    all_trace_dirs = sorted( all_trace_dirs, key=lambda x: int(x.split("/")[-2][3:]) )
-    if run_range_lower is not None and run_range_upper is not None:
-        trace_dirs = all_trace_dirs[run_range_lower-1 : run_range_upper]
-    else:   
-        trace_dirs = all_trace_dirs
-    return trace_dirs
-
-
-#@timer
-def get_slice_dirs( trace_dirs, slicing_policy ):
-    trace_dir_to_slice_dir = {}
-    for td in trace_dirs:
-        slice_dir = td + "/slices_"
-        for idx,kvp in enumerate(slicing_policy.items()):
-            key,val = kvp
-            slice_dir += str(key) + "_" + str(val)
-            if idx < len(slicing_policy)-1:
-                slice_dir += "_"
-        slice_dir += "/"
-        trace_dir_to_slice_dir[ td ] = slice_dir
-    return trace_dir_to_slice_dir
-
-
-#@timer 
 def make_output_path( traces_root_dir, slicing_policy, kernel_params ):
     output_path = traces_root_dir + "/kernel_distance_time_series_"
     output_path += "SLICING_"
@@ -120,14 +89,6 @@ def make_output_path( traces_root_dir, slicing_policy, kernel_params ):
     output_path += ".pkl"
     return output_path
 
-#@timer
-def validate_slice_dirs( slice_dirs ):
-    slice_counts = set()
-    for sd in slice_dirs:
-        slice_files = glob.glob( sd + "/*.graphml" )
-        n_slices = len(slice_files)
-        slice_counts.add( n_slices )
-    assert( len(slice_counts) == 1 )
 
 ################################################################################
 ############### Supplemental slice data extraction functions ###################
@@ -168,30 +129,7 @@ def extract_callstack_data( slice_subgraphs ):
 #@timer 
 def compute_kernel_distance_matrices( slice_subgraphs, kernel_params ):
     # Relabel based on requested graph kernels
-    kernel_label_pair_to_relabeled_graphs = {}
-    for kernel in kernel_params:
-        # Which graph kernel are we relabeling for?
-        kernel_name = kernel[ "name" ]
-
-        # Which label are we using? 
-        try:
-            label = kernel["params"]["label"]
-        except:
-            raise KeyError("Requested re-labeling for kernel: {} not possible, label not specified".format(kernel_name))
-
-        key = ( kernel_name, label )
-        if key not in kernel_label_pair_to_relabeled_graphs:
-            # Relabel for Weisfeiler-Lehman Subtree-Pattern kernel 
-            if kernel_name == "wlst":
-                graphs = [ relabel_for_wlst_kernel(g, label) for g in slice_subgraphs ]
-            # Relabel for edge-histogram kernel 
-            elif kernel_name == "eh":
-                graphs = [ relabel_for_eh_kernel(g, label) for g in slice_subgraphs ]
-            # Relabel for vertex-histogram kernel
-            elif kernel_name == "vh":
-                graphs = [ relabel_for_vh_kernel(g, label) for g in slice_subgraphs ]
-            kernel_label_pair_to_relabeled_graphs[ key ] = graphs
-
+    kernel_label_pair_to_relabeled_graphs = get_relabeled_graphs( slice_subgraphs, kernel_params )
 
     # Actually compute the kernel distance matrices
     kernel_to_distance_matrix = {}
@@ -232,121 +170,194 @@ def compute_kernel_distance_matrices( slice_subgraphs, kernel_params ):
 
 ################################################################################
 
-def assign_slices( n_slices ):
-    my_rank = comm.Get_rank()
-    comm_size = comm.Get_size()
-    slices_per_rank = n_slices / comm_size
-    my_slices = list( filter( lambda x : x % comm_size == my_rank, range( n_slices ) ) )
-    return my_slices
 
+
+
+
+
+
+################################################################################
+######## Functions for dividing computations between available proceses ########
+################################################################################
+
+"""
+Determines which slice indices each MPI process is responsible for via
+round-robin assignment
+"""
+def assign_slice_indices( n_slices ):
+    rank = comm.Get_rank()
+    n_procs = comm.Get_size()
+    indices = list(filter(lambda x : x % n_procs == rank, range(n_slices)))
+    return indices
+
+################################################################################
+############### Functions for ingesting and validating inputs ##################
+################################################################################
+
+"""
+Check that each slice directory has appropriate contents
+"""
+def validate_slice_dirs( slice_dirs ):
+    slice_counts = set()
+    for sd in slice_dirs:
+        assert( sd.is_dir() )
+        slice_counts.add( len(list(sd.glob("*.graphml"))) )
+    assert( len( slice_counts ) == 1 )
+    return list(slice_counts)[0]
+
+"""
+Determines the slice subdirectory's name 
+"""
+def get_slice_dir_suffix( slicing_policy_file, slice_dir_name ):
+    # Case 1: Determine slice directory suffix from slicing policy
+    if slicing_policy_file is not None and slice_dir_name is None:
+        with open( slicing_policy_file, "r" ) as infile:
+            slicing_policy = json.load( infile )
+        slice_dir_suffix = "/slices_"
+        for idx,kvp in enumerate(slicing_policy.items()):
+            key,val = kvp
+            slice_dir_suffix += str(key) + "_" + str(val)
+            if idx < len(slicing_policy)-1:
+                slice_dir_suffix += "_"
+        slice_dir_suffix += "/"
+    # Case 2: Slice directory suffix provided by user
+    elif slicing_policy_file is None and slice_dir_name is not None:
+        slice_dir_suffix = "/" + slice_dir_name + "/"
+    # Case 3: Neither slicing policy nor user-specified name provided, 
+    # use default
+    else:
+        slice_dir_suffix = "/slices/"
+    return slice_dir_suffix
+
+"""
+Determines the location of event graph slices
+"""
+def get_slice_dirs( trace_dirs, slicing_policy, slice_dir_name  ):
+    suffix = get_slice_dir_suffix( slicing_policy, slice_dir_name )
+    slice_dirs = [ str(td) + suffix for td in trace_dirs ]
+    slice_dirs = [ Path(sd) for sd in slice_dirs ]
+    return slice_dirs
+
+"""
+Determines for which runs' traces to compute the kernel distance time series
+"""
+def get_requested_trace_dirs( traces_root_dir, runs, run_range_lower, 
+                              run_range_upper ):
+    # Get all trace directories' paths
+    trace_dirs = [ Path(p) for p in glob.glob( traces_root_dir + "/run*/" ) ]
+    trace_dirs = sorted( trace_dirs, key=lambda p: p.name )
+    # Case 1: Retain only an explicitly specified subset of runs
+    if runs is not None:
+        requested_trace_dirs = [ trace_dirs[idx-1] for idx in runs ]
+    # Case 2: Retain a contiguous range of runs
+    elif run_range_lower is not None and run_range_upper is not None:
+        run_indices = range( run_range_lower-1, run_range_upper )
+        requested_trace_dirs = [ trace_dirs[idx] for idx in run_indices ]
+    # Case 3: Retain all runs
+    else:
+        requested_trace_dirs = trace_dirs
+    return requested_trace_dirs
+
+"""
+Root MPI process ingests all inputs for later broadcast
+"""
+def ingest_inputs( traces_root_dir, kernel_file, 
+                   runs, run_range_lower, run_range_upper,
+                   slicing_policy_file, slice_dir_name ):
+    # First determine for which runs we will be computing the kernel distance
+    # time series
+    trace_dirs = get_requested_trace_dirs( traces_root_dir, runs, 
+                                           run_range_lower, run_range_upper )
+    # Determine what the subdirectory containing the slices is called
+    slice_dirs = get_slice_dirs( trace_dirs, slicing_policy_file, slice_dir_name )
+    # Read in file describing all graph kernels to compute and their parameters
+    with open( kernel_file, "r" ) as infile:
+        kernels = json.load( infile )["kernels"]
+    return slice_dirs, kernels    
+
+################################################################################
 
 def main( traces_root_dir, 
           slicing_policy_path, 
+          slice_dir_name,
           kernel_file, 
           runs, 
           run_range_lower, 
           run_range_upper, 
           callstacks_available, 
           output_path ):
-    
-    my_rank = comm.Get_rank()
-
-    if my_rank == 0:
-
-        # Get parent directories for each run. These are the directories that 
-        # contain the original DUMPI traces, the full run's event graph, and most
-        # importantly the subdirectories of slice subgraphs
-        trace_dirs = get_all_trace_dirs( traces_root_dir, 
-                                         runs, 
-                                         run_range_lower, 
-                                         run_range_upper )
-            
-        # Read in slicing policy
-        # This will tell us which sub-directory of the trace directory to look in
-        # for the slice subgraph 
-        with open( slicing_policy_path, "r" ) as infile:
-            slicing_policy = json.load( infile )
-
-        # Determine set of slices to compute over based on slicing policy
-        trace_dir_to_slice_dir = get_slice_dirs( trace_dirs, slicing_policy )
-
-        # Sort slice dirs in run order 
-        slice_dirs = sorted( trace_dir_to_slice_dir.values(), 
-                             key=lambda x:  int(os.path.abspath(x).split("/")[-2][3:]) )
-
-        # Check that each slice directory contains the same number of slice subgraphs
-        validate_slice_dirs( slice_dirs )
-        
-        # Read in kernel parameters
-        with open( kernel_file, "r" ) as infile:
-            kernel_params = json.load( infile )["kernels"]
+    # Get MPI rank
+    rank = comm.Get_rank()
+    # Ingest inputs on root process
+    if rank == 0:
+        # Determine slice directories and kernels from inputs
+        slice_dirs, kernels = ingest_inputs( traces_root_dir, kernel_file, 
+                                             runs, run_range_lower, run_range_upper,
+                                             slicing_policy_path, slice_dir_name )
+        # Sanity-check the slice directories
+        n_slices = validate_slice_dirs( slice_dirs )
+        input_config = { "slice_dirs" : slice_dirs,
+                         "kernels"    : kernels,
+                         "n_slices"   : n_slices }
     else:
-        slicing_policy = None
-        slice_dirs = None
-        kernel_params = None
-
-    slicing_policy = comm.bcast( slicing_policy, root=0 )
-    kernel_params = comm.bcast( kernel_params, root=0 )
-    slice_dirs = comm.bcast( slice_dirs, root=0 )
-
-    if my_rank == 0:
-        print("Input ingested:")
-        print("Slicing Policy:")
-        pprint.pprint( slicing_policy )
-        print("Graph Kernels:")
-        pprint.pprint( kernel_params )
-        print("Slice Directories:")
-        pprint.pprint( slice_dirs )
-
-    comm.barrier()
-
-    # Compute time series of kernel distance matrices
-    slice_idx_to_data = {}
-    n_slices = len(glob.glob( slice_dirs[0] + "/*.graphml" ))
-    assigned_indices = assign_slices( n_slices )
-
-    comm.barrier()
-
-
-    #for slice_idx in range( n_slices ):
-    for slice_idx in assigned_indices:
-        slice_data = get_slice_data( slice_dirs, 
-                                     slice_idx, 
-                                     kernel_params, 
-                                     callstacks_available )
-        slice_idx_to_data[ slice_idx ] = slice_data
-        print("Rank: {} done computing kernel distance data for slice: {}".format(my_rank, slice_idx))
+        input_config = None
+    # Broadcast from root to all other processes
+    input_config = comm.bcast( input_config, root=0 )
+    # Unpack 
+    slice_dirs = input_config["slice_dirs"]
+    n_slices   = input_config["n_slices"]
+    kernels    = input_config["kernels"]
     
-    print("Rank: {} done computing kernel distance data".format(my_rank))
-    comm.barrier()
+    # Determine slice assignment
+    assigned_indices = assign_slice_indices( n_slices )
+    print("Rank: {}, Assigned Slices: {}".format( rank, assigned_indices ))
 
-    # Gather all per-slice kernel distance results
-    kdts_data = comm.gather( slice_idx_to_data, root=0 )
+    # Compute all requested kernel distances on assigned slices
+    slice_to_data = compute_kernel_distances( slice_dirs, 
+                                              assigned_indices,
+                                              kernels,
+                                              callstacks_available )
+    exit()
 
-    if my_rank == 0:
-        print("Kernel distance data gathered")
+    ##for slice_idx in range( n_slices ):
+    #for slice_idx in assigned_indices:
+    #    slice_data = get_slice_data( slice_dirs, 
+    #                                 slice_idx, 
+    #                                 kernel_params, 
+    #                                 callstacks_available )
+    #    slice_idx_to_data[ slice_idx ] = slice_data
+    #    print("Rank: {} done computing kernel distance data for slice: {}".format(my_rank, slice_idx))
+    #
+    #print("Rank: {} done computing kernel distance data".format(my_rank))
+    #comm.barrier()
 
-    # Merge on root and write out
-    if my_rank == 0:
-        kdts = merge_dicts( kdts_data, check_keys=True )
+    ## Gather all per-slice kernel distance results
+    #kdts_data = comm.gather( slice_idx_to_data, root=0 )
 
-        # Name output path based on slicing policy and kernel params unless one is
-        # provided
-        if output_path is None:
-            output_path = make_output_path( traces_root_dir, 
-                                            slicing_policy, 
-                                            kernel_params )
-        else:
-            name,ext = os.path.splitext( output_path )
-            if ext != ".pkl":
-                output_path = traces_root_dir + "/" + name + ".pkl"
-            else:
-                output_path = traces_root_dir + "/" + output_path
+    #if my_rank == 0:
+    #    print("Kernel distance data gathered")
 
-        # Write out time series data for further analysis or visualization
-        with open( output_path, "wb" ) as pklfile:
-            #pkl.dump( slice_idx_to_data, pklfile, pkl.HIGHEST_PROTOCOL )
-            pkl.dump( kdts, pklfile, pkl.HIGHEST_PROTOCOL )
+    ## Merge on root and write out
+    #if my_rank == 0:
+    #    kdts = merge_dicts( kdts_data, check_keys=True )
+
+    #    # Name output path based on slicing policy and kernel params unless one is
+    #    # provided
+    #    if output_path is None:
+    #        output_path = make_output_path( traces_root_dir, 
+    #                                        slicing_policy, 
+    #                                        kernel_params )
+    #    else:
+    #        name,ext = os.path.splitext( output_path )
+    #        if ext != ".pkl":
+    #            output_path = traces_root_dir + "/" + name + ".pkl"
+    #        else:
+    #            output_path = traces_root_dir + "/" + output_path
+
+    #    # Write out time series data for further analysis or visualization
+    #    with open( output_path, "wb" ) as pklfile:
+    #        #pkl.dump( slice_idx_to_data, pklfile, pkl.HIGHEST_PROTOCOL )
+    #        pkl.dump( kdts, pklfile, pkl.HIGHEST_PROTOCOL )
 
 
 
@@ -354,17 +365,19 @@ def main( traces_root_dir,
 
 
 if __name__ == "__main__":
-    desc = ""
+    desc = "Computes a time series of kernel distance distributions for a set of event graphs"
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("traces_root_dir",
                         help="The top-level directory containing as subdirectories all the traces of the runs for which this kernel distance time series will be computed")  
-    parser.add_argument("slicing_policy",
-                        help="Path to a JSON file describing how to slice the event graph")
     parser.add_argument("kernel_file", 
                         help="A JSON file describing the graph kernels that will be computed for each set of slice subgraphs")
+    parser.add_argument("--slicing_policy", required=False, default=None,
+                        help="Path to a JSON file describing the slicing policy from which the slices subdirectory may be determined")
+    parser.add_argument("--slice_dir_name", required=False, default=None,
+                        help="A user-specified name for the slices subdirectory")
     parser.add_argument("-c", "--callstacks_available", action="store_true", default=False,
                         help="Toggle on extraction of call-stack data")
-    parser.add_argument("-r", "--runs", nargs="+", required=False, default=None,
+    parser.add_argument("-r", "--runs", nargs="+", required=False, default=None, type=int,
                         help="Which runs to compute pairwise kernel distances for")
     parser.add_argument("-l", "--run_range_lower", type=int, required=False, default=None,
                         help="lower bound of range of runs")
@@ -377,6 +390,7 @@ if __name__ == "__main__":
 
     main( args.traces_root_dir, 
           args.slicing_policy, 
+          args.slice_dir_name,
           args.kernel_file, 
           args.runs, 
           args.run_range_lower,
