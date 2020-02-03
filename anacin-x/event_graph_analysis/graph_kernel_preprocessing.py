@@ -13,7 +13,7 @@ legal_vertex_labels = [ "event_type",
 
 def get_relabeled_graphs( graphs, kernels ):
     relabeled_graphs = {}
-    for kernel in assigned_kernels:
+    for kernel in kernels:
         # Which graph kernel are we relabeling for?
         name = kernel[ "name" ]
         # Which label are we using? 
@@ -21,23 +21,23 @@ def get_relabeled_graphs( graphs, kernels ):
             label = kernel["params"]["label"]
         except:
             err_msg = "Requested re-labeling for kernel: {} not possible, " \
-                      "label not specified".format(kernel_name)
+                      "label not specified".format(name)
             raise KeyError( err_msg )
         # Define a key that uniquely identifies this kernel / label pair
-        key = ( kernel_name, label )
+        key = ( name, label )
         # Only generate a relabeled set of graphs if needed
         # The list of kernels may include multiple distinct kernels that can 
         # use the same relabeled graphs (e.g., multiple WL kernels with the same
         # label but different numbers of WL iterations)
         if key not in relabeled_graphs:
             # Relabel for Weisfeiler-Lehman Subtree-Pattern kernel 
-            if kernel_name == "wlst":
+            if name == "wlst":
                 graphs = [ relabel_for_wlst_kernel(g, label) for g in graphs ]
             # Relabel for edge-histogram kernel 
-            elif kernel_name == "eh":
+            elif name == "eh":
                 graphs = [ relabel_for_eh_kernel(g, label) for g in graphs ]
             # Relabel for vertex-histogram kernel
-            elif kernel_name == "vh":
+            elif name == "vh":
                 graphs = [ relabel_for_vh_kernel(g, label) for g in graphs ]
             relabeled_graphs[ key ] = graphs
     return relabeled_graphs

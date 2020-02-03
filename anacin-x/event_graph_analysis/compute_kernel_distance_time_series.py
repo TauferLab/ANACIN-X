@@ -42,34 +42,6 @@ from graph_kernel_postprocessing import ( convert_to_distance_matrix,
 ################################################################################
 
 #@timer
-def get_slice_data( slice_dirs, slice_idx, kernel_params, callstacks_available ):
-    #print("Ingesting subgraphs for slice: {}".format( slice_idx ))
-    slice_subgraph_paths = [ sd + "/slice_" + str(slice_idx) + ".graphml" for sd in slice_dirs ]
-    #slice_subgraphs = read_graphs_parallel( slice_subgraph_paths )
-    slice_subgraphs = [ read_graph(g) for g in slice_subgraph_paths ]
-    
-    # Compute the requested kernel distance matrices
-    #print("Computing kernel distances for slice: {}".format( slice_idx ))
-    kernel_distance_data = compute_kernel_distance_matrices( slice_subgraphs, 
-                                                             kernel_params )
-    
-    # Extract wall-time information for correlating with application events
-    #print("Extracting wall-time data for slice: {}".format( slice_idx ))
-    wall_time_data = extract_wall_time_data( slice_subgraphs )
-    
-    # Extract callstack data if available
-    if callstacks_available:
-        #print("Extracting callstack data for slice: {}".format( slice_idx ))
-        callstack_data = extract_callstack_data( slice_subgraphs )
-    else:
-        callstack_data = {}
-    
-    slice_data = { "kernel_distance" : kernel_distance_data,
-                   "wall_time"       : wall_time_data,
-                   "callstack"       : callstack_data }
-    return slice_data
-
-
 def make_output_path( traces_root_dir, slicing_policy, kernel_params ):
     output_path = traces_root_dir + "/kernel_distance_time_series_"
     output_path += "SLICING_"
@@ -89,38 +61,6 @@ def make_output_path( traces_root_dir, slicing_policy, kernel_params ):
     output_path += ".pkl"
     return output_path
 
-
-################################################################################
-############### Supplemental slice data extraction functions ###################
-################################################################################
-
-#@timer
-def extract_wall_time_data( slice_subgraphs ):
-    graph_to_wall_time_data = {}
-    for idx,g in enumerate(slice_subgraphs):
-        wall_times = [ float(wt) for wt in g.vs[:]["wall_time"] ]
-        time_stats = {}
-        time_stats["median_wall_time"] = np.median( wall_times )
-        time_stats["mean_wall_time"] = np.mean( wall_times )
-        time_stats["min_wall_time"] = min( wall_times )
-        time_stats["max_wall_time"] = max( wall_times )
-        graph_to_wall_time_data[idx] = time_stats
-    return graph_to_wall_time_data
-
-#@timer
-def extract_callstack_data( slice_subgraphs ):
-    graph_to_callstack_data = {}
-    for idx,g in enumerate(slice_subgraphs):
-        callstack_to_count = {}
-        callstacks = g.vs[:]["callstack"]
-        for c in callstacks:
-            if c != "":
-                if c not in callstack_to_count:
-                    callstack_to_count[c] = 1
-                else:
-                    callstack_to_count[c] += 1
-        graph_to_callstack_data[ idx ] = callstack_to_count
-    return graph_to_callstack_data
 
 ################################################################################
 ##################### Graph kernel distance functions ##########################
@@ -169,10 +109,64 @@ def compute_kernel_distance_matrices( slice_subgraphs, kernel_params ):
             
 
 ################################################################################
+####################### Slice data extraction functions ########################
+################################################################################
 
+#@timer
+def extract_wall_time_data( slice_subgraphs ):
+    graph_to_wall_time_data = {}
+    for idx,g in enumerate(slice_subgraphs):
+        wall_times = [ float(wt) for wt in g.vs[:]["wall_time"] ]
+        time_stats = {}
+        time_stats["median_wall_time"] = np.median( wall_times )
+        time_stats["mean_wall_time"] = np.mean( wall_times )
+        time_stats["min_wall_time"] = min( wall_times )
+        time_stats["max_wall_time"] = max( wall_times )
+        graph_to_wall_time_data[idx] = time_stats
+    return graph_to_wall_time_data
 
+#@timer
+def extract_callstack_data( slice_subgraphs ):
+    graph_to_callstack_data = {}
+    for idx,g in enumerate(slice_subgraphs):
+        callstack_to_count = {}
+        callstacks = g.vs[:]["callstack"]
+        for c in callstacks:
+            if c != "":
+                if c not in callstack_to_count:
+                    callstack_to_count[c] = 1
+                else:
+                    callstack_to_count[c] += 1
+        graph_to_callstack_data[ idx ] = callstack_to_count
+    return graph_to_callstack_data
 
-
+#@timer
+def get_slice_data( slice_dirs, slice_idx, kernel_params, callstacks_available ):
+    #print("Ingesting subgraphs for slice: {}".format( slice_idx ))
+    slice_subgraph_paths = [ str(sd) + "/slice_" + str(slice_idx) + ".graphml" for sd in slice_dirs ]
+    #slice_subgraphs = read_graphs_parallel( slice_subgraph_paths )
+    slice_subgraphs = [ read_graph(g) for g in slice_subgraph_paths ]
+    
+    # Compute the requested kernel distance matrices
+    #print("Computing kernel distances for slice: {}".format( slice_idx ))
+    kernel_distance_data = compute_kernel_distance_matrices( slice_subgraphs, 
+                                                             kernel_params )
+    
+    # Extract wall-time information for correlating with application events
+    #print("Extracting wall-time data for slice: {}".format( slice_idx ))
+    wall_time_data = extract_wall_time_data( slice_subgraphs )
+    
+    # Extract callstack data if available
+    if callstacks_available:
+        #print("Extracting callstack data for slice: {}".format( slice_idx ))
+        callstack_data = extract_callstack_data( slice_subgraphs )
+    else:
+        callstack_data = {}
+    
+    slice_data = { "kernel_distance" : kernel_distance_data,
+                   "wall_time"       : wall_time_data,
+                   "callstack"       : callstack_data }
+    return slice_data
 
 
 
@@ -184,10 +178,17 @@ def compute_kernel_distance_matrices( slice_subgraphs, kernel_params ):
 Determines which slice indices each MPI process is responsible for via
 round-robin assignment
 """
-def assign_slice_indices( n_slices ):
+def assign_slice_indices( n_slices, slices, slice_range_lower, slice_range_upper ):
     rank = comm.Get_rank()
     n_procs = comm.Get_size()
-    indices = list(filter(lambda x : x % n_procs == rank, range(n_slices)))
+    if slices is not None:
+        requested_slices = slices
+    elif slices is None and slice_range_lower is not None and slice_range_upper is not None:
+        requested_slices = range(slice_range_lower, slice_range_upper )
+    else:
+        requested_slices = range( n_slices )
+    indices = list(filter(lambda x : x % n_procs == rank, range(len(requested_slices))))
+    indices = [ requested_slices[idx] for idx in indices ]
     return indices
 
 ################################################################################
@@ -284,6 +285,9 @@ def main( traces_root_dir,
           runs, 
           run_range_lower, 
           run_range_upper, 
+          slices, 
+          slice_range_lower, 
+          slice_range_upper, 
           callstacks_available, 
           output_path ):
     # Get MPI rank
@@ -309,55 +313,49 @@ def main( traces_root_dir,
     kernels    = input_config["kernels"]
     
     # Determine slice assignment
-    assigned_indices = assign_slice_indices( n_slices )
+    assigned_indices = assign_slice_indices( n_slices, slices, slice_range_lower, slice_range_upper )
     print("Rank: {}, Assigned Slices: {}".format( rank, assigned_indices ))
 
-    # Compute all requested kernel distances on assigned slices
-    slice_to_data = compute_kernel_distances( slice_dirs, 
-                                              assigned_indices,
-                                              kernels,
-                                              callstacks_available )
-    exit()
+    # Compute kernel distances and collect wall-time or callstack data as 
+    # requested
+    slice_idx_to_data = {}
+    for slice_idx in assigned_indices:
+        slice_data = get_slice_data( slice_dirs, 
+                                     slice_idx, 
+                                     kernels, 
+                                     callstacks_available )
+        slice_idx_to_data[ slice_idx ] = slice_data
+        print("Rank: {} done computing kernel distance data for slice: {}".format(rank, slice_idx))
+    
+    print("Rank: {} done computing kernel distance data".format(rank))
+    comm.barrier()
 
-    ##for slice_idx in range( n_slices ):
-    #for slice_idx in assigned_indices:
-    #    slice_data = get_slice_data( slice_dirs, 
-    #                                 slice_idx, 
-    #                                 kernel_params, 
-    #                                 callstacks_available )
-    #    slice_idx_to_data[ slice_idx ] = slice_data
-    #    print("Rank: {} done computing kernel distance data for slice: {}".format(my_rank, slice_idx))
-    #
-    #print("Rank: {} done computing kernel distance data".format(my_rank))
-    #comm.barrier()
+    # Gather all per-slice kernel distance results
+    kdts_data = comm.gather( slice_idx_to_data, root=0 )
 
-    ## Gather all per-slice kernel distance results
-    #kdts_data = comm.gather( slice_idx_to_data, root=0 )
+    if rank == 0:
+        print("Kernel distance data gathered")
 
-    #if my_rank == 0:
-    #    print("Kernel distance data gathered")
+    # Merge on root and write out
+    if rank == 0:
+        kdts = merge_dicts( kdts_data, check_keys=True )
 
-    ## Merge on root and write out
-    #if my_rank == 0:
-    #    kdts = merge_dicts( kdts_data, check_keys=True )
+        # Name output path based on slicing policy and kernel params unless one is
+        # provided
+        if output_path is None:
+            output_path = make_output_path( traces_root_dir, 
+                                            slicing_policy, 
+                                            kernels )
+        else:
+            name,ext = os.path.splitext( output_path )
+            if ext != ".pkl":
+                output_path = traces_root_dir + "/" + name + ".pkl"
+            else:
+                output_path = traces_root_dir + "/" + output_path
 
-    #    # Name output path based on slicing policy and kernel params unless one is
-    #    # provided
-    #    if output_path is None:
-    #        output_path = make_output_path( traces_root_dir, 
-    #                                        slicing_policy, 
-    #                                        kernel_params )
-    #    else:
-    #        name,ext = os.path.splitext( output_path )
-    #        if ext != ".pkl":
-    #            output_path = traces_root_dir + "/" + name + ".pkl"
-    #        else:
-    #            output_path = traces_root_dir + "/" + output_path
-
-    #    # Write out time series data for further analysis or visualization
-    #    with open( output_path, "wb" ) as pklfile:
-    #        #pkl.dump( slice_idx_to_data, pklfile, pkl.HIGHEST_PROTOCOL )
-    #        pkl.dump( kdts, pklfile, pkl.HIGHEST_PROTOCOL )
+        # Write out time series data for further analysis or visualization
+        with open( output_path, "wb" ) as pklfile:
+            pkl.dump( kdts, pklfile, pkl.HIGHEST_PROTOCOL )
 
 
 
@@ -375,14 +373,24 @@ if __name__ == "__main__":
                         help="Path to a JSON file describing the slicing policy from which the slices subdirectory may be determined")
     parser.add_argument("--slice_dir_name", required=False, default=None,
                         help="A user-specified name for the slices subdirectory")
+    # Indicates whether callstack data should be extracted
     parser.add_argument("-c", "--callstacks_available", action="store_true", default=False,
                         help="Toggle on extraction of call-stack data")
+    # Args to select subset of runs
     parser.add_argument("-r", "--runs", nargs="+", required=False, default=None, type=int,
                         help="Which runs to compute pairwise kernel distances for")
     parser.add_argument("-l", "--run_range_lower", type=int, required=False, default=None,
                         help="lower bound of range of runs")
     parser.add_argument("-u", "--run_range_upper", type=int, required=False, default=None,
                         help="lower bound of range of runs")
+    # Args to select subset of slices
+    parser.add_argument("--slices", nargs="+", required=False, default=None, type=int,
+                        help="Which slics to compute pairwise kernel distances for")
+    parser.add_argument("--slice_range_lower", type=int, required=False, default=None,
+                        help="lower bound of range of slices")
+    parser.add_argument("--slice_range_upper", type=int, required=False, default=None,
+                        help="lower bound of range of slicds")
+    # Defines location of output
     parser.add_argument("-o", "--output_path", default=None,
                         action="store", type=str, required=False,
                         help="Path to write kernel distance time series data to. Optional. If not provided, a default will be constructed from the traces root dir., the slicing policy, and the kernel params.")
@@ -395,6 +403,9 @@ if __name__ == "__main__":
           args.runs, 
           args.run_range_lower,
           args.run_range_upper,
+          args.slices, 
+          args.slice_range_lower,
+          args.slice_range_upper,
           args.callstacks_available, 
           args.output_path )
 
