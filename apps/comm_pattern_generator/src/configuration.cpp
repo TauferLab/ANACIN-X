@@ -27,7 +27,14 @@ Configuration::Configuration( const std::string config_file_path )
     auto pattern_name = elem["pattern_name"];
     auto n_iters = elem["n_iters"];
     auto nd_fraction = elem["nd_fraction"];
-    CommPattern comm_pattern( pattern_name, n_iters, nd_fraction );
+    nlohmann::json params_json = elem["params"];
+    std::unordered_map<std::string,int> params;
+    for ( auto p : params_json ) {
+      std::string key = p["key"];
+      int val = p["val"];
+      params.insert( { key, val } );
+    }
+    CommPattern comm_pattern( pattern_name, n_iters, nd_fraction, params );
     comm_pattern_seq.push_back( comm_pattern );
   }
 }
@@ -35,10 +42,15 @@ Configuration::Configuration( const std::string config_file_path )
 void Configuration::print() const 
 {
   for ( auto comm_pattern : comm_pattern_seq ) {
-    std::cout << comm_pattern.pattern_name << ", "
-              << comm_pattern.n_iters << ", "
-              << comm_pattern.nd_fraction 
+    std::cout << "Comm. Pattern: " << comm_pattern.pattern_name << ", "
+              << "# Iterations: " << comm_pattern.n_iters << ", "
+              << "% Non-Deterministic " << comm_pattern.nd_fraction 
               << std::endl;
+    std::cout << "Parameters: " << std::endl;
+    for ( auto kvp : comm_pattern.params ) {
+      std::cout << "\t" << kvp.first << " --> " << kvp.second << std::endl;
+    }
+    std::cout << std::endl;
   }
 }
 

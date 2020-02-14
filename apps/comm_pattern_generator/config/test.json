@@ -1,0 +1,54 @@
+{
+    "comm_patterns" : 
+        [
+            {
+                "pattern_name" : "naive_reduce",
+                "n_iters" : 1,
+                "nd_fraction" : 0.5,
+                "params" : [
+                           ]
+            },
+            {
+                "pattern_name" : "naive_reduce",
+                "n_iters" : 1,
+                "nd_fraction" : 0.25,
+                "params" : [
+                           ]
+            },
+            {
+                "pattern_name" : "unstructured_mesh",
+                "n_iters" : 1,
+                "nd_fraction" : 1.0,
+                "params" : [
+                                { 
+                                  "key" : "n_procs_x", 
+                                  "val" : 3
+                                },
+                                { 
+                                  "key" : "n_procs_y", 
+                                  "val" : 3
+                                },
+                                { 
+                                  "key" : "n_procs_z", 
+                                  "val" : 3
+                                },
+                                { 
+                                  "key" : "min_degree", 
+                                  "val" : 1
+                                },
+                                { 
+                                  "key" : "max_degree", 
+                                  "val" : 4
+                                },
+                                { 
+                                  "key" : "neighborhood_size", 
+                                  "val" : 2
+                                },
+                                { 
+                                  "key" : "msg_size", 
+                                  "val" : 1024
+                                }
+                           ]
+            }
+        ]
+}

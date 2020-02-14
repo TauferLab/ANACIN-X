@@ -4,9 +4,10 @@
 #include <string>
 #include <iostream>
 
+#include "configuration.hpp"
 #include "naive_reduce.hpp"
 #include "amg2013.hpp"
-#include "configuration.hpp"
+#include "unstructured_mesh.hpp"
 
 int main( int argc, char** argv )
 {
@@ -24,7 +25,7 @@ int main( int argc, char** argv )
   } else {
     broadcast_config( config );
   }
-  
+
   // Iterate over the comm patterns
   auto comm_pattern_seq = config.get_comm_pattern_seq();
   for ( auto comm_pattern : comm_pattern_seq ) {
@@ -52,6 +53,15 @@ int main( int argc, char** argv )
       } 
       else if ( pattern_name == "amg2013" ) {
         comm_pattern_amg2013( pattern_comm, color, false );
+      }
+      else if ( pattern_name == "unstructured_mesh" ) {
+        auto n_procs_x = comm_pattern.params.at("n_procs_x");
+        auto n_procs_y = comm_pattern.params.at("n_procs_y");
+        auto n_procs_z = comm_pattern.params.at("n_procs_z");
+        auto min_degree = comm_pattern.params.at("min_degree");
+        auto max_degree = comm_pattern.params.at("max_degree");
+        auto neighborhood_size = comm_pattern.params.at("neighborhood_size");
+        comm_pattern_unstructured_mesh( pattern_comm, color );
       }
       mpi_rc = MPI_Barrier( MPI_COMM_WORLD );
     }
