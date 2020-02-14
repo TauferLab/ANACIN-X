@@ -26,7 +26,8 @@ int main( int argc, char** argv )
   mpi_rc = MPI_Comm_rank( pattern_comm, &pattern_comm_rank );
   mpi_rc = MPI_Comm_size( pattern_comm, &pattern_comm_size );
 
-  comm_pattern_naive_reduce( pattern_comm, color );
+  //comm_pattern_naive_reduce( pattern_comm, color );
+  comm_pattern_amg2013( pattern_comm, color, false );
 
   mpi_rc = MPI_Comm_free( &pattern_comm );
 
