@@ -64,9 +64,10 @@ int main( int argc, char** argv )
         auto msg_size = comm_pattern.params.at("msg_size");
         comm_pattern_naive_reduce( i, nd_fraction, msg_size, false );
       } 
-      //else if ( pattern_name == "amg2013" ) {
-      //  comm_pattern_amg2013( pattern_comm, color, false );
-      //}
+      else if ( pattern_name == "amg2013" ) {
+        auto msg_size = comm_pattern.params.at("msg_size");
+        comm_pattern_amg2013( i, nd_fraction, msg_size );
+      }
       else if ( pattern_name == "unstructured_mesh" ) {
         auto n_procs_x = comm_pattern.params.at("n_procs_x");
         auto n_procs_y = comm_pattern.params.at("n_procs_y");
