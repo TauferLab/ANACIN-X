@@ -8,15 +8,15 @@
                 "params" : [
                                 { 
                                   "key" : "n_procs_x", 
-                                  "val" : 2
+                                  "val" : 3
                                 },
                                 { 
                                   "key" : "n_procs_y", 
-                                  "val" : 2
+                                  "val" : 3
                                 },
                                 { 
                                   "key" : "n_procs_z", 
-                                  "val" : 2
+                                  "val" : 3
                                 },
                                 { 
                                   "key" : "min_deg", 
