@@ -16,9 +16,20 @@ int coords_to_rank( int x_coord, int y_coord, int z_coord, int n_procs_x, int n_
            + ( z_coord * n_procs_x * n_procs_y ) );
 }
 
-int wrap( int x, int n_procs )
-{
-  return ( x + n_procs ) % n_procs;
+int rand_translate( int coord, int max_coord, int max_dist )
+{   
+  auto direction = ( ( std::rand() % 2 ) ? -1 : 1 );
+  auto distance = std::rand() % max_dist;
+  auto new_coord = ( coord + ( direction * distance ) ) % max_coord;
+  if ( new_coord < 0 ) {
+    new_coord = max_coord + new_coord;
+  }
+  //std::cout << "Translating x = " << coord 
+  //          << " direction = " << direction 
+  //          << " distance = " << distance 
+  //          << " new x = " << new_coord 
+  //          << std::endl;
+  return new_coord;
 }
 
 int rank_to_dist( int src_rank, int dst_rank, int n_procs_x, int n_procs_y, int n_procs_z )
@@ -53,7 +64,7 @@ void comm_pattern_unstructured_mesh( int iter, double nd_fraction,
   int y_coord = ( rank % ( n_procs_x * n_procs_y ) ) / n_procs_x;
   int z_coord = ( rank % ( n_procs_x * n_procs_y * n_procs_z ) ) / ( n_procs_x * n_procs_y );
 
-  std::cout << "Rank: " << rank << " (" << x_coord << ", " << y_coord << ", " << z_coord << ")" << std::endl;
+  //std::cout << "Rank: " << rank << " (" << x_coord << ", " << y_coord << ", " << z_coord << ")" << std::endl;
   
   mpi_rc = MPI_Barrier( MPI_COMM_WORLD );
   
@@ -70,31 +81,30 @@ void comm_pattern_unstructured_mesh( int iter, double nd_fraction,
   std::unordered_set<int> destination_set;
   std::vector<int> destinations;
   for (int i=0; i<degree; ++i ) {
-    int destination_rank = rank;
+    int dst_rank = rank;
     // Randomize next destination until it isn't own rank
     while (true) {
-      int destination_x_coord = wrap( x_coord, (((std::rand() % 2) ? -1 : 1) * (std::rand() % max_dist)));
-      int destination_y_coord = wrap( y_coord, (((std::rand() % 2) ? -1 : 1) * (std::rand() % max_dist)));
-      int destination_z_coord = wrap( z_coord, (((std::rand() % 2) ? -1 : 1) * (std::rand() % max_dist)));
-      destination_rank = coords_to_rank( destination_x_coord, destination_y_coord, 
-                                      destination_z_coord, n_procs_x, n_procs_y );
+      int dst_x_coord = rand_translate( x_coord, n_procs_x, max_dist );
+      int dst_y_coord = rand_translate( y_coord, n_procs_y, max_dist );
+      int dst_z_coord = rand_translate( z_coord, n_procs_z, max_dist );
+      dst_rank = coords_to_rank( dst_x_coord, dst_y_coord, dst_z_coord, 
+                                 n_procs_x, n_procs_y );
+      
+      //std::cout << "My Rank: " << rank 
+      //          << " My Position: (" << x_coord << ", " << y_coord << ", " << z_coord << ")" 
+      //          << " Neighbor Position: (" << dst_x_coord << ", " << dst_y_coord << ", " << dst_z_coord << ")" 
+      //          << " Neighbor Rank: " << dst_rank
+      //          << std::endl;
+
       // Only accept a destination if it is:
       // 1. Not self rank
       // 2. Not already a destination
-      //if ( destination_rank != rank and destinations.find(destination_rank) == destinations.end() ) 
-      //
-      if ( rank < n_procs_x + 1 ) {
+      if ( dst_rank != rank and destination_set.find(dst_rank) == destination_set.end() ) {
+        destination_set.insert( dst_rank );
         break;
-      } 
-      else {
-        if ( destination_rank != rank and destination_set.find(destination_rank) == destination_set.end() ) {
-        //if ( destination_set.find(destination_rank) == destination_set.end() ) {
-          destination_set.insert( destination_rank );
-          break;
-        }
       }
     }
-    destinations.push_back( destination_rank );
+    destinations.push_back( dst_rank );
   }
   std::cout << "Rank: " << rank << ", # destinations = " << degree << ", destinations: ";
   for ( auto n : destinations ) {
