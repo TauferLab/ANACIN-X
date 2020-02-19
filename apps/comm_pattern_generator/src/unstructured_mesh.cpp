@@ -9,6 +9,8 @@
 #include <unordered_set>
 #include <iostream>
 
+#include "debug.hpp"
+
 int coords_to_rank( int x_coord, int y_coord, int z_coord, int n_procs_x, int n_procs_y )
 {
   return ( x_coord 
@@ -24,11 +26,6 @@ int rand_translate( int coord, int max_coord, int max_dist )
   if ( new_coord < 0 ) {
     new_coord = max_coord + new_coord;
   }
-  //std::cout << "Translating x = " << coord 
-  //          << " direction = " << direction 
-  //          << " distance = " << distance 
-  //          << " new x = " << new_coord 
-  //          << std::endl;
   return new_coord;
 }
 
@@ -81,8 +78,6 @@ void comm_pattern_unstructured_mesh( int iter, double nd_fraction,
   (range > 0) ? range : 1;
   int degree = min_deg + ( std::rand() % range );
 
-  //std::cout << "Rank: " << rank << ", # destinations = " << degree << std::endl;
-
   // Determine who this process's destinations are
   std::unordered_set<int> destination_set;
   std::vector<int> destinations;
@@ -95,12 +90,13 @@ void comm_pattern_unstructured_mesh( int iter, double nd_fraction,
       int dst_z_coord = rand_translate( z_coord, n_procs_z, max_dist );
       dst_rank = coords_to_rank( dst_x_coord, dst_y_coord, dst_z_coord, 
                                  n_procs_x, n_procs_y );
-      
-      //std::cout << "My Rank: " << rank 
-      //          << " My Position: (" << x_coord << ", " << y_coord << ", " << z_coord << ")" 
-      //          << " Neighbor Position: (" << dst_x_coord << ", " << dst_y_coord << ", " << dst_z_coord << ")" 
-      //          << " Neighbor Rank: " << dst_rank
-      //          << std::endl;
+#ifdef DEBUG 
+      std::cout << "My Rank: " << rank 
+                << " My Position: (" << x_coord << ", " << y_coord << ", " << z_coord << ")" 
+                << " Neighbor Position: (" << dst_x_coord << ", " << dst_y_coord << ", " << dst_z_coord << ")" 
+                << " Neighbor Rank: " << dst_rank
+                << std::endl;
+#endif
 
       // Only accept a destination if it is:
       // 1. Not self rank
@@ -112,13 +108,14 @@ void comm_pattern_unstructured_mesh( int iter, double nd_fraction,
     }
     destinations.push_back( dst_rank );
   }
-  
-  //std::cout << "Rank: " << rank << ", # destinations = " << degree << ", destinations: ";
-  //for ( auto n : destinations ) {
-  //  std::cout << n << " ";
-  //}
-  //std::cout << std::endl;
-
+ 
+#ifdef DEBUG
+  std::cout << "Rank: " << rank << ", # destinations = " << degree << ", destinations: ";
+  for ( auto n : destinations ) {
+    std::cout << n << " ";
+  }
+  std::cout << std::endl;
+#endif
 
   // Determine how many messages this process will receive
   int* local_counts = new int[comm_size];

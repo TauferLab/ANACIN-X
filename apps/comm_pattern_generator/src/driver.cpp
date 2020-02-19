@@ -9,10 +9,12 @@
 #include "amg2013.hpp"
 #include "unstructured_mesh.hpp"
 
+#include "debug.hpp"
+
 int main( int argc, char** argv )
 {
   int mpi_rc, rank, comm_size;
-  mpi_rc = MPI_Init( nullptr, nullptr );
+  mpi_rc = MPI_Init( &argc, &argv );
   mpi_rc = MPI_Comm_rank( MPI_COMM_WORLD, &rank );
   mpi_rc = MPI_Comm_size( MPI_COMM_WORLD, &comm_size );
 
@@ -27,38 +29,27 @@ int main( int argc, char** argv )
     broadcast_config( config );
   }
 
+#ifdef DEBUG
   if ( rank == 0 ) {
     config.print();
   }
+#endif
 
   // Iterate over the comm patterns
   auto comm_pattern_seq = config.get_comm_pattern_seq();
   mpi_rc = MPI_Barrier( MPI_COMM_WORLD );
   for ( auto comm_pattern : comm_pattern_seq ) {
-    // First, split comms based on desired fraction of non-deterministic 
-    // communication
     auto pattern_name = comm_pattern.pattern_name;
     auto nd_fraction = comm_pattern.nd_fraction;
     auto n_iters = comm_pattern.n_iters;
+#ifdef DEBUG
     if ( rank == 0 ) {
       std::cout << "Communication Pattern: " << pattern_name 
                 << " Non-Determinism Fraction: " << nd_fraction
                 << " # iterations: " << n_iters
                 << std::endl;
     }
-    //int cutoff_rank = comm_size * nd_fraction;
-    //if ( rank == 0 ) {
-    //  std::cout << "Ranks up to " << cutoff_rank << " will execute non-deterministic version of pattern" << std::endl;
-    //}
-    //int color;
-    //if ( rank < cutoff_rank ) {
-    //  color = 0;
-    //} else {
-    //  color = 1;
-    //}
-    //MPI_Comm pattern_comm;
-    //mpi_rc = MPI_Comm_split( MPI_COMM_WORLD, color, rank, &pattern_comm);
-    // Do this pattern for specified number of iterations
+#endif
     for ( int i=0; i<n_iters; ++i ) {
       if ( pattern_name == "naive_reduce" ) {
         auto msg_size = comm_pattern.params.at("msg_size");
@@ -80,9 +71,7 @@ int main( int argc, char** argv )
                                         n_procs_z, min_deg, max_deg, max_dist, 
                                         msg_size );
       }
-      //mpi_rc = MPI_Barrier( MPI_COMM_WORLD );
     }
-    //mpi_rc = MPI_Comm_free( &pattern_comm );
     mpi_rc = MPI_Barrier( MPI_COMM_WORLD );
   }
 
