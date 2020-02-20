@@ -3,6 +3,7 @@
 import argparse
 import pickle as pkl
 import numpy as np
+from scipy.stats.stats import pearsonr
 import pprint
 
 import sys
@@ -18,14 +19,19 @@ def main( kdts_path ):
     # Reduce to flat lists of distances
     gk = ('wlst','logical_time', 5)
     slice_indices = sorted( slice_idx_to_data.keys() )
-    dist_seq = get_distances_seq( slice_idx_to_data, slice_indices, gk )
-    dist_stats_seq = get_stats_seq( dist_seq )
+    nd_fraction_labels = [ 0, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0 ]
+    flat_dists_seq = get_distances_seq( slice_idx_to_data, slice_indices, gk )
+    # Associate each kernel distance with the non-determinism fraction of the 
+    # runs its generating graphs represent
+    nd_fraction_seq = []
+    dist_seq = []
+    for i in range( len( nd_fraction_labels ) ):
+        for d in flat_dists_seq[i]:
+            nd_fraction_seq.append( nd_fraction_labels[i] )
+            dist_seq.append( d )
 
-    nd_fractions = [ 0, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0 ]
-    for stat in [ "min", "median", "mean", "max" ]:
-        kd_seq = [ x[stat] for x in dist_stats_seq ]
-        pearson_r = np.corrcoef( nd_fractions, kd_seq )[0][1]
-        print("Kernel Distance {} correlates with ND Fraction w/ Pearson-R = {}".format(stat,pearson_r))
+    pearson_r, significance = pearsonr( nd_fraction_seq, dist_seq )
+    print("Kernel Distance correlates with ND Fraction w/ Pearson-R = {}, significance = {}".format(pearson_r, significance))
 
 if __name__ == "__main__":
     desc = "Computes correlation between kernel distance and non-determinism fraction for naive reduce example"
