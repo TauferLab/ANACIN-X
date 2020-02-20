@@ -10,3 +10,6 @@
 [submodule "submodules/PnMPI"]
 	path = submodules/PnMPI
 	url = git@github.com:LLNL/PnMPI.git
+[submodule "submodules/ninja"]
+	path = submodules/ninja
+	url = git@github.com:PRUNERS/NINJA.git

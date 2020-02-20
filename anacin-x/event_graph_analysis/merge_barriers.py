@@ -3,8 +3,8 @@
 #SBATCH -N 1
 #SBATCH -n 1
 #SBATCH -t 01:00:00
-#SBATCH -o squash_barriers-%j.out
-#SBATCH -e squash_barriers-%j.err
+#SBATCH -o merge_barriers-%j.out
+#SBATCH -e merge_barriers-%j.err
 
 import os
 import argparse
@@ -23,12 +23,12 @@ from utilities import ( timer,
 # init --> recv --> send --> barrier --> barrier --> recv --> finalize
 # The transformed program order will look like:
 # init --> recv --> send --> barrier --> recv --> finalize
-def squash_barriers( graph ):
+def merge_barriers( graph ):
     ranks = sorted( list( set( graph.vs[:]["process_id"] ) ) )
     vertices = []
     for rank in ranks:
         event_seq = graph.vs.select( process_id_eq=rank )
-        print("Finding consecutive barriers to squash in event sequence for rank: {}".format( rank ))
+        print("Finding consecutive barriers to merge in event sequence for rank: {}".format( rank ))
         for i in range(len(event_seq)):
             v = event_seq[i]
             v_idx = int(v["id"][1:])
@@ -65,13 +65,13 @@ def main( graph_path, output_path ):
     graph = read_graph( graph_path )    
 
     # Generate a new event graph with consecutive barrier nodes merged
-    new_graph = squash_barriers( graph ) 
+    new_graph = merge_barriers( graph ) 
 
     # If no output path is given, construct default output path
     if output_path is None:
         output_dir = os.path.dirname( graph_path )
         name,ext = os.path.splitext( os.path.basename( graph_path ) )
-        output_graph_name = name + "_squashed"
+        output_graph_name = name + "_merged_barriers"
         output_path = output_dir + "/" + output_graph_name + ext
 
     # Write new graph out to file
@@ -83,7 +83,7 @@ if __name__ == "__main__":
     desc = "Checks that an event graph is constructed properly"
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("graph_path",
-                        help="A GraphML file representing the event graph whose consecutive barriers you want to squash")
+                        help="A GraphML file representing the event graph whose consecutive barriers you want to merge")
     parser.add_argument("-o", "--output_path", default=None,
                         action="store", type=str, required=False,
                         help="Path to write transformed graph to. Optional.")

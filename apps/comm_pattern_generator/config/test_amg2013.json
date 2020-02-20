@@ -1,0 +1,27 @@
+{
+    "comm_patterns" : 
+        [
+            {
+                "pattern_name" : "amg2013",
+                "n_iters" : 1,
+                "nd_fraction" : 0.0,
+                "params" : [
+                              { 
+                                "key" : "msg_size",
+                                "val" : 1
+                              }
+                           ]
+            },
+            {
+                "pattern_name" : "amg2013",
+                "n_iters" : 1,
+                "nd_fraction" : 1.0,
+                "params" : [
+                              { 
+                                "key" : "msg_size",
+                                "val" : 1
+                              }
+                           ]
+            }
+        ]
+}

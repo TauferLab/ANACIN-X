@@ -139,7 +139,7 @@ def get_endpoint_vertices( core_slice_vertices ):
             if s["process_id"] != v["process_id"]:
                 endpoint_vertices.append(s)
         for p in v.predecessors():
-            if ["process_id"] != v["process_id"]:
+            if p["process_id"] != v["process_id"]:
                 endpoint_vertices.append(p)
     return endpoint_vertices
 
@@ -200,6 +200,8 @@ def extract_barrier_delimited_full_slices( graph, ranks, include_endpoints, outp
     
     assigned_slices = assign_slices( n_slices )
 
+    print("Rank: {} assigned slices: {}".format( my_rank, assigned_slices ) )
+
     # Select slice subgraphs based on timestamp bounds 
     #n_slices = len( rank_to_timestamp_interval_seq[0] )
     #for slice_idx in range( n_slices ):
@@ -210,7 +212,7 @@ def extract_barrier_delimited_full_slices( graph, ranks, include_endpoints, outp
         slice_subgraph = extract_slice( graph, clock, rank_to_timestamp_interval, include_endpoints )
         # Write the slice subgraph to file
         write_slice( slice_subgraph, output_dir, slice_idx, output_format )
-        #print("Rank: {} extracted slice: {}".format(my_rank, slice_idx))
+        print("Rank: {} extracted slice: {}".format(my_rank, slice_idx))
 
 ################################################################################
 
@@ -379,21 +381,17 @@ def get_logical_time_slice_seq_dense( graph, slice_len, slice_overlap, ranks, in
 
 
 """
-Root MPI process reads in graph and slicing policy, then broadcasts to rest
+Root MPI process reads in slicing policy, then broadcasts to rest
+All MPI processes read in graph independently
 """
 def ingest_inputs( graph_path, slicing_policy_path ):
-    #my_rank = comm.Get_rank()
-    #if my_rank == 0:
-    #    with open( slicing_policy_path, "r" ) as infile:
-    #        slicing_policy = json.load( infile )
-    #    graph = read_graph( graph_path )
-    #else:
-    #    slicing_policy = None
-    #    graph = None
-    #slicing_policy = comm.bcast( slicing_policy, root=0 )
-    #graph = comm.bcast( graph, root=0 )
-    with open( slicing_policy_path, "r" ) as infile:
-        slicing_policy = json.load( infile )
+    my_rank = comm.Get_rank()
+    if my_rank == 0:
+        with open( slicing_policy_path, "r" ) as infile:
+            slicing_policy = json.load( infile )
+    else:
+        slicing_policy = None
+    slicing_policy = comm.bcast( slicing_policy, root=0 )
     graph = read_graph( graph_path )
     return graph, slicing_policy
 
@@ -406,40 +404,24 @@ def ingest_inputs( graph_path, slicing_policy_path ):
 # Extracts a sequence of subgraphs (referred to herein and elsewhere as "slices")
 # from an event graph
 def main( graph_path, slicing_policy_path, output_dir, output_format ):
-
-    start_time = time.time()
-
-    #my_rank = comm.Get_rank()
-    #if my_rank == 0:
-    #    # Read in slicing policy:
-    #    with open( slicing_policy_path, "r" ) as infile:
-    #        slicing_policy = json.load( infile )
-    #    # Read in parent graph
-    #    graph = read_graph( graph_path )    
-    #else:
-    #    slicing_policy = None
-    #    graph = None
-    #slicing_policy = comm.bcast( slicing_policy, root=0 )
-    #graph = comm.bcast( graph, root=0 )
-
+    ingest_start_time = time.time()
     graph, slicing_policy = ingest_inputs( graph_path, slicing_policy_path )
-
-    end_time = time.time()
-
+    ingest_end_time = time.time()
+    ingest_elapsed_time = ingest_end_time - ingest_start_time
     try:
         n_vertices = len(graph.vs[:])
         n_edges = len(graph.es[:])
     except:
         n_vertices = 0
         n_edges = 0
-    print( "Rank: {}, ingestion time: {}, # vertices: {}, # edges: {}".format( my_rank, end_time - start_time, n_vertices, n_edges ))
+    #print( "Rank: {}, ingestion time: {}, # vertices: {}, # edges: {}".format( my_rank, ingest_elapsed_time, n_vertices, n_edges ))
     comm.barrier()
-    exit()
     
     # Determine, and if necessary, create output directory
     output_dir = make_output_dir( output_dir, slicing_policy, graph_path )
 
     #print("Rank: {} - Output Directory: {}".format( my_rank, output_dir ))
+    #exit()
 
     # Check that output format is in the supported set
     allowed_formats = [ "adjacency", "dimacs", "dot", "graphviz", "edgelist", 

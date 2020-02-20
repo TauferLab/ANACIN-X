@@ -10,14 +10,48 @@ legal_vertex_labels = [ "event_type",
                       ]
 
 
+
+def get_relabeled_graphs( graphs, kernels ):
+    relabeled_graphs = {}
+    for kernel in kernels:
+        # Which graph kernel are we relabeling for?
+        name = kernel[ "name" ]
+        # Which label are we using? 
+        try:
+            label = kernel["params"]["label"]
+        except:
+            err_msg = "Requested re-labeling for kernel: {} not possible, " \
+                      "label not specified".format(name)
+            raise KeyError( err_msg )
+        # Define a key that uniquely identifies this kernel / label pair
+        key = ( name, label )
+        # Only generate a relabeled set of graphs if needed
+        # The list of kernels may include multiple distinct kernels that can 
+        # use the same relabeled graphs (e.g., multiple WL kernels with the same
+        # label but different numbers of WL iterations)
+        if key not in relabeled_graphs:
+            # Relabel for Weisfeiler-Lehman Subtree-Pattern kernel 
+            if name == "wlst":
+                graphs = [ relabel_for_wlst_kernel(g, label) for g in graphs ]
+            # Relabel for edge-histogram kernel 
+            elif name == "eh":
+                graphs = [ relabel_for_eh_kernel(g, label) for g in graphs ]
+            # Relabel for vertex-histogram kernel
+            elif name == "vh":
+                graphs = [ relabel_for_vh_kernel(g, label) for g in graphs ]
+            relabeled_graphs[ key ] = graphs
+    return relabeled_graphs
+
+
+"""
+Returns a copy of the graph with no vertex or edge labels
+"""
 def label_free_copy( graph ):
     n_vertices = len(graph.vs[:])
     copy = igraph.Graph(n_vertices, directed=True)
     edges = [ (e.source, e.target) for e in graph.es[:] ]
     copy.add_edges( edges )
     return copy
-    
-
 
 # Relabels a graph for comparison using the graphkernels Weisfeiler-Lehman 
 # Subtree Pattern kernel

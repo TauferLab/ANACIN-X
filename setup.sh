@@ -25,7 +25,7 @@ echo "Done fetching submodules."
 echo ${progress_delimiter}
 echo
 
-# Build tracing infrastructure (DUMPI, CSMPI, PnMPI)
+# Build tracing infrastructure (DUMPI, CSMPI, NINJA, PnMPI)
 echo
 echo ${progress_delimiter}
 echo "Building SST-DUMPI..."
@@ -35,6 +35,18 @@ echo
 echo 
 echo ${progress_delimiter}
 echo "Done building SST-DUMPI."
+echo ${progress_delimiter}
+echo
+
+echo
+echo ${progress_delimiter}
+echo "Building NINJA Noise-Injection Agent..."
+echo ${progress_delimiter}
+echo
+./install/install_ninja.sh
+echo 
+echo ${progress_delimiter}
+echo "Done building NINJA Noise-Injection Agent."
 echo ${progress_delimiter}
 echo
 
@@ -71,6 +83,7 @@ echo
 mkdir -p ./anacin-x/tracing/pnmpi_patched_libs
 ./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/sst-dumpi/build/lib/libdumpi.so ./anacin-x/tracing/pnmpi_patched_libs/libdumpi.so
 ./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/csmpi/build/libcsmpi.so ./anacin-x/tracing/pnmpi_patched_libs/libcsmpi.so
+./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/ninja/build/libninja.so ./anacin-x/tracing/pnmpi_patched_libs/libninja.so
 echo
 echo ${progress_delimiter}
 echo "Done patching tracing libraries for use with PnMPI..."

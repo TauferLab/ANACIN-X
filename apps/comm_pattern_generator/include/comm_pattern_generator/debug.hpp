@@ -1,0 +1,6 @@
+#ifndef COMM_PATTERN_GENERATOR_DEBUG_H
+#define COMM_PATTERN_GENERATOR_DEBUG_H
+
+//#define DEBUG
+
+#endif
