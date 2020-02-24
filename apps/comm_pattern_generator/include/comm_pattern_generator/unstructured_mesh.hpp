@@ -8,6 +8,6 @@ void comm_pattern_unstructured_mesh( int iter, double nd_fraction_neighbors, dou
                                      int min_deg, int max_deg, int max_dist, int msg_size );
 
 int coords_to_rank( int x_coord, int y_coord, int z_coord, int n_procs_x, int n_procs_y, int n_procs_z );
-int wrap( int x, int n_procs );
+int rand_translate( int coord, int max_coord, int max_dist );
 
 #endif
