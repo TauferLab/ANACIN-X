@@ -3,8 +3,9 @@
 import igraph
 import hashlib
 import argparse
-from pathlib import Path
+import pathlib
 import glob
+import os
 
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
@@ -21,7 +22,9 @@ import pprint
 
 def get_sender_pid_from_recv( recv_vertex ):
     preds = recv_vertex.predecessors()
-    assert( len( preds ) == 2 )
+    print( recv_vertex )
+    print( preds )
+    #assert( len( preds ) == 2 )
     for p in preds:
         pred_pid = p["process_id"]
         if pred_pid != recv_vertex["process_id"]:
@@ -32,9 +35,9 @@ def transform_to_communication_channel_graph( event_graph ):
     comm_graph_vertices = set()
     comm_graph_edges = {}
     for e in edges:
-        if e["order"] == "message":
-            src_pid = event_graph.vs[ e.source ][ "process_id" ]
-            dst_pid = event_graph.vs[ e.target ][ "process_id" ]
+        src_pid = int(event_graph.vs[ e.source ][ "process_id" ])
+        dst_pid = int(event_graph.vs[ e.target ][ "process_id" ])
+        if src_pid != dst_pid:
             comm_graph_vertices.add( src_pid )
             comm_graph_vertices.add( dst_pid )
             comm_graph_edge = ( src_pid, dst_pid )
@@ -93,7 +96,9 @@ def assign_slices( slice_dir ):
 def main( slice_dir, transform, output_dir ):
     # Set up transformed slice dir
     if output_dir is None:
-        parent_path = str(Path(slice_dir).parent) + "/transformed_slices_" + transform + "/"
+        output_dir = str(pathlib.Path(slice_dir).parent) + "/transformed_slices_" + transform + "/"
+    if not os.path.isdir( output_dir ):
+        pathlib.Path( output_dir ).mkdir( parents=True, exist_ok=True )
     # Compute slice-to-rank assignment
     assignment = assign_slices( slice_dir )
     # Each rank ingests its slices
@@ -121,7 +126,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     main( args.slice_dir,
-          args.transform
+          args.transform,
+          args.output_dir
         )
 
     #g = igraph.Graph(directed=True)

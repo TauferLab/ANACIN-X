@@ -184,6 +184,7 @@ def main( flagged_slices_path, kdts_path, executable_path ):
             frames = [ frame.strip() for frame in cs.strip().split(",") ]
             cleaned_callstack_to_count[ tuple(frames) ] = count
 
+
         print("Collected callstack counts. Starting callstack translation...") 
         address_to_translation = {}
         translated_callstack_to_count = {}
@@ -225,6 +226,7 @@ def main( flagged_slices_path, kdts_path, executable_path ):
                 translated_callstack = tuple( translated_callstack )
                 translated_callstack_to_count[ translated_callstack ] = count
         print("Done with callstack translation. Creating report...")
+
 
         traces_dir = os.path.dirname( kdts_path )
         report_file = traces_dir + "/anomaly_report_for_policy_" + policy + ".txt"

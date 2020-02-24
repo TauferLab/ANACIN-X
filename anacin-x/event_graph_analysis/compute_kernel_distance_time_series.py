@@ -298,6 +298,7 @@ def main( traces_root_dir,
         slice_dirs, kernels = ingest_inputs( traces_root_dir, kernel_file, 
                                              runs, run_range_lower, run_range_upper,
                                              slicing_policy_path, slice_dir_name )
+
         # Sanity-check the slice directories
         n_slices = validate_slice_dirs( slice_dirs )
         input_config = { "slice_dirs" : slice_dirs,
@@ -311,6 +312,7 @@ def main( traces_root_dir,
     slice_dirs = input_config["slice_dirs"]
     n_slices   = input_config["n_slices"]
     kernels    = input_config["kernels"]
+   
     
     # Determine slice assignment
     assigned_indices = assign_slice_indices( n_slices, slices, slice_range_lower, slice_range_upper )
@@ -327,6 +329,7 @@ def main( traces_root_dir,
         slice_idx_to_data[ slice_idx ] = slice_data
         print("Rank: {} done computing kernel distance data for slice: {}".format(rank, slice_idx))
     
+    comm.barrier()
     print("Rank: {} done computing kernel distance data".format(rank))
     comm.barrier()
 
@@ -356,6 +359,7 @@ def main( traces_root_dir,
         # Write out time series data for further analysis or visualization
         with open( output_path, "wb" ) as pklfile:
             pkl.dump( kdts, pklfile, pkl.HIGHEST_PROTOCOL )
+        print("Kernel distance data written to: {}".format(output_path))
 
 
 
