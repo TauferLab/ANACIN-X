@@ -157,43 +157,6 @@ def detect_anomalies( kernel_distance_seq, policy ):
         flagged_slice_indices = [ cp-1 for cp in change_points ]
         return flagged_slice_indices
             
-
-    
-
-    ## Detect anomalies based on distance between distributions using the 
-    ## chi-squared test statistic
-    #elif policy_name == "chi_squared":
-    #    n_buckets = policy["params"]["n_buckets"]
-    #    flagged_slice_indices = []
-    #    for slice_idx in enumerate( 1, kernel_distance_seq ):
-    #        # Get the distances for current slice and its predecessor
-    #        prev_slice_distances = get_flat_distances( kernel_distance_seq[ slice_idx-1 ] )
-    #        curr_slice_distances = get_flat_distances( kernel_distance_seq[ slice_idx ] )
-    #        # Get extrema for the distances in these pairs of distance observations
-    #        min_dist = min( prev_slice_distances + curr_slice_distances )
-    #        max_dist = max( prev_slice_distances + curr_slice_distances )
-    #        # Define buckets based on extrema and desired number of buckets
-    #        buckets = np.linspace( min_dist, max_dist, n_buckets+1, endpoint=True )
-    #        # Bucket distance values
-    #        prev_slice_bucketed_distances = bucket_distances( prev_slice_distances, buckets )
-    #        curr_slice_bucketed_distances = bucket_distances( curr_slice_distances, buckets )
-    #        # Compute test statistic for this pair of slices
-    #        observed_frequencies = [ v for k,v in sorted(prev_slice_bucketed_distances.items()) ]
-    #        expected_frequencies = [ v for k,v in sorted(curr_slice_bucketed_distances.items()) ]
-    #        #test_statistic = 0
-    #        #for bucket in sorted( prev_slice_bucketed_distances.keys() ):
-    #        #    prev_slice_count = prev_slice_bucketed_distances[ bucket ] 
-    #        #    curr_slice_count = curr_slice_bucketed_distances[ bucket ] 
-    #        #    contribution = ( ( prev_slice_count - curr_slice_count ) ** 2 ) / prev_slice_count
-    #        #    test_statistic += contribution
-    #        ## Check whether we reject the null hypothesis that the current 
-    #        ## slice's distances are drawn from the same distribution as the 
-    #        ## previous slice's
-    #        #n_degrees_of_freedom = n_buckets - 1
-
-            
-
-     
     else:
         raise NotImplementedError("Anomaly detection policy: {} is not implemented".format(policy_name))
     
@@ -210,7 +173,6 @@ def main( kernel_distance_data_path, policy_file_path, output_path ):
 
     # Choose a kernel
     chosen_kernel = ( "wlst", "logical_time", 5 )
-    #chosen_kernel = ( "wlst", 5, "logical_time")
 
     # Filter down to a kernel distance time series w/r/t that kernel
     kernel_distances_seq = []

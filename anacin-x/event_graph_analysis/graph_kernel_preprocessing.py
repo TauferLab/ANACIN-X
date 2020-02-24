@@ -10,6 +10,17 @@ legal_vertex_labels = [ "event_type",
                       ]
 
 
+def convert_to_grakel_graph( graph ):
+    edge_list = []
+    vid_to_label = {}
+    eid_to_label = {}
+    for v in graph.vs[:]:
+        #vid_to_label[ v.index ] = v["label"]
+        vid_to_label[ v.index ] = 0
+    for e in graph.es[:]:
+        edge_list.append( ( e.source, e.target ) )
+    return [ edge_list, vid_to_label, eid_to_label ]
+
 
 def get_relabeled_graphs( graphs, kernels ):
     relabeled_graphs = {}
