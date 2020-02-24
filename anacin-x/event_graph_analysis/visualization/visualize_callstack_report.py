@@ -67,7 +67,13 @@ def make_callstack_frequency_bar_plot( callstack_to_count, y_axis="normalized" )
     # Annotate y-axis
     y_axis_label = "Frequency"
     ax.set_ylabel( y_axis_label )
-    plt.show()
+    
+    #plt.show()
+
+    plt.savefig( "callstack_distribution.png",
+                 bbox_inches="tight",
+                 dpi=300,
+                 pad_inches=0.05 )
 
 
 def normalize_counts( callstack_to_count ):
