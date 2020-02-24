@@ -200,7 +200,7 @@ def make_violin_plots( slice_idx_to_data ):
         #                #showmeans=True,
         #                #showextrema=True
         #)
-        axis = sns.violinplot( data=violin_plot_data )
+        axis = sns.violinplot( data=violin_plot_data  )
 
         #label_to_plot[ str(kernel) ] = vp
    
@@ -245,35 +245,39 @@ def make_scatter_plot( slice_idx_to_data, slice_idx_lower, slice_idx_upper, stat
         slice_indices = all_slice_indices[ slice_idx_lower : slice_idx_upper+1 ]
     else:
         slice_indices = all_slice_indices
-    # Determine which kernels' data we are plotting 
-    kernels = slice_idx_to_data[0]["kernel_distance"].keys()
-    # Build mapping between kernels and  descriptive statistics for each slice
-    kernel_to_distance_stats_seq = { k:None for k in kernels }
-    for k in kernels:
-        distances_seq = get_distances_seq( slice_idx_to_data, slice_indices, k )
-        stats_seq = get_stats_seq( distances_seq )
-        kernel_to_distance_stats_seq[ k ] = stats_seq
-    # Generate the plots
-    fig, ax = plt.subplots()
-    stat_to_marker = { "min" : "_", 
-                       "max" : "+",
-                       "median" : "o" 
-                     }
-    stat_to_color =  { "min" : "red", 
-                       "max" : "blue",
-                       "median" : "green" 
-                     }
-    marker_size = 1.0
-    for k in kernels:
-        for s in stats:
-            X = slice_indices
-            Y = [ stat_dict[s] for stat_dict in kernel_to_distance_stats_seq[ k ] ]
-            ax.scatter( X, Y, marker=stat_to_marker[s], s=marker_size, c=stat_to_color[s] )
-        break
+
+    kernel = ('wlst','logical_time', 5)
+    idx_to_distances = { k:flatten_distance_matrix(v["kernel_distance"][kernel]) for k,v in slice_idx_to_data.items() }
+
+    x_vals = []
+    y_vals = []
+    for slice_idx,distances in idx_to_distances.items():
+        base_x_val = slice_idx
+        for d in distances:
+            x_val = base_x_val + np.random.uniform(-0.25,0.25)
+            y_val = d
+            x_vals.append( x_val )
+            y_vals.append( y_val )
+
+    fig,ax = plt.subplots()
+    ax.scatter( x_vals, y_vals )
+
+    x_axis_label = "% Messages Non-Deterministic"
+    x_tick_labels = [ "0", "20", "30", "40", "50", "60", "70", "80", "90", "100" ]
+    x_ticks = list(range(len(x_tick_labels)))
+    ax.set_xticks( x_ticks )
+    ax.set_xticklabels( x_tick_labels, rotation=45 )
+    ax.set_xlabel( x_axis_label )
+
+    # Y-axis stuff
+    y_axis_label = "Kernel Distance (Higher == Runs Less Similar)"
+    ax.set_ylabel( y_axis_label )
+
+    # Plot title
+    plot_title = "Fraction of Messages Non-Deterministic vs. Kernel Distance"
+    plt.title( plot_title )
 
     plt.show()
-
-
 
 def get_plot_element_positions( slice_idx_to_data, slice_idx_lower, slice_idx_upper, slice_indices, wall_time_layout ):
     requested_slices = get_requested_slices( slice_idx_to_data, slice_idx_lower, slice_idx_upper, slice_indices )
@@ -428,16 +432,18 @@ def make_box_plots( slice_idx_to_data, slice_idx_lower, slice_idx_upper, wall_ti
                 x_tick_labels.append( "" )
     else:
         x_tick_labels_base = [ str(i) for i in range(n_boxes) ]
-        x_axis_label = "Slice Index"
-        x_tick_labels = []
-        for idx,label in enumerate(x_tick_labels_base):
-            if idx == 0 or idx == len(x_tick_labels_base)-1:
-                x_tick_labels.append( label )
-            else:
-                if idx % 10 == 0:
-                    x_tick_labels.append( label )
-                else:
-                    x_tick_labels.append( "" )
+        #x_axis_label = "Slice Index"
+        x_axis_label = "% Messages Non-Deterministic"
+        x_tick_labels = [ "0", "20", "30", "40", "50", "60", "70", "80", "90", "100" ]
+        #x_tick_labels = []
+        #for idx,label in enumerate(x_tick_labels_base):
+        #    if idx == 0 or idx == len(x_tick_labels_base)-1:
+        #        x_tick_labels.append( label )
+        #    else:
+        #        if idx % 10 == 0:
+        #            x_tick_labels.append( label )
+        #        else:
+        #            x_tick_labels.append( "" )
     # Select subset of x-tick labels so axis isn't too crowded
     ax.set_xticklabels( x_tick_labels, rotation=45 )
     ax.set_xlabel( x_axis_label )
@@ -446,7 +452,7 @@ def make_box_plots( slice_idx_to_data, slice_idx_lower, slice_idx_upper, wall_ti
     y_axis_label = "Kernel Distance (Higher == Runs Less Similar)"
     ax.set_ylabel( y_axis_label )
 
-    ax.set_ylim(0, 700)
+    #ax.set_ylim(0, 700)
 
     # Legend stuff
     #ax.legend( [ label_to_boxplot[k]["boxes"][0] for k in sorted(label_to_boxplot.keys()) ], list(sorted(label_to_boxplot.keys())), loc="best" )
