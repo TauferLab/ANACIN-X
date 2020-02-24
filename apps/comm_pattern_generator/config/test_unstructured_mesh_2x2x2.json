@@ -4,8 +4,12 @@
             {
                 "pattern_name" : "unstructured_mesh",
                 "n_iters" : 1,
-                "nd_fraction" : 0.0,
+                "nd_fraction" : 0.5,
                 "params" : [
+                                {
+                                  "key" : "nd_fraction_neighbors",
+                                  "val" : 0.0
+                                },
                                 { 
                                   "key" : "n_procs_x", 
                                   "val" : 2
@@ -20,11 +24,11 @@
                                 },
                                 { 
                                   "key" : "min_deg", 
-                                  "val" : 1
+                                  "val" : 4
                                 },
                                 { 
                                   "key" : "max_deg", 
-                                  "val" : 3
+                                  "val" : 4
                                 },
                                 { 
                                   "key" : "max_dist", 

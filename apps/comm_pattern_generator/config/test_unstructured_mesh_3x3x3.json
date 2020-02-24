@@ -6,6 +6,10 @@
                 "n_iters" : 1,
                 "nd_fraction" : 1.0,
                 "params" : [
+                                {
+                                  "key" : "nd_fraction_neighbors",
+                                  "val" : 0.0
+                                },
                                 { 
                                   "key" : "n_procs_x", 
                                   "val" : 3

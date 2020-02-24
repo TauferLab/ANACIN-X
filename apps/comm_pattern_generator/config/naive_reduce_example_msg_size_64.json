@@ -1,0 +1,115 @@
+{
+    "comm_patterns" : 
+        [
+            {
+                "pattern_name" : "naive_reduce",
+                "n_iters" : 10,
+                "nd_fraction" : 0.1,
+                "params" : [
+                                { 
+                                  "key" : "msg_size",
+                                  "val" : 64
+                                }
+                           ]
+            },
+            {
+                "pattern_name" : "naive_reduce",
+                "n_iters" : 10,
+                "nd_fraction" : 0.2,
+                "params" : [
+                                { 
+                                  "key" : "msg_size",
+                                  "val" : 64
+                                }
+                           ]
+            },
+            {
+                "pattern_name" : "naive_reduce",
+                "n_iters" : 10,
+                "nd_fraction" : 0.3,
+                "params" : [
+                                { 
+                                  "key" : "msg_size",
+                                  "val" : 64
+                                }
+                           ]
+            },
+            {
+                "pattern_name" : "naive_reduce",
+                "n_iters" : 10,
+                "nd_fraction" : 0.4,
+                "params" : [
+                                { 
+                                  "key" : "msg_size",
+                                  "val" : 64
+                                }
+                           ]
+            },
+            {
+                "pattern_name" : "naive_reduce",
+                "n_iters" : 10,
+                "nd_fraction" : 0.5,
+                "params" : [
+                                { 
+                                  "key" : "msg_size",
+                                  "val" : 64
+                                }
+                           ]
+            },
+            {
+                "pattern_name" : "naive_reduce",
+                "n_iters" : 10,
+                "nd_fraction" : 0.6,
+                "params" : [
+                                { 
+                                  "key" : "msg_size",
+                                  "val" : 64
+                                }
+                           ]
+            },
+            {
+                "pattern_name" : "naive_reduce",
+                "n_iters" : 10,
+                "nd_fraction" : 0.7,
+                "params" : [
+                                { 
+                                  "key" : "msg_size",
+                                  "val" : 64
+                                }
+                           ]
+            },
+            {
+                "pattern_name" : "naive_reduce",
+                "n_iters" : 10,
+                "nd_fraction" : 0.8,
+                "params" : [
+                                { 
+                                  "key" : "msg_size",
+                                  "val" : 64
+                                }
+                           ]
+            },
+            {
+                "pattern_name" : "naive_reduce",
+                "n_iters" : 10,
+                "nd_fraction" : 0.9,
+                "params" : [
+                                { 
+                                  "key" : "msg_size",
+                                  "val" : 64
+                                }
+                           ]
+            },
+            {
+                "pattern_name" : "naive_reduce",
+                "n_iters" : 10,
+                "nd_fraction" : 1.0,
+                "params" : [
+                                { 
+                                  "key" : "msg_size",
+                                  "val" : 64
+                                }
+                           ]
+            }
+        ]
+}
