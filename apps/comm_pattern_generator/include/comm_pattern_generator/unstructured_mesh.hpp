@@ -3,7 +3,7 @@
 
 #include <mpi.h>
 
-void comm_pattern_unstructured_mesh( int iter, double nd_fraction, 
+void comm_pattern_unstructured_mesh( int iter, double nd_fraction_neighbors, double nd_fraction_recvs,
                                      int n_procs_x, int n_procs_y, int n_procs_z, 
                                      int min_deg, int max_deg, int max_dist, int msg_size );
 
