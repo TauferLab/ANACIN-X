@@ -48,7 +48,7 @@ int rank_to_dist( int src_rank, int dst_rank, int n_procs_x, int n_procs_y, int 
   return dist;
 }
 
-void comm_pattern_unstructured_mesh( int iter, double nd_fraction, 
+void comm_pattern_unstructured_mesh( int iter, double nd_fraction_neighbors, double nd_fraction_recvs,
                                      int n_procs_x, int n_procs_y, int n_procs_z, 
                                      int min_deg, int max_deg, int max_dist, int msg_size )
 {
@@ -65,7 +65,7 @@ void comm_pattern_unstructured_mesh( int iter, double nd_fraction,
   // or non-deterministically. 
   // If deterministic, RNG is seeded same way each iteration
   // If not, RNG is seeded differently on each iteration
-  auto max_nd_rank = (int) (comm_size) * nd_fraction;
+  auto max_nd_rank = (int) (comm_size) * nd_fraction_neighbors;
   if ( rank < max_nd_rank ) {
     std::srand( std::time(NULL) + iter );
   } else {
@@ -73,10 +73,7 @@ void comm_pattern_unstructured_mesh( int iter, double nd_fraction,
   }
 
   // Determine number of destinations
-  int range = max_deg - min_deg;
-  // Guarantee range of at least one
-  (range > 0) ? range : 1;
-  int degree = min_deg + ( std::rand() % range );
+  int degree = (std::rand() % (max_deg + 1 - min_deg)) + min_deg;
 
   // Determine who this process's destinations are
   std::unordered_set<int> destination_set;
@@ -115,45 +112,111 @@ void comm_pattern_unstructured_mesh( int iter, double nd_fraction,
     std::cout << n << " ";
   }
   std::cout << std::endl;
+  mpi_rc = MPI_Barrier(MPI_COMM_WORLD);
 #endif
+  
 
-  // Determine how many messages this process will receive
-  int* local_counts = new int[comm_size];
-  for ( int i=0; i<comm_size; ++i ) {
-    local_counts[i] = 0;
+  // Determine who will be received from
+  std::vector<int> senders;
+  for ( int curr_rank=0; curr_rank<comm_size; ++curr_rank ) {
+    // First the current process broadcasts how many others it plans to send to
+    int n_destinations;
+    if ( rank == curr_rank ) {
+      n_destinations = destinations.size();
+    }
+    mpi_rc = MPI_Bcast( &n_destinations, 1, MPI_INT, curr_rank, MPI_COMM_WORLD );
+    // Next it broadcasts which others it plans to send to
+    int buffer[ n_destinations ];
+    if ( rank == curr_rank ) {
+      for ( int i=0; i<destinations.size(); ++i ) {
+        buffer[i] = destinations[i];
+      }
+    }
+    mpi_rc = MPI_Bcast( &buffer[0], n_destinations, MPI_INT, curr_rank, MPI_COMM_WORLD );
+    // Next all other processes check to see if they are an upcoming 
+    // destination of the current process
+    if ( rank != curr_rank ) {
+      for ( int i=0; i<n_destinations; ++i ) {
+        if ( buffer[i] == rank ) {
+          senders.push_back( curr_rank );
+        }
+      }
+    }
   }
-  for ( int i=0; i<degree; ++i ) {
-    local_counts[ destinations[i] ]++;
-  }
-  int* global_counts = new int[comm_size];
-  mpi_rc = MPI_Allreduce( local_counts, 
-                          global_counts, 
-                          comm_size, 
-                          MPI_INTEGER, 
-                          MPI_SUM, 
-                          MPI_COMM_WORLD );
-  int n_neighbors = global_counts[ rank ];
-  delete [] local_counts;
-  delete [] global_counts;
 
+#ifdef DEBUG
+  std::cout << "Rank: " << rank << ", # recvs needed = " << senders.size() << ", senders: ";
+  for ( auto s : senders ) {
+    std::cout << s << " ";
+  }
+  std::cout << std::endl;
+  mpi_rc = MPI_Barrier(MPI_COMM_WORLD);
+#endif
+  
+
+//  // Determine how many messages this process will receive
+//  int* local_counts = new int[comm_size];
+//  for ( int i=0; i<comm_size; ++i ) {
+//    local_counts[i] = 0;
+//  }
+//  for ( int i=0; i<degree; ++i ) {
+//    local_counts[ destinations[i] ]++;
+//  }
+//  int* global_counts = new int[comm_size];
+//  mpi_rc = MPI_Allreduce( local_counts, 
+//                          global_counts, 
+//                          comm_size, 
+//                          MPI_INTEGER, 
+//                          MPI_SUM, 
+//                          MPI_COMM_WORLD );
+//  int n_neighbors = global_counts[ rank ];
+//  delete [] local_counts;
+//  delete [] global_counts;
+//
+//#ifdef DEBUG
+//  std::cout << "Rank: " << rank << ", # neighbors = " << n_neighbors << std::endl;
+//  mpi_rc = MPI_Barrier(MPI_COMM_WORLD);
+//#endif
+
+  int in_degree = senders.size();
+  
+  // Determine split of deterministic vs. non-deterministic receives
+  int n_nd_recvs = (int) in_degree * nd_fraction_recvs;
+  int n_det_recvs = in_degree - n_nd_recvs; 
+  
   // Allocate send and receive buffers 
   char* send_buffer = (char*) malloc (degree * msg_size * sizeof(char));
-  char* recv_buffer = (char*) malloc (n_neighbors * msg_size * sizeof(char));
-
+  char* det_recv_buffer = (char*) malloc (n_det_recvs * msg_size * sizeof(char));
+  char* nd_recv_buffer = (char*) malloc (n_nd_recvs * msg_size * sizeof(char));
+  
   // Allocate requests
   MPI_Request * send_reqs = new MPI_Request[ degree ];
-  MPI_Request * recv_reqs = new MPI_Request[ n_neighbors ];
+  MPI_Request * det_recv_reqs = new MPI_Request[ n_det_recvs ];
+  MPI_Request * nd_recv_reqs = new MPI_Request[ n_nd_recvs  ];
+
+  // Post deterministic receives
+  for (int j = 0; j < n_det_recvs; j++) {
+    MPI_Irecv( &det_recv_buffer[j * msg_size], 
+               msg_size, 
+               MPI_CHAR, 
+               senders[j], 
+               iter,
+               MPI_COMM_WORLD, 
+               &det_recv_reqs[j] );
+  }
   
-  // Post communication requests
-  for (int j = 0; j < n_neighbors; j++) {
-    MPI_Irecv( &recv_buffer[j * msg_size], 
+  // Post non-deterministic receives
+  for (int j = 0; j < n_nd_recvs; j++) {
+    MPI_Irecv( &nd_recv_buffer[j * msg_size], 
                msg_size, 
                MPI_CHAR, 
                MPI_ANY_SOURCE, 
                iter,
                MPI_COMM_WORLD, 
-               &recv_reqs[j] );
+               &nd_recv_reqs[j] );
   }
+
+  // Post sends
   for (int j = 0; j < degree; j++) {
     MPI_Isend( &send_buffer[j * msg_size], 
                msg_size, 
@@ -164,9 +227,24 @@ void comm_pattern_unstructured_mesh( int iter, double nd_fraction,
                &send_reqs[j] );
   } 
   
-  // Complete communication requests
+  // Complete sends
   MPI_Waitall(degree, &send_reqs[0], MPI_STATUSES_IGNORE);
-  MPI_Status recv_statuses[ n_neighbors ];
-  MPI_Waitall(n_neighbors, &recv_reqs[0], &recv_statuses[0]);
+
+  // Complete deterministic recvs
+  MPI_Status det_recv_status;
+  for ( int i=0; i<n_det_recvs; ++i ) {
+    mpi_rc = MPI_Wait( &det_recv_reqs[i], &det_recv_status );
+    std::cout << "(DETERMINISTIC) Rank: " << rank << " received from: " << det_recv_status.MPI_SOURCE << std::endl;
+  }
+
+  // Complete non-deterministic recvs
+  MPI_Status nd_recv_status;
+  for ( int i=0; i<n_nd_recvs; ++i ) {
+    mpi_rc = MPI_Wait( &nd_recv_reqs[i], &nd_recv_status );
+    std::cout << "(NON-DETERMINISTIC) Rank: " << rank << " received from: " << nd_recv_status.MPI_SOURCE << std::endl;
+  }
+
+  //MPI_Status recv_statuses[ n_neighbors ];
+  //MPI_Waitall(n_neighbors, &recv_reqs[0], &recv_statuses[0]);
 }
 
