@@ -156,4 +156,4 @@ void comm_pattern_amg2013( int iter, double nd_fraction, int msg_size )
     printf("(NON-DETERMINISTIC) Rank: %d round-2 received from rank: %d\n", rank, round_2_recv_status.MPI_SOURCE);
 #endif
   }
-
+}
