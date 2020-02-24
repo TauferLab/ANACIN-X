@@ -29,8 +29,9 @@ def flatten_distance_matrix( dist_mat ):
     assert( n_rows == n_cols )
     distances = []
     for i in range( n_rows ):
-        for j in range( i, n_cols ):
-            distances.append( dist_mat[i][j] )
+        for j in range( n_cols ):
+            if i > j:
+                distances.append( dist_mat[i][j] )
     return distances
                 
     

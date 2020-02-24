@@ -130,54 +130,13 @@ def main( flagged_slices_path, kdts_path, executable_path ):
     with open( executable_path, "rb" ) as executable_infile:
         elf_file = ELFFile( executable_infile )
         validate( elf_file )
-
-    ## Read in slicing policy
-    ## This will tell us which sub-directory of the trace directory to look in
-    ## for the slice subgraph 
-    #with open( slicing_policy_path, "r" ) as infile:
-    #    slicing_policy = json.load( infile )
-
-    ## Determine set of slices to compute over based on slicing policy
-    #trace_dirs = get_all_trace_dirs( traces_root_dir )
-    #trace_dir_to_slice_dir = get_slice_dirs( trace_dirs, slicing_policy )
-
-    ## Sort slice dirs in run order 
-    ##slice_dirs = sorted( trace_dir_to_slice_dir.values(), key=lambda x:  int(os.path.abspath(x).split("/")[-2][3:]) )
-    #slice_dirs = sorted( [ td + "/slices_mesh_refinement_events/" for td in trace_dirs ], key=lambda x: int(os.path.abspath(x).split("/")[-2][3:]) )
-
+    
     # For each anomaly detection policy, load in the slice subgraphs 
     # corresponding to the flagged slice indices
     for policy,slice_indices in policy_to_flagged_indices.items():
         
         callstack_to_count = get_callstacks( slice_indices, slice_idx_to_data )
                     
-        #callstack_to_count = {}
-        #for slice_idx in slice_indices:
-        #    print("Policy: {} - Loading slice subgraphs for slice index: {}".format( policy, slice_idx ))
-        #    # Load slice subgraphs for this index
-        #    slice_paths = [ sd + "/slice_" + str(slice_idx) + ".graphml" for sd in slice_dirs ]
-        #    slice_subgraphs = read_graphs_parallel( slice_paths ) ### getting OSError too many open files?
-        #    #slice_subgraphs = read_graphs_serial( slice_paths )
-        #    #slice_subgraphs = [] 
-        #    #for sd in slice_dirs:
-        #    #    slice_subgraph_path = sd + "/slice_" + str(slice_idx) + ".graphml"
-        #    #    slice_subgraph = read_graph( slice_subgraph_path )
-        #    #    slice_subgraphs.append( slice_subgraph )
-
-        #    # Extract call-stack information from the slice subgraphs
-        #    #callstack_to_count = {}
-        #    for g in slice_subgraphs:
-        #        callstacks = g.vs[:]["callstack"]
-        #        # Filter out empties
-        #        callstacks = list( filter( lambda cs: cs != "", callstacks ) )
-        #        # Aggregate into map from unique callstacks to # times appearing
-        #        for cs in callstacks:
-        #            if cs not in callstack_to_count:
-        #                callstack_to_count[ cs ] = 1
-        #            else:
-        #                callstack_to_count[ cs ] += 1
-
-
         # Clean up callstacks
         cleaned_callstack_to_count = {}
         for cs,count in callstack_to_count.items():
