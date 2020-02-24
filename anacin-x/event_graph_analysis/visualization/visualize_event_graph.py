@@ -47,14 +47,14 @@ def visualize( graph, barrier_adjustment=False ):
         for pid in pids:
             vertex_seq = graph.vs.select( process_id_eq=pid )
             curr_barrier_lts = 0
-            barrier_idx = -1
+            barrier_idx = -1 
             for v in vertex_seq:
                 if v["event_type"] == "barrier":
                     curr_barrier_lts = v["logical_time"]
                     barrier_idx += 1
                 else:
                     vertex_to_offset[ v["id"] ] = ( barrier_idx, v["logical_time"] - curr_barrier_lts )
-            
+           
         # Adjust barriers 
         for barrier_idx in range( 1,n_barriers ):
             # Figure out offset for current barrier
@@ -66,16 +66,15 @@ def visualize( graph, barrier_adjustment=False ):
             for pid,barrier_vertex in pid_to_barrier_vertex.items():
                 print("Rank: {}, Old barrier time: {}, New barrier time: {}".format( pid, barrier_vertex["logical_time"], barrier_vertex["logical_time"] + pid_to_offset[pid] ) )
                 barrier_vertex["logical_time"] += pid_to_offset[ pid ]
-            
+        
         # Adjust everything else
         pid_to_barrier_seq = { pid:graph.vs.select(process_id_eq=pid, event_type="barrier") for pid in pids }
         for v in graph.vs[:]:
             if v["event_type"] not in ["barrier", "init"]:
                 pid = v["process_id"]
                 preceding_barrier_idx,offset = vertex_to_offset[ v["id"] ]
-                v["logical_time"] = pid_to_barrier_seq[pid][preceding_barrier_idx]["logical_time"] + offset
-                if pid == 0:
-                    v["logical_time"] += 1
+                if preceding_barrier_idx != -1:
+                    v["logical_time"] = pid_to_barrier_seq[pid][preceding_barrier_idx]["logical_time"] + offset
 
         # Finally adjust finalize vertices
         max_lts = max( graph.vs[:]["logical_time"] )
