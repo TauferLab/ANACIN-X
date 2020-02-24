@@ -63,36 +63,6 @@ def make_pairwise_scatter_plot( slice_idx_to_data ):
     ax.legend( loc="upper left", ncol=6, fancybox=True )
     plt.show()
 
-def make_pairwise_bar_plot( slice_idx_to_data ):
-    # Unpack kernel distance stuff
-    graph_pair_to_distance_seq = {}
-    slice_idx_seq = list( sorted( slice_idx_to_data.keys() ) )
-    for slice_idx,data in sorted( slice_idx_to_data.items() ):
-        # Get kernel distance data for this slice
-        kernel_distance_data = data["kernel_distance"]
-        for k,dist_mat in kernel_distance_data.items():
-            # Extract all pairwise distances at this slice, for this kernel
-            for i in range(len(dist_mat)):
-                for j in range(len(dist_mat[0])):
-                    if i > j:
-                        graph_pair = (i,j)
-                        distance = dist_mat[i][j]
-                        if graph_pair not in graph_pair_to_distance_seq:
-                            graph_pair_to_distance_seq[ graph_pair ] = [ distance ]
-                        else:
-                            graph_pair_to_distance_seq[ graph_pair ].append( distance )
-
-    fig,ax = plt.subplots()
-    for graph_pair,distance_seq in graph_pair_to_distance_seq.items():
-        graph_pair_label = str(graph_pair)
-        # Scale distances
-        max_dist = max( distance_seq )
-        scaled_distance_seq = [ d / max_dist for d in distance_seq ]
-        bar_width=0.4
-        ax.bar( slice_idx_seq, scaled_distance_seq, width=bar_width, label=graph_pair_label, color="r" )
-   
-    #ax.legend( loc="best" )
-    plt.show()
 
 def make_plot(lts_to_distances):
     lts_midpoints = []
@@ -305,12 +275,35 @@ def make_scatter_plot( slice_idx_to_data, slice_idx_lower, slice_idx_upper, stat
 
 
 
+def get_plot_element_positions( slice_idx_to_data, slice_idx_lower, slice_idx_upper, slice_indices, wall_time_layout ):
+    requested_slices = get_requested_slices( slice_idx_to_data, slice_idx_lower, slice_idx_upper, slice_indices )
+
+
+
+
+"""
+Determines which slices' data will be plotted.
+"""
+def get_requested_slices( slice_idx_to_data, slice_idx_lower, slice_idx_upper, slice_indices ):
+    # Case 1: All slices
+    if slice_idx_lower is None and slice_idx_upper is None and slice_indices is None:
+        requested_slice_indices = sorted( slice_idx_to_data.keys() )
+    # Case 2: Contiguous range of slices
+    elif slice_idx_lower is not None and slice_idx_upper is not None and slice_indices is None:
+        requested_slice_indices = list( range( slice_idx_lower, slice_idx_upper+1 ) )
+    # Case 3: User-defined set of slices
+    else:
+        requested_slice_indices = slice_indices
+    return requested_slice_indices
+
+
 
 
 def make_box_plots( slice_idx_to_data, slice_idx_lower, slice_idx_upper, wall_time_layout, application_events ):
     # Unpack kernel distance stuff
     wall_times = [] 
     kernel_to_distance_data_seq = {}
+    
 
     slice_indices = sorted( slice_idx_to_data.keys() )
     if slice_idx_lower is not None and slice_idx_upper is not None:
@@ -348,6 +341,7 @@ def make_box_plots( slice_idx_to_data, slice_idx_lower, slice_idx_upper, wall_ti
                 kernel_to_distance_data_seq[k].append( distances )
 
     fig, ax = plt.subplots()
+    fig.set_size_inches( 18, 9 )
    
     # Track maximum y-value of data so we know how tall to make application 
     # event lines/boxes
@@ -461,13 +455,17 @@ def make_box_plots( slice_idx_to_data, slice_idx_lower, slice_idx_upper, wall_ti
     plot_title = "Kernel Distance Time Series"
     plt.title( plot_title )
 
-    plt.show()
+    #plt.show()
+    plt.savefig( "kdts.png", 
+                 bbox_inches="tight",
+                 transparent=True,
+                 pad_inches=0.05,
+                 dpi=300 )
 
 
 
 
-
-def main( kdts_path, plot_type, slice_idx_lower, slice_idx_upper, wall_time_layout, application_events ):
+def main( kdts_path, plot_type, slice_idx_lower, slice_idx_upper, flagged_slices, wall_time_layout, application_events ):
 
     # Read in kdts data
     with open( kdts_path, "rb" ) as infile:
@@ -487,29 +485,31 @@ def main( kdts_path, plot_type, slice_idx_lower, slice_idx_upper, wall_time_layo
     elif plot_type == "violin":
         make_violin_plots( slice_idx_to_data )
 
-    elif plot_type == "pairwise_scatter":
-        make_pairwise_scatter_plot( slice_idx_to_data )
-
-    elif plot_type == "pairwise_bar":
-        make_pairwise_bar_plot( slice_idx_to_data )
-
 
 if __name__ == "__main__":
     desc = "Script to visualize time series of kernel distances between slices of executions"
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("data", 
                         help="Path to pickle file of kernel distance time series data")
-    parser.add_argument("plot_type", 
-                        help="Specify which kind of visualization to create. Options: box, scatter, violin, pairwise-scatter, pairwise_bars")
+    parser.add_argument("--plot_type", 
+                        help="Specify which kind of visualization to create. Options: box, scatter, violin")
     parser.add_argument("-l", "--lower", required=False, default=None, type=int,
                         help="Lower bound (inclusive) of slice indices for which to plot data")
     parser.add_argument("-u", "--upper", required=False, default=None, type=int,
                         help="Upper bound (inclusive) of slice indices for which to plot data")
+    parser.add_argument("--flagged_slices", required=False, default=None,
+                        help="A list of slice indices indicating which slices have been flagged by anomaly detection and should be marked with a contrasting color. (Optional)")
     parser.add_argument("-w", "--wall_time_layout", action="store_true", default=False,
                         help="If enabled, place the kernel distance boxplots for each slice on the x-axis based on the wall-time of the slice")
     parser.add_argument("-a", "--application_events", required=False,
                         help="Path to pickle file of supplementary application-specific event data")
     args = parser.parse_args()
 
-    main( args.data, args.plot_type, args.lower, args.upper, args.wall_time_layout, args.application_events )
+    main( args.data, 
+          args.plot_type, 
+          args.lower, 
+          args.upper, 
+          args.flagged_slices,
+          args.wall_time_layout, 
+          args.application_events )
 
