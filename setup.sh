@@ -80,10 +80,9 @@ echo ${progress_delimiter}
 echo "Patching tracing libraries for use with PnMPI..."
 echo ${progress_delimiter}
 echo 
-mkdir -p ./anacin-x/tracing/pnmpi_patched_libs
-./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/sst-dumpi/build/lib/libdumpi.so ./anacin-x/tracing/pnmpi_patched_libs/libdumpi.so
-./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/csmpi/build/libcsmpi.so ./anacin-x/tracing/pnmpi_patched_libs/libcsmpi.so
-./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/ninja/build/libninja.so ./anacin-x/tracing/pnmpi_patched_libs/libninja.so
+./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/sst-dumpi/build/lib/libdumpi.so ./anacin-x/pnmpi/patched_libs/libdumpi.so
+./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/csmpi/build/libcsmpi.so ./anacin-x/pnmpi/patched_libs/libcsmpi.so
+./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/ninja/build/libninja.so ./anacin-x/pnmpi/patched_libs/libninja.so
 echo
 echo ${progress_delimiter}
 echo "Done patching tracing libraries for use with PnMPI..."
@@ -133,6 +132,6 @@ touch ./anacin-x/base_vars.sh
 echo "anacin_x_root=$(pwd)" >> ./anacin-x/base_vars.sh
 echo "ega_x_root=${anacin_x_root}/anacin-x/event_graph_analysis/" >> ./anacin-x/base_vars.sh
 
-# Set up conda environment
-conda env create -f ./install/anacin-x-environment.yml
-source ./install/activate_environment.sh
+## Set up conda environment
+#conda env create -f ./install/anacin-x-environment.yml
+#source ./install/activate_environment.sh
