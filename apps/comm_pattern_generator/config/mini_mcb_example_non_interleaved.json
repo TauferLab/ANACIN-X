@@ -1,0 +1,235 @@
+{
+    "comm_patterns" : 
+        [
+            {
+                "pattern_name" : "mini_mcb",
+                "n_iters" : 1,
+                "nd_fraction" : 0.0,
+                "params" : [
+                              { 
+                                "key" : "n_sub_iters",
+                                "val" : "10"
+                              },
+                              { 
+                                "key" : "n_grid_steps",
+                                "val" : "4"
+                              },
+                              { 
+                                "key" : "n_reduction_steps",
+                                "val" : "4"
+                              },
+                              { 
+                                "key" : "interleave_nd_iters",
+                                "val" : "0"
+                              }
+                           ]
+            },
+            {
+                "pattern_name" : "mini_mcb",
+                "n_iters" : 1,
+                "nd_fraction" : 0.1,
+                "params" : [
+                              { 
+                                "key" : "n_sub_iters",
+                                "val" : "10"
+                              },
+                              { 
+                                "key" : "n_grid_steps",
+                                "val" : "4"
+                              },
+                              { 
+                                "key" : "n_reduction_steps",
+                                "val" : "4"
+                              },
+                              { 
+                                "key" : "interleave_nd_iters",
+                                "val" : "0"
+                              }
+                           ]
+            },
+            {
+                "pattern_name" : "mini_mcb",
+                "n_iters" : 1,
+                "nd_fraction" : 0.2,
+                "params" : [
+                              { 
+                                "key" : "n_sub_iters",
+                                "val" : "10"
+                              },
+                              { 
+                                "key" : "n_grid_steps",
+                                "val" : "4"
+                              },
+                              { 
+                                "key" : "n_reduction_steps",
+                                "val" : "4"
+                              },
+                              { 
+                                "key" : "interleave_nd_iters",
+                                "val" : "0"
+                              }
+                           ]
+            },
+            {
+                "pattern_name" : "mini_mcb",
+                "n_iters" : 1,
+                "nd_fraction" : 0.4,
+                "params" : [
+                              { 
+                                "key" : "n_sub_iters",
+                                "val" : "10"
+                              },
+                              { 
+                                "key" : "n_grid_steps",
+                                "val" : "4"
+                              },
+                              { 
+                                "key" : "n_reduction_steps",
+                                "val" : "4"
+                              },
+                              { 
+                                "key" : "interleave_nd_iters",
+                                "val" : "0"
+                              }
+                           ]
+            },
+            {
+                "pattern_name" : "mini_mcb",
+                "n_iters" : 1,
+                "nd_fraction" : 0.5,
+                "params" : [
+                              { 
+                                "key" : "n_sub_iters",
+                                "val" : "10"
+                              },
+                              { 
+                                "key" : "n_grid_steps",
+                                "val" : "4"
+                              },
+                              { 
+                                "key" : "n_reduction_steps",
+                                "val" : "4"
+                              },
+                              { 
+                                "key" : "interleave_nd_iters",
+                                "val" : "0"
+                              }
+                           ]
+            },
+            {
+                "pattern_name" : "mini_mcb",
+                "n_iters" : 1,
+                "nd_fraction" : 0.6,
+                "params" : [
+                              { 
+                                "key" : "n_sub_iters",
+                                "val" : "10"
+                              },
+                              { 
+                                "key" : "n_grid_steps",
+                                "val" : "4"
+                              },
+                              { 
+                                "key" : "n_reduction_steps",
+                                "val" : "4"
+                              },
+                              { 
+                                "key" : "interleave_nd_iters",
+                                "val" : "0"
+                              }
+                           ]
+            },
+            {
+                "pattern_name" : "mini_mcb",
+                "n_iters" : 1,
+                "nd_fraction" : 0.7,
+                "params" : [
+                              { 
+                                "key" : "n_sub_iters",
+                                "val" : "10"
+                              },
+                              { 
+                                "key" : "n_grid_steps",
+                                "val" : "4"
+                              },
+                              { 
+                                "key" : "n_reduction_steps",
+                                "val" : "4"
+                              },
+                              { 
+                                "key" : "interleave_nd_iters",
+                                "val" : "0"
+                              }
+                           ]
+            },
+            {
+                "pattern_name" : "mini_mcb",
+                "n_iters" : 1,
+                "nd_fraction" : 0.8,
+                "params" : [
+                              { 
+                                "key" : "n_sub_iters",
+                                "val" : "10"
+                              },
+                              { 
+                                "key" : "n_grid_steps",
+                                "val" : "4"
+                              },
+                              { 
+                                "key" : "n_reduction_steps",
+                                "val" : "4"
+                              },
+                              { 
+                                "key" : "interleave_nd_iters",
+                                "val" : "0"
+                              }
+                           ]
+            }
+            {
+                "pattern_name" : "mini_mcb",
+                "n_iters" : 1,
+                "nd_fraction" : 0.9,
+                "params" : [
+                              { 
+                                "key" : "n_sub_iters",
+                                "val" : "10"
+                              },
+                              { 
+                                "key" : "n_grid_steps",
+                                "val" : "4"
+                              },
+                              { 
+                                "key" : "n_reduction_steps",
+                                "val" : "4"
+                              },
+                              { 
+                                "key" : "interleave_nd_iters",
+                                "val" : "0"
+                              }
+                           ]
+            },
+            {
+                "pattern_name" : "mini_mcb",
+                "n_iters" : 1,
+                "nd_fraction" : 1.0,
+                "params" : [
+                              { 
+                                "key" : "n_sub_iters",
+                                "val" : "10"
+                              },
+                              { 
+                                "key" : "n_grid_steps",
+                                "val" : "4"
+                              },
+                              { 
+                                "key" : "n_reduction_steps",
+                                "val" : "4"
+                              },
+                              { 
+                                "key" : "interleave_nd_iters",
+                                "val" : "0"
+                              }
+                           ]
+            }
+        ]
+}
