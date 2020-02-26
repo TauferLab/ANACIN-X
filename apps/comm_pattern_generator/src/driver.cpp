@@ -52,23 +52,23 @@ int main( int argc, char** argv )
 #endif
     for ( int i=0; i<n_iters; ++i ) {
       if ( pattern_name == "naive_reduce" ) {
-        auto msg_size = comm_pattern.params.at("msg_size");
+        auto msg_size = std::stoi( comm_pattern.params.at("msg_size") );
         comm_pattern_naive_reduce( i, nd_fraction, msg_size, false );
       } 
       else if ( pattern_name == "amg2013" ) {
-        auto msg_size = comm_pattern.params.at("msg_size");
+        auto msg_size = std::stoi( comm_pattern.params.at("msg_size") );
         comm_pattern_amg2013( i, nd_fraction, msg_size );
       }
       else if ( pattern_name == "unstructured_mesh" ) {
         auto nd_fraction_recvs = nd_fraction;
-        auto nd_fraction_neighbors = comm_pattern.params.at("nd_fraction_neighbors");
-        auto n_procs_x = comm_pattern.params.at("n_procs_x");
-        auto n_procs_y = comm_pattern.params.at("n_procs_y");
-        auto n_procs_z = comm_pattern.params.at("n_procs_z");
-        auto min_deg = comm_pattern.params.at("min_deg");
-        auto max_deg = comm_pattern.params.at("max_deg");
-        auto max_dist = comm_pattern.params.at("max_dist");
-        auto msg_size = comm_pattern.params.at("msg_size");
+        auto nd_fraction_neighbors = std::stod( comm_pattern.params.at("nd_fraction_neighbors") );
+        auto n_procs_x = std::stoi( comm_pattern.params.at("n_procs_x") );
+        auto n_procs_y = std::stoi( comm_pattern.params.at("n_procs_y") );
+        auto n_procs_z = std::stoi( comm_pattern.params.at("n_procs_z") );
+        auto min_deg = std::stoi( comm_pattern.params.at("min_deg") );
+        auto max_deg = std::stoi( comm_pattern.params.at("max_deg") );
+        auto max_dist = std::stoi( comm_pattern.params.at("max_dist") );
+        auto msg_size = std::stoi( comm_pattern.params.at("msg_size") );
         comm_pattern_unstructured_mesh( i, nd_fraction_neighbors, nd_fraction_recvs,
                                         n_procs_x, n_procs_y, n_procs_z, 
                                         min_deg, max_deg, max_dist, msg_size );

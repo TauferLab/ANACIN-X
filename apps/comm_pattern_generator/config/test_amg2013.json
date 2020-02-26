@@ -8,7 +8,7 @@
                 "params" : [
                               { 
                                 "key" : "msg_size",
-                                "val" : 1
+                                "val" : "1"
                               }
                            ]
             },
@@ -19,7 +19,18 @@
                 "params" : [
                               { 
                                 "key" : "msg_size",
-                                "val" : 512
+                                "val" : "512"
+                              }
+                           ]
+            },
+            {
+                "pattern_name" : "amg2013",
+                "n_iters" : 1,
+                "nd_fraction" : 1.0,
+                "params" : [
+                              { 
+                                "key" : "msg_size",
+                                "val" : "4096"
                               }
                            ]
             }

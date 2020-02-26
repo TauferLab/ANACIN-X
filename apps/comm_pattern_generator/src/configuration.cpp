@@ -28,10 +28,10 @@ Configuration::Configuration( const std::string config_file_path )
     auto n_iters = elem["n_iters"];
     auto nd_fraction = elem["nd_fraction"];
     nlohmann::json params_json = elem["params"];
-    std::unordered_map<std::string,int> params;
+    std::unordered_map<std::string,std::string> params;
     for ( auto p : params_json ) {
       std::string key = p["key"];
-      int val = p["val"];
+      std::string val = p["val"];
       params.insert( { key, val } );
     }
     CommPattern comm_pattern( pattern_name, n_iters, nd_fraction, params );

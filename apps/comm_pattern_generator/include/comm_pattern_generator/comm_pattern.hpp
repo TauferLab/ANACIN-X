@@ -14,12 +14,12 @@ struct CommPattern
   int n_iters;
   double nd_fraction;
   std::string pattern_name;
-  std::unordered_map<std::string,int> params;
+  std::unordered_map<std::string,std::string> params;
 
   CommPattern( std::string pattern_name, 
                int n_iters, 
                double nd_fraction,
-               std::unordered_map<std::string,int> params 
+               std::unordered_map<std::string,std::string> params 
              ) : pattern_name(pattern_name), 
                  n_iters(n_iters), 
                  nd_fraction(nd_fraction),

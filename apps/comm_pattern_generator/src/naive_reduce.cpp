@@ -31,13 +31,13 @@ void comm_pattern_naive_reduce( int iter, double nd_fraction, int msg_size, bool
   if ( !interleave_nd_recvs ) {
     // Root posts receives
     if ( rank == 0 ) {
-      int* recv_buffer = (int*) malloc( msg_size * sizeof(int) );
+      char* recv_buffer = (char*) malloc( msg_size * sizeof(char) );
       MPI_Status status;
       // Post receives for deterministically ordered messages
       for (int i=0; i<n_det_recvs; ++i ) {
         mpi_rc = MPI_Recv( recv_buffer, 
                            msg_size,
-                           MPI_INT,
+                           MPI_CHAR,
                            i+1,
                            iter,
                            MPI_COMM_WORLD,
@@ -50,7 +50,7 @@ void comm_pattern_naive_reduce( int iter, double nd_fraction, int msg_size, bool
       for (int i=0; i<n_nd_recvs; ++i ) {
         mpi_rc = MPI_Recv( recv_buffer, 
                            msg_size,
-                           MPI_INT,
+                           MPI_CHAR,
                            MPI_ANY_SOURCE,
                            iter,
                            MPI_COMM_WORLD,
@@ -64,11 +64,11 @@ void comm_pattern_naive_reduce( int iter, double nd_fraction, int msg_size, bool
     }
     // Others send single message
     else {
-      int* send_buffer = (int*) malloc( msg_size * sizeof(int) );
+      char* send_buffer = (char*) malloc( msg_size * sizeof(char) );
       std::memset( send_buffer, rank, sizeof(send_buffer) );
       mpi_rc = MPI_Send( send_buffer,
                          msg_size,
-                         MPI_INT,
+                         MPI_CHAR,
                          0,
                          iter,
                          MPI_COMM_WORLD );

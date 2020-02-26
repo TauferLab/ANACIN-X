@@ -8,7 +8,18 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : 1
+                                  "val" : "1"
+                                }
+                           ]
+            },
+            {
+                "pattern_name" : "naive_reduce",
+                "n_iters" : 1,
+                "nd_fraction" : 0.5,
+                "params" : [
+                                { 
+                                  "key" : "msg_size",
+                                  "val" : "4096"
                                 }
                            ]
             }
