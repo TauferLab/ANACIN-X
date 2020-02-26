@@ -2,8 +2,6 @@
 
 # Clean up previous installations
 rm -rf ./submodules/*
-rm -rf ./apps && mkdir apps
-rm ./anacin-x/base_vars.sh
 
 n_columns=$(stty size | awk '{print $2}')
 progress_delimiter=""
