@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 system=$( hostname | sed 's/[0-9]*//g' )
-build_dir=build/${system}
+build_dir=build_${system}
 
 cd submodules/sst-dumpi
 mkdir -p ${build_dir}
