@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_executable(comm_pattern_generator)
 
-target_sources(comm_pattern_generator PRIVATE src/driver.cpp src/configuration.cpp src/comm_pattern.cpp src/naive_reduce.cpp src/amg2013.cpp src/unstructured_mesh.cpp src/mcb_grid.cpp)
+target_sources(comm_pattern_generator PRIVATE src/driver.cpp src/configuration.cpp src/comm_pattern.cpp src/naive_reduce.cpp src/amg2013.cpp src/unstructured_mesh.cpp src/mini_mcb.cpp)
 target_include_directories(comm_pattern_generator PRIVATE include include/comm_pattern_generator include/external)
 
 # Boost

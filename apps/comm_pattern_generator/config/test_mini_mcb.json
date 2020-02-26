@@ -1,0 +1,28 @@
+{
+    "comm_patterns" : 
+        [
+            {
+                "pattern_name" : "mini_mcb",
+                "n_iters" : 1,
+                "nd_fraction" : 0.5,
+                "params" : [
+                              { 
+                                "key" : "n_sub_iters",
+                                "val" : "2"
+                              },
+                              { 
+                                "key" : "n_grid_steps",
+                                "val" : "1"
+                              },
+                              { 
+                                "key" : "n_reduction_steps",
+                                "val" : "1"
+                              },
+                              { 
+                                "key" : "interleave_nd_iters",
+                                "val" : "0"
+                              }
+                           ]
+            }
+        ]
+}
