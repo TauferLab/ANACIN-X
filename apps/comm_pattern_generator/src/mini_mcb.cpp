@@ -450,7 +450,7 @@ void comm_pattern_mini_mcb( int n_iters, int n_grid_steps, int n_reduction_steps
   
   neighbor_communication_init();
   bin_reduction_init();
-  MPI_Barrier(MPI_COMM_WORLD);
+  //MPI_Barrier(MPI_COMM_WORLD);
 
   int non_det_iter = num_iterations*non_det;
   printf("Non deterministic iterations: %d\n", non_det_iter);
@@ -477,21 +477,29 @@ void comm_pattern_mini_mcb( int n_iters, int n_grid_steps, int n_reduction_steps
     /* 2.  neighbor exchange    */
     /* ======================== */
     neighbor_communication(non_deter[k]);
-    MPI_Barrier(MPI_COMM_WORLD);
+    //MPI_Barrier(MPI_COMM_WORLD);
     /* ======================== */
     /* 3. End: binary tree reduction */
     /* ======================== */
 #ifdef USE_BIN_REDUCTION
     bin_reduction_end(non_deter[k]);
 #endif
-    MPI_Barrier(MPI_COMM_WORLD); /*<= korehazushitemo daizyoubuni shi ro !!! MPI_Cancel problem*/
+    //MPI_Barrier(MPI_COMM_WORLD); /*<= korehazushitemo daizyoubuni shi ro !!! MPI_Cancel problem*/
+    int reduce_recv_buffer;
+    int reduce_send_buffer = my_rank;
+    MPI_Allreduce( &reduce_recv_buffer,
+                &reduce_send_buffer,
+                1,
+                MPI_INT,
+                MPI_MAX,
+                MPI_COMM_WORLD );
     //if (my_rank == 0) rempi_test_dbgi_print(0, " Step %d -- end", k);
   } // end: for
 
   //  exit(1);
   //  rempi_test_dbgi_print(0, " Finalizing ");
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  //MPI_Barrier(MPI_COMM_WORLD);
   hash = compute_global_hash();
 
   bin_reduction_finalize();
