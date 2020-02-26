@@ -5,11 +5,14 @@
 #include <iostream>
 
 #include "configuration.hpp"
+#include "debug.hpp"
+
+// Communication patterns
 #include "naive_reduce.hpp"
 #include "amg2013.hpp"
 #include "unstructured_mesh.hpp"
+#include "mcb_grid.hpp"
 
-#include "debug.hpp"
 
 int main( int argc, char** argv )
 {
@@ -72,6 +75,16 @@ int main( int argc, char** argv )
         comm_pattern_unstructured_mesh( i, nd_fraction_neighbors, nd_fraction_recvs,
                                         n_procs_x, n_procs_y, n_procs_z, 
                                         min_deg, max_deg, max_dist, msg_size );
+      }
+      else if ( pattern_name == "mcb_grid" ) {
+        auto msg_size = std::stoi( comm_pattern.params.at("msg_size") );
+        auto n_neighbors = std::stoi( comm_pattern.params.at("n_neighbors") );
+        auto n_steps = std::stoi( comm_pattern.params.at("n_steps") );
+        auto nd_fraction_send = std::stod( comm_pattern.params.at("nd_fraction_send") );
+        auto nd_fraction_recv = std::stod( comm_pattern.params.at("nd_fraction_recv") );
+        comm_pattern_mcb_grid( i, nd_fraction_send, nd_fraction_recv,
+                               n_neighbors, n_steps, msg_size ); 
+        
       }
     }
     mpi_rc = MPI_Barrier( MPI_COMM_WORLD );
