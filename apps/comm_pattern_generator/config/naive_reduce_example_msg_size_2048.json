@@ -8,7 +8,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : 2048
+                                  "val" : "2048"
                                 }
                            ]
             },
@@ -19,7 +19,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : 2048
+                                  "val" : "2048"
                                 }
                            ]
             },
@@ -30,7 +30,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : 2048
+                                  "val" : "2048"
                                 }
                            ]
             },
@@ -41,7 +41,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : 2048
+                                  "val" : "2048"
                                 }
                            ]
             },
@@ -52,7 +52,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : 2048
+                                  "val" : "2048"
                                 }
                            ]
             },
@@ -63,7 +63,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : 2048
+                                  "val" : "2048"
                                 }
                            ]
             },
@@ -74,7 +74,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : 2048
+                                  "val" : "2048"
                                 }
                            ]
             },
@@ -85,7 +85,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : 2048
+                                  "val" : "2048"
                                 }
                            ]
             },
@@ -96,7 +96,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : 2048
+                                  "val" : "2048"
                                 }
                            ]
             },
@@ -107,7 +107,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : 2048
+                                  "val" : "2048"
                                 }
                            ]
             }

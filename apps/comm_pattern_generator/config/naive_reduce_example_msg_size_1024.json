@@ -8,7 +8,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : 1024
+                                  "val" : "1024"
                                 }
                            ]
             },
@@ -19,7 +19,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : 1024
+                                  "val" : "1024"
                                 }
                            ]
             },
@@ -30,7 +30,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : 1024
+                                  "val" : "1024"
                                 }
                            ]
             },
@@ -41,7 +41,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : 1024
+                                  "val" : "1024"
                                 }
                            ]
             },
@@ -52,7 +52,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : 1024
+                                  "val" : "1024"
                                 }
                            ]
             },
@@ -63,7 +63,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : 1024
+                                  "val" : "1024"
                                 }
                            ]
             },
@@ -74,7 +74,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : 1024
+                                  "val" : "1024"
                                 }
                            ]
             },
@@ -85,7 +85,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : 1024
+                                  "val" : "1024"
                                 }
                            ]
             },
@@ -96,7 +96,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : 1024
+                                  "val" : "1024"
                                 }
                            ]
             },
@@ -107,7 +107,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : 1024
+                                  "val" : "1024"
                                 }
                            ]
             }
