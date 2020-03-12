@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
 
-rm -rf ./build && mkdir build
-cd build
+system=$( hostname | sed 's/[0-9]*//g' )
+if [ ${system} == "quartz" ]; then
+    build_dir="./build_quartz"
+elif [ ${system} == "catalyst" ]; then
+    build_dir="./build_catalyst"
+fi
+
+rm -rf ${build_dir} && mkdir ${build_dir}
+cd ${build_dir}
 export CC=mpicc
 export CXX=mpicxx
 cmake .. && make -j

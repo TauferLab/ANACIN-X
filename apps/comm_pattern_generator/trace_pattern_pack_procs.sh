@@ -18,7 +18,7 @@ n_nodes=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc
 
 # Define tool stack
 anacin_x_root=$HOME/ANACIN-X
-pnmpi=${anacin_x_root}/submodules/PnMPI/build/lib/libpnmpi.so
+pnmpi=${anacin_x_root}/submodules/PnMPI/build_${system}/lib/libpnmpi.so
 pnmpi_lib_path=${anacin_x_root}/anacin-x//pnmpi/patched_libs/
 pnmpi_conf=${anacin_x_root}/anacin-x/pnmpi/configs/dumpi.conf
 

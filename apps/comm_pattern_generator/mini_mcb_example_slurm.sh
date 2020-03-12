@@ -14,7 +14,7 @@ elif [ ${system} == "catalyst" ]; then
 fi
 # Determine where to write results data (trace files, event graphs, etc.)
 if [ ${system} == "quartz" ] || [ ${system} == "catalyst" ]; then
-    results_root="/p/lscratchh/chapp1/comm_patterns/naive_reduce/system_${system}/"
+    results_root="/p/lscratchh/chapp1/comm_patterns/mini_mcb_grid/system_${system}/"
 fi
 
 # Comm pattern proxy app
@@ -31,7 +31,7 @@ job_script_build_graph=${anacin_x_root}/apps/comm_pattern_generator/build_graph.
 extract_slices_script=${anacin_x_root}/anacin-x/event_graph_analysis/extract_slices.py
 slicing_policy=${anacin_x_root}/anacin-x/event_graph_analysis/slicing_policies/barrier_delimited_full.json
 job_script_extract_slices=${anacin_x_root}/apps/comm_pattern_generator/extract_slices.sh
-n_procs_extract_slices=10
+n_procs_extract_slices=11
 n_nodes_extract_slices=$(echo "(${n_procs_extract_slices} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
 
 # Convenience function for making the dependency lists for the kernel distance
@@ -41,14 +41,14 @@ function join_by { local IFS="$1"; shift; echo "$*"; }
 # Kernel distance time series computation
 compute_kdts_script=${anacin_x_root}/anacin-x/event_graph_analysis/compute_kernel_distance_time_series.py
 job_script_compute_kdts=${anacin_x_root}/apps/comm_pattern_generator/compute_kdts.sh
-n_procs_compute_kdts=10
+n_procs_compute_kdts=11
 n_nodes_compute_kdts=$(echo "(${n_procs_compute_kdts} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
 
 # Define which graph kernels we'll compute KDTS for 
 graph_kernel=${anacin_x_root}/anacin-x/event_graph_analysis/graph_kernel_policies/wlst_5iters_logical_timestamp_label.json
 
 # Visualizations
-make_plot_script=${anacin_x_root}/anacin-x/event_graph_analysis/visualization/make_naive_reduce_example_plot.py
+#make_plot_script=${anacin_x_root}/anacin-x/event_graph_analysis/visualization/make_mini_mcb_example_plot.py
 job_script_make_plot=${anacin_x_root}/apps/comm_pattern_generator/make_plot.sh
 
 #proc_placement=("pack" "spread")
@@ -59,18 +59,22 @@ job_script_make_plot=${anacin_x_root}/apps/comm_pattern_generator/make_plot.sh
 #run_scales=(11)
 #message_sizes=(1)
 
-proc_placement=("pack" "spread")
-run_scales=(21)
-message_sizes=(1)
+#proc_placement=("pack" "spread")
+#run_scales=(36)
+#interleave_options=("non_interleaved" "interleaved")
+
+proc_placement=("pack")
+run_scales=(36)
+interleave_options=("non_interleaved")
 
 for proc_placement in ${proc_placement[@]};
 do
     for n_procs in ${run_scales[@]};
     do
-        for msg_size in ${message_sizes[@]};
+        for option in ${interleave_options[@]};
         do
-            echo "Launching jobs for: proc. placement = ${proc_placement}, # procs. = ${n_procs}, msg. size = ${msg_size}"
-            runs_root=${results_root}/n_procs_${n_procs}/proc_placement_${proc_placement}/msg_size_${msg_size}/
+            echo "Launching jobs for: proc. placement = ${proc_placement}, # procs. = ${n_procs}, interleaving?  ${option}"
+            runs_root=${results_root}/n_procs_${n_procs}/proc_placement_${proc_placement}/interleave_option_${option}/
 
             # Launch intra-execution jobs
             kdts_job_deps=()
@@ -82,7 +86,7 @@ do
                 cd ${run_dir}
 
                 # Trace execution
-                config=${anacin_x_root}/apps/comm_pattern_generator/config/naive_reduce_example_msg_size_${msg_size}.json
+                config=${anacin_x_root}/apps/comm_pattern_generator/config/mini_mcb_grid_example_${option}.json
                 if [ ${proc_placement} == "pack" ]; then
                     n_nodes_trace=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
                     trace_stdout=$( sbatch -N${n_nodes_trace} ${job_script_trace_pack_procs} ${n_procs} ${app} ${config} )
@@ -92,27 +96,27 @@ do
                 fi
                 trace_job_id=$( echo ${trace_stdout} | sed 's/[^0-9]*//g' )
                 
-                # Build event graph
-                n_nodes_build_graph=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
-                build_graph_stdout=$( sbatch -N${n_nodes_build_graph} --dependency=afterok:${trace_job_id} ${job_script_build_graph} ${n_procs} ${dumpi_to_graph_bin} ${dumpi_to_graph_config} ${run_dir} )
-                build_graph_job_id=$( echo ${build_graph_stdout} | sed 's/[^0-9]*//g' )
-                event_graph=${run_dir}/event_graph.graphml
+                ## Build event graph
+                #n_nodes_build_graph=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
+                #build_graph_stdout=$( sbatch -N${n_nodes_build_graph} --dependency=afterok:${trace_job_id} ${job_script_build_graph} ${n_procs} ${dumpi_to_graph_bin} ${dumpi_to_graph_config} ${run_dir} )
+                #build_graph_job_id=$( echo ${build_graph_stdout} | sed 's/[^0-9]*//g' )
+                #event_graph=${run_dir}/event_graph.graphml
 
-                # Extract slices
-                extract_slices_stdout=$( sbatch -N${n_nodes_extract_slices} --dependency=afterok:${build_graph_job_id} ${job_script_extract_slices} ${n_procs_extract_slices} ${extract_slices_script} ${event_graph} ${slicing_policy} )
-                extract_slices_job_id=$( echo ${extract_slices_stdout} | sed 's/[^0-9]*//g' ) 
-                kdts_job_deps+=(${extract_slices_job_id})
+                ## Extract slices
+                #extract_slices_stdout=$( sbatch -N${n_nodes_extract_slices} --dependency=afterok:${build_graph_job_id} ${job_script_extract_slices} ${n_procs_extract_slices} ${extract_slices_script} ${event_graph} ${slicing_policy} )
+                #extract_slices_job_id=$( echo ${extract_slices_stdout} | sed 's/[^0-9]*//g' ) 
+                #kdts_job_deps+=(${extract_slices_job_id})
             done # runs
 
-            # Compute kernel distances for each slice
-            kdts_job_dep_str=$( join_by : ${kdts_job_deps[@]} )
-            cd ${runs_root}
-            compute_kdts_stdout=$( sbatch -N${n_nodes_compute_kdts} --dependency=afterok:${kdts_job_dep_str} ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} )
-            #compute_kdts_stdout=$( sbatch -N${n_nodes_compute_kdts} ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} )
-            compute_kdts_job_id=$( echo ${compute_kdts_stdout} | sed 's/[^0-9]*//g' )
+            ## Compute kernel distances for each slice
+            #kdts_job_dep_str=$( join_by : ${kdts_job_deps[@]} )
+            #cd ${runs_root}
+            #compute_kdts_stdout=$( sbatch -N${n_nodes_compute_kdts} --dependency=afterok:${kdts_job_dep_str} ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} )
+            ##compute_kdts_stdout=$( sbatch -N${n_nodes_compute_kdts} ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} )
+            #compute_kdts_job_id=$( echo ${compute_kdts_stdout} | sed 's/[^0-9]*//g' )
 
             # Generate plot
-            make_plot_stdout=$( sbatch -N1 --dependency=afterok:${compute_kdts_job_id} ${job_script_make_plot} ${make_plot_script} "${runs_root}/kdts.pkl" )
+            #make_plot_stdout=$( sbatch -N1 --dependency=afterok:${compute_kdts_job_id} ${job_script_make_plot} ${make_plot_script} "${runs_root}/kdts.pkl" )
             #make_plot_stdout=$( sbatch -N1 ${job_script_make_plot} ${make_plot_script} "${runs_root}/kdts.pkl" )
 
         done # msg sizes
