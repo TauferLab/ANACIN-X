@@ -1,0 +1,16 @@
+{
+    "comm_patterns" : 
+        [
+            {
+                "pattern_name" : "naive_reduce",
+                "n_iters" : 1000,
+                "nd_fraction" : 0.2,
+                "params" : [
+                                { 
+                                  "key" : "msg_size",
+                                  "val" : "1"
+                                }
+                           ]
+            }
+        ]
+}

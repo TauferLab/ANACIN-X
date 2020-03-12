@@ -16,11 +16,11 @@
                               },
                               { 
                                 "key" : "n_reduction_steps",
-                                "val" : "4"
+                                "val" : "0"
                               },
                               { 
                                 "key" : "interleave_nd_iters",
-                                "val" : "0"
+                                "val" : "1"
                               }
                            ]
             },
@@ -39,34 +39,11 @@
                               },
                               { 
                                 "key" : "n_reduction_steps",
-                                "val" : "4"
+                                "val" : "0"
                               },
                               { 
                                 "key" : "interleave_nd_iters",
-                                "val" : "0"
-                              }
-                           ]
-            },
-            {
-                "pattern_name" : "mini_mcb",
-                "n_iters" : 1,
-                "nd_fraction" : 0.2,
-                "params" : [
-                              { 
-                                "key" : "n_sub_iters",
-                                "val" : "10"
-                              },
-                              { 
-                                "key" : "n_grid_steps",
-                                "val" : "4"
-                              },
-                              { 
-                                "key" : "n_reduction_steps",
-                                "val" : "4"
-                              },
-                              { 
-                                "key" : "interleave_nd_iters",
-                                "val" : "0"
+                                "val" : "1"
                               }
                            ]
             },
@@ -85,11 +62,11 @@
                               },
                               { 
                                 "key" : "n_reduction_steps",
-                                "val" : "4"
+                                "val" : "0"
                               },
                               { 
                                 "key" : "interleave_nd_iters",
-                                "val" : "0"
+                                "val" : "1"
                               }
                            ]
             },
@@ -108,11 +85,11 @@
                               },
                               { 
                                 "key" : "n_reduction_steps",
-                                "val" : "4"
+                                "val" : "0"
                               },
                               { 
                                 "key" : "interleave_nd_iters",
-                                "val" : "0"
+                                "val" : "1"
                               }
                            ]
             },
@@ -131,11 +108,11 @@
                               },
                               { 
                                 "key" : "n_reduction_steps",
-                                "val" : "4"
+                                "val" : "0"
                               },
                               { 
                                 "key" : "interleave_nd_iters",
-                                "val" : "0"
+                                "val" : "1"
                               }
                            ]
             },
@@ -154,11 +131,11 @@
                               },
                               { 
                                 "key" : "n_reduction_steps",
-                                "val" : "4"
+                                "val" : "0"
                               },
                               { 
                                 "key" : "interleave_nd_iters",
-                                "val" : "0"
+                                "val" : "1"
                               }
                            ]
             },
@@ -177,11 +154,11 @@
                               },
                               { 
                                 "key" : "n_reduction_steps",
-                                "val" : "4"
+                                "val" : "0"
                               },
                               { 
                                 "key" : "interleave_nd_iters",
-                                "val" : "0"
+                                "val" : "1"
                               }
                            ]
             },
@@ -200,11 +177,11 @@
                               },
                               { 
                                 "key" : "n_reduction_steps",
-                                "val" : "4"
+                                "val" : "0"
                               },
                               { 
                                 "key" : "interleave_nd_iters",
-                                "val" : "0"
+                                "val" : "1"
                               }
                            ]
             },
@@ -223,11 +200,11 @@
                               },
                               { 
                                 "key" : "n_reduction_steps",
-                                "val" : "4"
+                                "val" : "0"
                               },
                               { 
                                 "key" : "interleave_nd_iters",
-                                "val" : "0"
+                                "val" : "1"
                               }
                            ]
             },
@@ -246,11 +223,11 @@
                               },
                               { 
                                 "key" : "n_reduction_steps",
-                                "val" : "4"
+                                "val" : "0"
                               },
                               { 
                                 "key" : "interleave_nd_iters",
-                                "val" : "0"
+                                "val" : "1"
                               }
                            ]
             }

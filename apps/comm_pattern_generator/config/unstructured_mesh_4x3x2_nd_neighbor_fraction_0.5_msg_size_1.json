@@ -24,50 +24,11 @@
                                 },
                                 { 
                                   "key" : "min_deg", 
-                                  "val" : "4"
+                                  "val" : "10"
                                 },
                                 { 
                                   "key" : "max_deg", 
-                                  "val" : "8"
-                                },
-                                { 
-                                  "key" : "max_dist", 
-                                  "val" : "4"
-                                },
-                                { 
-                                  "key" : "msg_size", 
-                                  "val" : "1"
-                                }
-                           ]
-            },
-            {
-                "pattern_name" : "unstructured_mesh",
-                "n_iters" : 1,
-                "nd_fraction" : 0.1,
-                "params" : [
-                                {
-                                  "key" : "nd_fraction_neighbors",
-                                  "val" : "0.5"
-                                },
-                                { 
-                                  "key" : "n_procs_x", 
-                                  "val" : "4"
-                                },
-                                { 
-                                  "key" : "n_procs_y", 
-                                  "val" : "3"
-                                },
-                                { 
-                                  "key" : "n_procs_z", 
-                                  "val" : "2"
-                                },
-                                { 
-                                  "key" : "min_deg", 
-                                  "val" : "4"
-                                },
-                                { 
-                                  "key" : "max_deg", 
-                                  "val" : "8"
+                                  "val" : "10"
                                 },
                                 { 
                                   "key" : "max_dist", 
@@ -102,11 +63,11 @@
                                 },
                                 { 
                                   "key" : "min_deg", 
-                                  "val" : "4"
+                                  "val" : "10"
                                 },
                                 { 
                                   "key" : "max_deg", 
-                                  "val" : "8"
+                                  "val" : "10"
                                 },
                                 { 
                                   "key" : "max_dist", 
@@ -141,11 +102,11 @@
                                 },
                                 { 
                                   "key" : "min_deg", 
-                                  "val" : "4"
+                                  "val" : "10"
                                 },
                                 { 
                                   "key" : "max_deg", 
-                                  "val" : "8"
+                                  "val" : "10"
                                 },
                                 { 
                                   "key" : "max_dist", 
@@ -180,11 +141,11 @@
                                 },
                                 { 
                                   "key" : "min_deg", 
-                                  "val" : "4"
+                                  "val" : "10"
                                 },
                                 { 
                                   "key" : "max_deg", 
-                                  "val" : "8"
+                                  "val" : "10"
                                 },
                                 { 
                                   "key" : "max_dist", 
@@ -219,11 +180,11 @@
                                 },
                                 { 
                                   "key" : "min_deg", 
-                                  "val" : "4"
+                                  "val" : "10"
                                 },
                                 { 
                                   "key" : "max_deg", 
-                                  "val" : "8"
+                                  "val" : "10"
                                 },
                                 { 
                                   "key" : "max_dist", 
@@ -258,11 +219,11 @@
                                 },
                                 { 
                                   "key" : "min_deg", 
-                                  "val" : "4"
+                                  "val" : "10"
                                 },
                                 { 
                                   "key" : "max_deg", 
-                                  "val" : "8"
+                                  "val" : "10"
                                 },
                                 { 
                                   "key" : "max_dist", 
@@ -297,11 +258,50 @@
                                 },
                                 { 
                                   "key" : "min_deg", 
-                                  "val" : "4"
+                                  "val" : "10"
                                 },
                                 { 
                                   "key" : "max_deg", 
-                                  "val" : "8"
+                                  "val" : "10"
+                                },
+                                { 
+                                  "key" : "max_dist", 
+                                  "val" : "4"
+                                },
+                                { 
+                                  "key" : "msg_size", 
+                                  "val" : "1"
+                                }
+                           ]
+            },
+            {
+                "pattern_name" : "unstructured_mesh",
+                "n_iters" : 1,
+                "nd_fraction" : 0.8,
+                "params" : [
+                                {
+                                  "key" : "nd_fraction_neighbors",
+                                  "val" : "0.5"
+                                },
+                                { 
+                                  "key" : "n_procs_x", 
+                                  "val" : "4"
+                                },
+                                { 
+                                  "key" : "n_procs_y", 
+                                  "val" : "3"
+                                },
+                                { 
+                                  "key" : "n_procs_z", 
+                                  "val" : "2"
+                                },
+                                { 
+                                  "key" : "min_deg", 
+                                  "val" : "10"
+                                },
+                                { 
+                                  "key" : "max_deg", 
+                                  "val" : "10"
                                 },
                                 { 
                                   "key" : "max_dist", 
@@ -336,11 +336,11 @@
                                 },
                                 { 
                                   "key" : "min_deg", 
-                                  "val" : "4"
+                                  "val" : "10"
                                 },
                                 { 
                                   "key" : "max_deg", 
-                                  "val" : "8"
+                                  "val" : "10"
                                 },
                                 { 
                                   "key" : "max_dist", 
@@ -375,11 +375,11 @@
                                 },
                                 { 
                                   "key" : "min_deg", 
-                                  "val" : "4"
+                                  "val" : "10"
                                 },
                                 { 
                                   "key" : "max_deg", 
-                                  "val" : "8"
+                                  "val" : "10"
                                 },
                                 { 
                                   "key" : "max_dist", 

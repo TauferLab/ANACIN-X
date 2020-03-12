@@ -1,0 +1,32 @@
+{
+    "comm_patterns" : 
+        [
+            {
+                "pattern_name" : "mcb_grid",
+                "n_iters" : 1,
+                "nd_fraction" : 0.0,
+                "params" : [
+                              { 
+                                "key" : "msg_size",
+                                "val" : "1"
+                              },
+                              { 
+                                "key" : "n_neighbors",
+                                "val" : "3"
+                              },
+                              { 
+                                "key" : "n_steps",
+                                "val" : "4"
+                              },
+                              { 
+                                "key" : "nd_fraction_send",
+                                "val" : "0.0"
+                              },
+                              { 
+                                "key" : "nd_fraction_recv",
+                                "val" : "1.0"
+                              }
+                           ]
+            }
+        ]
+}
