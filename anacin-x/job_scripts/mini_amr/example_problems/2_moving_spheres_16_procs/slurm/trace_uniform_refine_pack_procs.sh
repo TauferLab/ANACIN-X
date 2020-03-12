@@ -2,21 +2,23 @@
 
 #SBATCH -o mini_amr_%j.out
 #SBATCH -e mini_amr_%j.err
+#SBATCH -t 12:00:00
 
 mini_amr_bin=$1
-load_balancing_policy=$2
-load_balancing_threshold=$3
-refinement_policy=$4
-refinement_frequency=$5
+csmpi_config=$2
+n_refine_level=$3
+
+# Max blocks should be increased if n_refine_levels is increased
+# n_refine_levels = 5 and max_blocks = 4000 works 
 
 anacin_x_root=$HOME/ANACIN-X/
 pnmpi=${anacin_x_root}/submodules/PnMPI/build_quartz/lib/libpnmpi.so
 pnmpi_lib_path=${anacin_x_root}/anacin-x/pnmpi/patched_libs/
-pnmpi_conf=${anacin_x_root}/anacin-x/pnmpi/configs/dumpi.conf
+pnmpi_conf=${anacin_x_root}/anacin-x/pnmpi/configs/dumpi_csmpi.conf
 
-LD_PRELOAD=${pnmpi} PNMPI_LIB_PATH=${pnmpi_lib_path} PNMPI_CONF=${pnmpi_conf} srun -N1 -n16 ${mini_amr_bin} \
-    --num_refine 0 \
-    --max_blocks 4000 \
+LD_PRELOAD=${pnmpi} PNMPI_LIB_PATH=${pnmpi_lib_path} PNMPI_CONF=${pnmpi_conf} CSMPI_CONFIG=${csmpi_config} srun -N1 -n16 ${mini_amr_bin} \
+    --num_refine ${n_refine_level} \
+    --max_blocks 32000 \
     --init_x 1 \
     --init_y 1 \
     --init_z 1 \
@@ -32,8 +34,6 @@ LD_PRELOAD=${pnmpi} PNMPI_LIB_PATH=${pnmpi_lib_path} PNMPI_CONF=${pnmpi_conf} sr
     --num_tsteps 100 \
     --checksum_freq 4 \
     --stages_per_ts 16 \
-    --lb_opt ${load_balancing_policy} \
-    --inbalance ${lb_balancing_threshold} \
-    --uniform_refine ${refinement_policy} \
-    --refine_freq ${refinement_frequency} \
+    --uniform_refine 1 \
+    --lb_opt 0 \
     --log

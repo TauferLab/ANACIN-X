@@ -4,10 +4,10 @@
 #SBATCH -e mini_amr_%j.err
 
 mini_amr_bin=$1
-load_balancing_policy=$2
-load_balancing_threshold=$3
-refinement_policy=$4
-refinement_frequency=$5
+#load_balancing_policy=$2
+#load_balancing_threshold=$3
+#refinement_policy=$4
+#refinement_frequency=$5
 
 anacin_x_root=$HOME/ANACIN-X/
 pnmpi=${anacin_x_root}/submodules/PnMPI/build_quartz/lib/libpnmpi.so
@@ -32,8 +32,4 @@ LD_PRELOAD=${pnmpi} PNMPI_LIB_PATH=${pnmpi_lib_path} PNMPI_CONF=${pnmpi_conf} sr
     --num_tsteps 100 \
     --checksum_freq 4 \
     --stages_per_ts 16 \
-    --lb_opt ${load_balancing_policy} \
-    --inbalance ${lb_balancing_threshold} \
-    --uniform_refine ${refinement_policy} \
-    --refine_freq ${refinement_frequency} \
     --log
