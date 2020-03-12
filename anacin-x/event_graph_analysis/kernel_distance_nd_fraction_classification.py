@@ -72,7 +72,7 @@ def main( traces_root_dir, kernel_file ):
         gk = GraphKernel(kernel=kernel, normalize=True)
         k_train = gk.fit_transform( g_train )
         k_test  = gk.transform( g_test )
-
+        
         #print( k_train.shape )
         #print( k_test.shape )
         

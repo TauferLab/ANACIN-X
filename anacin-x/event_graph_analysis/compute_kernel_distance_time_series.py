@@ -16,6 +16,8 @@ import graphkernels
 import graphkernels.kernels as gk
 import numpy as np
 
+import grakel
+
 import pprint
 
 from mpi4py import MPI
@@ -131,34 +133,36 @@ def extract_callstack_data( slice_subgraphs ):
     for idx,g in enumerate(slice_subgraphs):
         callstack_to_count = {}
         callstacks = g.vs[:]["callstack"]
-        for c in callstacks:
+        mpi_fns = g.vs[:]["mpi_function"]
+        for c,f in zip(callstacks, mpi_fns):
             if c != "":
-                if c not in callstack_to_count:
-                    callstack_to_count[c] = 1
+                key = (c,f)
+                if key not in callstack_to_count:
+                    callstack_to_count[key] = 1
                 else:
-                    callstack_to_count[c] += 1
+                    callstack_to_count[key] += 1
         graph_to_callstack_data[ idx ] = callstack_to_count
     return graph_to_callstack_data
 
 #@timer
 def get_slice_data( slice_dirs, slice_idx, kernel_params, callstacks_available ):
-    #print("Ingesting subgraphs for slice: {}".format( slice_idx ))
+    print("Ingesting subgraphs for slice: {}".format( slice_idx ))
     slice_subgraph_paths = [ str(sd) + "/slice_" + str(slice_idx) + ".graphml" for sd in slice_dirs ]
     #slice_subgraphs = read_graphs_parallel( slice_subgraph_paths )
     slice_subgraphs = [ read_graph(g) for g in slice_subgraph_paths ]
     
     # Compute the requested kernel distance matrices
-    #print("Computing kernel distances for slice: {}".format( slice_idx ))
+    print("Computing kernel distances for slice: {}".format( slice_idx ))
     kernel_distance_data = compute_kernel_distance_matrices( slice_subgraphs, 
                                                              kernel_params )
     
     # Extract wall-time information for correlating with application events
-    #print("Extracting wall-time data for slice: {}".format( slice_idx ))
+    print("Extracting wall-time data for slice: {}".format( slice_idx ))
     wall_time_data = extract_wall_time_data( slice_subgraphs )
     
     # Extract callstack data if available
     if callstacks_available:
-        #print("Extracting callstack data for slice: {}".format( slice_idx ))
+        print("Extracting callstack data for slice: {}".format( slice_idx ))
         callstack_data = extract_callstack_data( slice_subgraphs )
     else:
         callstack_data = {}
@@ -166,6 +170,12 @@ def get_slice_data( slice_dirs, slice_idx, kernel_params, callstacks_available )
     slice_data = { "kernel_distance" : kernel_distance_data,
                    "wall_time"       : wall_time_data,
                    "callstack"       : callstack_data }
+    
+    #for k,d in kernel_distance_data.items():
+    #    if np.count_nonzero( d ) > 0:
+    #        pprint.pprint( slice_data )
+    #        exit()
+
     return slice_data
 
 
@@ -312,7 +322,6 @@ def main( traces_root_dir,
     slice_dirs = input_config["slice_dirs"]
     n_slices   = input_config["n_slices"]
     kernels    = input_config["kernels"]
-   
     
     # Determine slice assignment
     assigned_indices = assign_slice_indices( n_slices, slices, slice_range_lower, slice_range_upper )

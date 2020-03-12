@@ -14,6 +14,8 @@ from scipy.stats.stats import pearsonr, spearmanr
 import sys
 sys.path.append(".")
 sys.path.append("..")
+sys.path.append("/g/g12/chapp1/ANACIN-X/anacin-x/event_graph_analysis/")
+sys.path.append("/g/g12/chapp1/ANACIN-X/anacin-x/event_graph_analysis/visualization/")
 
 from graph_kernel_postprocessing import flatten_distance_matrix
 from kernel_distance_time_series_postprocessing import get_distances_seq
@@ -61,7 +63,7 @@ def main( kdts_path ):
     
     aspect_ratio = "widescreen"
     figure_scale = 1.5
-    if aspect_ratio is "widescreen":
+    if aspect_ratio == "widescreen":
         base_figure_size = (16, 9)
     else:
         base_figure_size = (4, 3)

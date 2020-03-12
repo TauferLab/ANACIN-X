@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-#SBATCH -N 1
-#SBATCH -n 1
 #SBATCH -t 01:00:00
 #SBATCH -o extract_slices-%j.out
 #SBATCH -e extract_slices-%j.err
@@ -20,17 +18,19 @@ import time
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
 
-from utilities import timer, read_graph
+#from utilities import timer, read_graph
 
 import sys
 sys.path.append(".")
 sys.path.append("..")
 
+def read_graph( graph_path ):
+    graph = igraph.read( graph_path )
+    return graph
 
 ################################################################################
 ######################## Slice extraction utilities ############################
 ################################################################################
-
 
 # Returns a dict mapping MPI ranks to sequence of barrier vertices
 #@timer

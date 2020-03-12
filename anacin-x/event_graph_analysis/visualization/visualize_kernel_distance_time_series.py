@@ -22,6 +22,7 @@ import seaborn as sns
 import sys
 sys.path.append(".")
 sys.path.append("..")
+sys.path.append("/g/g12/chapp1/ANACIN-X/anacin-x/event_graph_analysis/")
 
 from graph_kernel_postprocessing import flatten_distance_matrix
 from kernel_distance_time_series_postprocessing import get_distances_seq, get_stats_seq
@@ -432,9 +433,9 @@ def make_box_plots( slice_idx_to_data, slice_idx_lower, slice_idx_upper, wall_ti
                 x_tick_labels.append( "" )
     else:
         x_tick_labels_base = [ str(i) for i in range(n_boxes) ]
-        #x_axis_label = "Slice Index"
-        x_axis_label = "% Messages Non-Deterministic"
-        x_tick_labels = [ "0", "20", "30", "40", "50", "60", "70", "80", "90", "100" ]
+        x_axis_label = "Slice Index"
+        #x_axis_label = "% Messages Non-Deterministic"
+        #x_tick_labels = [ "0", "20", "30", "40", "50", "60", "70", "80", "90", "100" ]
         #x_tick_labels = []
         #for idx,label in enumerate(x_tick_labels_base):
         #    if idx == 0 or idx == len(x_tick_labels_base)-1:
@@ -445,7 +446,7 @@ def make_box_plots( slice_idx_to_data, slice_idx_lower, slice_idx_upper, wall_ti
         #        else:
         #            x_tick_labels.append( "" )
     # Select subset of x-tick labels so axis isn't too crowded
-    ax.set_xticklabels( x_tick_labels, rotation=45 )
+    #ax.set_xticklabels( x_tick_labels, rotation=45 )
     ax.set_xlabel( x_axis_label )
 
     # Y-axis stuff
@@ -464,7 +465,7 @@ def make_box_plots( slice_idx_to_data, slice_idx_lower, slice_idx_upper, wall_ti
     #plt.show()
     plt.savefig( "kdts.png", 
                  bbox_inches="tight",
-                 transparent=True,
+                 transparent=False,
                  pad_inches=0.05,
                  dpi=300 )
 

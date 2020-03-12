@@ -1,6 +1,7 @@
 import igraph 
 
 from utilities import timer
+import pprint
 
 legal_vertex_labels = [ "event_type", 
                         "logical_time", 
@@ -23,7 +24,7 @@ def convert_to_grakel_graph( graph ):
 
 
 def get_relabeled_graphs( graphs, kernels ):
-    relabeled_graphs = {}
+    all_relabeled_graphs = {}
     for kernel in kernels:
         # Which graph kernel are we relabeling for?
         name = kernel[ "name" ]
@@ -40,18 +41,18 @@ def get_relabeled_graphs( graphs, kernels ):
         # The list of kernels may include multiple distinct kernels that can 
         # use the same relabeled graphs (e.g., multiple WL kernels with the same
         # label but different numbers of WL iterations)
-        if key not in relabeled_graphs:
+        if key not in all_relabeled_graphs:
             # Relabel for Weisfeiler-Lehman Subtree-Pattern kernel 
             if name == "wlst":
-                graphs = [ relabel_for_wlst_kernel(g, label) for g in graphs ]
+                relabeled_graphs = [ relabel_for_wlst_kernel(g, label) for g in graphs ]
             # Relabel for edge-histogram kernel 
             elif name == "eh":
-                graphs = [ relabel_for_eh_kernel(g, label) for g in graphs ]
+                relabeled_graphs = [ relabel_for_eh_kernel(g, label) for g in graphs ]
             # Relabel for vertex-histogram kernel
             elif name == "vh":
-                graphs = [ relabel_for_vh_kernel(g, label) for g in graphs ]
-            relabeled_graphs[ key ] = graphs
-    return relabeled_graphs
+                relabeled_graphs = [ relabel_for_vh_kernel(g, label) for g in graphs ]
+            all_relabeled_graphs[ key ] = relabeled_graphs
+    return all_relabeled_graphs
 
 
 """

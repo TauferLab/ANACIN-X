@@ -32,7 +32,7 @@ def get_scatter_plot_points( idx_to_distances ):
             y_vals.append( y_val )
     return x_vals, y_vals
 
-def main( kdts_path ):
+def main( kdts_path, nd_neighbor_fraction ):
     # Read in kdts data
     with open( kdts_path, "rb" ) as infile:
         slice_idx_to_data = pkl.load( infile )
@@ -60,7 +60,7 @@ def main( kdts_path ):
     
     # Specify appearance of scatter plot markers
     marker_size = 6
-
+    
     aspect_ratio = "widescreen"
     figure_scale = 1.5
     if aspect_ratio == "widescreen":
@@ -71,7 +71,7 @@ def main( kdts_path ):
     figure_size = (figure_scale*base_figure_size[0], figure_scale*base_figure_size[1] )
 
     fig,ax = plt.subplots( figsize=figure_size )
-    
+
     # Create box plots 
     bp = ax.boxplot( bp_data,
                      widths=box_width,
@@ -80,12 +80,12 @@ def main( kdts_path ):
                      showfliers=False,
                      boxprops=boxprops,
                      flierprops=flierprops )
-    
+
     # Overlay actual data points on same axis
     ax.scatter( scatter_x_vals, 
                 scatter_y_vals,
                 s=marker_size)
-    
+   
     # Plot annotation ( correlation coefficients )
     nd_fractions = [ 0, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0 ]
     nd_fraction_seq = []
@@ -100,7 +100,7 @@ def main( kdts_path ):
     #spearman_correlation_txt = "Kernel distance vs. % ND → Spearman-R = {}, p = {}".format(np.round(spearman_r, 2), spearman_p)
 
     pearson_correlation_txt = "Pearson's r = {}, p = {}\n".format(np.round(pearson_r, 2), pearson_p)
-    spearman_correlation_txt = "Spearman's ρ = {}, p = {}\n".format(np.round(spearman_r, 2), spearman_p)
+    spearman_correlation_txt = "Spearman's rho = {}, p = {}\n".format(np.round(spearman_r, 2), spearman_p)
     print( pearson_correlation_txt )
     print( spearman_correlation_txt )
 
@@ -118,17 +118,18 @@ def main( kdts_path ):
     #             fontsize=annotation_font_size,
     #             bbox=dict(boxstyle="square, pad=1", fc="w")
     #           )
-    
+
     # Tick labels
     tick_label_fontdict = {"fontsize" : 12}
     x_tick_labels = [ "0", "20", "30", "40", "50", "60", "70", "80", "90", "100" ]
     x_ticks = list(range(len(x_tick_labels)))
     ax.set_xticks( x_ticks )
     ax.set_xticklabels( x_tick_labels, rotation=0, fontdict=tick_label_fontdict )
-    y_ticks = [ 0, 10, 20, 30, 40, 50, 60, 70 ]
-    y_tick_labels = [ str(y) for y in y_ticks ]
-    ax.set_yticks( y_ticks )
-    ax.set_yticklabels( y_tick_labels, rotation=0, fontdict=tick_label_fontdict )
+    #y_ticks = [ 0, 5, 10, 15, 20, 25, 30, 35, 40 ]
+    #y_tick_labels = [ str(y) for y in y_ticks ]
+    #ax.set_yticks( y_ticks )
+    #ax.set_yticklabels( y_tick_labels, rotation=0, fontdict=tick_label_fontdict )
+    ax.set_ylim(0, 175)
 
     # Axis labels
     x_axis_label = "Percentage of Wildcard Receives (i.e., using MPI_ANY_SOURCE)"
@@ -137,13 +138,13 @@ def main( kdts_path ):
     ax.set_xlabel( x_axis_label, fontdict=axis_label_fontdict )
     ax.set_ylabel( y_axis_label, fontdict=axis_label_fontdict )
 
-    # Annotate plot
-    plot_title = "Percentage of Wildcard Receives vs. Kernel Distance - Communication Pattern: AMG2013"
-    title_fontdict = {"fontsize" : 20}
+    # Plot Title
+    plot_title = "Percentage of Wildcard Receives vs. Kernel Distance - Communication Pattern: Unstructured Mesh ({}% neighbors non-deterministically chosen )".format(int(nd_neighbor_fraction*100))
+    title_fontdict = {"fontsize" : 18}
     plt.title( plot_title, fontdict=title_fontdict )
 
     #plt.show()
-    plt.savefig( "amg2013_example.png",
+    plt.savefig( "unstructured_mesh_example.png",
                  bbox_inches="tight",
                  pad_inches=0.25
                )
@@ -153,5 +154,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("data", 
                         help="Path to pickle file of kernel distance time series data")
+    parser.add_argument("--nd_neighbor_fraction", type=float,
+                        help="Fraction of neighbors determined non-deterministically for these runs of the unstructured mesh comm. pattern")
     args = parser.parse_args()
-    main( args.data )
+    main( args.data, args.nd_neighbor_fraction )
