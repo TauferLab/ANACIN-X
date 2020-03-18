@@ -34,9 +34,9 @@ do
     for run_idx in `seq -f "%03g" ${run_idx_low} ${run_idx_high}`; 
     do
         # Trace execution
-        run_dir=${results_root}/msg_size_${msg_size}/without_ninja/run_${run_idx}/
+        run_dir=${results_root}/msg_size_${msg_size}/with_ninja/run_${run_idx}/
         mkdir -p ${run_dir}
-        pnmpi_conf=$HOME/pnmpi/config/dumpi_only.conf
+        pnmpi_conf=$HOME/pnmpi/config/mini_ninja.conf
         app_config=${anacin_x_root}/apps/comm_pattern_generator/config/naive_reduce_example_msg_size_${msg_size}.json
         LD_PRELOAD=${pnmpi} PNMPI_LIB_PATH=${pnmpi_lib_path} PNMPI_CONF=${pnmpi_conf} mpirun -np ${n_procs} ${app_bin} ${app_config}
         mv dumpi-* ${run_dir}
@@ -46,6 +46,6 @@ do
         # Extract slices
         mpirun -np 10 ${extract_slices_script} ${event_graph} ${slicing_policy} -o "slices"
     done
-    mpirun -np 10 ${compute_kdts_script} "${results_root}/msg_size_${msg_size}/without_ninja/" ${graph_kernel} --slice_dir_name "slices" -o "kdts.pkl"
+    mpirun -np 10 ${compute_kdts_script} "${results_root}/msg_size_${msg_size}/with_ninja/" ${graph_kernel} --slice_dir_name "slices" -o "kdts.pkl"
 done
 
