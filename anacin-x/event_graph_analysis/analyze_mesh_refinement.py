@@ -5,18 +5,136 @@ import glob
 import re
 import pprint
 
+import igraph
 
-class mesh_refine_event(object):
+class global_mesh_refine_event(object):
+    def __init__(self, rank_to_local_mesh_refine_event, make_graph=False):
+        self._rank_to_local_mre = rank_to_local_mesh_refine_event
+        self._ts = None
+        self._set_timestep()
+        self._begin_timestamp = None
+        self._end_timestamp = None
+        self._elapsed_time = None
+        self._set_timestamps()
+        self._total_recv = 0
+        self._total_sent = 0
+        self._total_block_traffic = None
+        self._channel_to_traffic = {}
+        self._set_total_block_traffic()
+        self._block_traffic_graph = None
+        if make_graph:
+            self._make_block_traffic_graph()
+
+    def _set_timestep(self):
+        rank_to_timestep = {rank:mre.timestep() for rank,mre in self._rank_to_local_mre.items()}
+        assert(len(set(rank_to_timestep.values())) == 1)
+        self._ts = rank_to_timestep[0]
+
+    def _set_timestamps(self):
+        rank_to_begin_ts = {rank:mre.begin_timestamp() for rank,mre in self._rank_to_local_mre.items()}
+        rank_to_end_ts = {rank:mre.end_timestamp() for rank,mre in self._rank_to_local_mre.items()}
+        self._begin_timestamp = min(rank_to_begin_ts.values())
+        self._end_timestamp = max(rank_to_end_ts.values())
+        self._elapsed_time = self._end_timestamp - self._begin_timestamp
+    
+    def _set_total_block_traffic(self):
+        for src_rank,mre in self._rank_to_local_mre.items():
+            self._total_recv += mre.total_recv()
+            for dst_rank,n_blocks in mre.rank_to_blocks_sent().items():
+                self._total_sent += n_blocks
+                channel = (src_rank, dst_rank)
+                if channel not in self._channel_to_traffic:
+                    self._channel_to_traffic[channel] = n_blocks
+                else:
+                    self._channel_to_traffic[channel] += n_blocks
+        assert(self._total_recv == self._total_sent)
+        self._total_block_traffic = self._total_recv
+
+    def __repr__(self):
+        repr_str = "Global Mesh Refinement Event at Time Step: {}\n".format(self._ts)
+        repr_str += "\tStart Time: {}\n".format(self._begin_timestamp)
+        repr_str += "\tEnd Time: {}\n".format(self._end_timestamp)
+        repr_str += "\tElapsed Time: {}\n".format(self._elapsed_time)
+        repr_str += "\tTotal Block Traffic: {} blocks\n".format(self._total_block_traffic)
+        repr_str += "\tChannel-to-Sent-Blocks:\n"
+        for channel,n_blocks in self._channel_to_traffic.items():
+             repr_str += "\t\tSent {} blocks to in channel {}\n".format(n_blocks,channel)
+        return repr_str
+
+    def __str__(self):
+        return self.__repr__()
+
+    def _make_block_traffic_graph(self):
+        graph = igraph.Graph(directed=True)
+        ranks = set()
+        for src_rank,mre in self._rank_to_local_mre.items():
+            ranks.add(src_rank)
+            for dst_rank in mre.rank_to_blocks_sent().keys():
+                ranks.add(dst_rank)
+        ranks = sorted(ranks)
+        graph.add_vertices(len(ranks))
+        graph.vs[:]["rank"] = ranks
+        edge_weights = []
+        for channel,n_blocks in self._channel_to_traffic.items():
+            src_rank, dst_rank = channel
+            if src_rank != dst_rank and n_blocks != 0:
+                graph.add_edge(src_rank, dst_rank)
+                edge_weights.append(n_blocks)
+        graph.es[:]["n_blocks"] = edge_weights
+        self._block_traffic_graph = graph
+        
+
+    def make_plot(self):
+        # Build graph if necessary
+        if self._block_traffic_graph is None:
+            self._make_block_traffic_graph()
+        # Normalize edge weights
+        max_nb = max(self._block_traffic_graph.es["n_blocks"])
+        normalized_nb = [ nb/max_nb for nb in self._block_traffic_graph.es["n_blocks"] ]
+        edge_width_scale = 8
+        edge_widths = [ nb*edge_width_scale for nb in normalized_nb ]
+        # Make plot 
+        n_vertices = len(self._block_traffic_graph.vs[:])
+        vertex_label_distances = [ 0 ] * n_vertices
+        
+        layout = self._block_traffic_graph.layout_circle()
+        igraph.plot( self._block_traffic_graph, 
+                     layout = layout,
+                     vertex_label=self._block_traffic_graph.vs[:]["rank"],
+                     vertex_label_dist=vertex_label_distances,
+                     edge_width=edge_widths,
+                     target="miniAMR_run_0_mre_0.png"
+                   )
+
+
+
+class local_mesh_refine_event(object):
     def __init__(self, timestep, load_balance_events):
         self._ts = timestep
         self._lb_events = load_balance_events
         self._begin_timestamp = None
         self._end_timestamp = None
+        self._elapsed_time = None
         self._set_timestamps()
         self._total_recv = 0
         self._total_sent = 0
         self._rank_to_total_sent = {}
         self._set_total_block_traffic()
+
+    def timestep(self):
+        return self._ts
+
+    def begin_timestamp(self):
+        return self._begin_timestamp
+    
+    def end_timestamp(self):
+        return self._end_timestamp
+    
+    def rank_to_blocks_sent(self):
+        return self._rank_to_total_sent
+
+    def total_recv(self):
+        return self._total_recv
 
     def _set_timestamps(self):
         n_lb_events = len(self._lb_events)
@@ -24,6 +142,7 @@ class mesh_refine_event(object):
         self._begin_timestamp = self._lb_events[0].wtime()
         # Get timestamp from last load balance event
         self._end_timestamp = self._lb_events[n_lb_events-1].wtime()
+        self._elapsed_time = self._end_timestamp - self._begin_timestamp
 
     def _set_total_block_traffic(self):
         for _,lb_event in self._lb_events.items():
@@ -36,9 +155,10 @@ class mesh_refine_event(object):
                     self._rank_to_total_sent[dst_rank] += n_blocks
 
     def __repr__(self):
-        repr_str = "Mesh Refinement Event at Time Step: {}\n".format(self._ts)
+        repr_str = "Local Mesh Refinement Event at Time Step: {}\n".format(self._ts)
         repr_str += "\tStart Time: {}\n".format(self._begin_timestamp)
         repr_str += "\tEnd Time: {}\n".format(self._end_timestamp)
+        repr_str += "\tElapsed Time: {}\n".format(self._elapsed_time)
         repr_str += "\tTotal Blocks Received: {}\n".format(self._total_recv)
         repr_str += "\tTotal Blocks Sent: {}\n".format(self._total_sent)
         repr_str += "\tRank-to-Sent-Blocks:\n"
@@ -49,7 +169,7 @@ class mesh_refine_event(object):
     def __str__(self):
         return self.__repr__()
 
-class load_balance_event(object):
+class local_load_balance_event(object):
     def __init__(self, idx, timestamp, imbalance, rank_to_sent_blocks, blocks_received):
         # An index indicating which load balancing event this was during its
         # containing mesh refinement event
@@ -123,19 +243,15 @@ def get_timestep_bounds( lines ):
     timestep_lines = get_timestep_lines(lines)
     n_mesh_refinements = len(timestep_lines)
     n_lines = len(lines)
-    ts_to_bounds = {}
+    ts_to_bounds = { 0 : (0, timestep_lines[0]-1) }
     for i in range(n_mesh_refinements):
         ts_line = timestep_lines[i]
-        # Case 1: First pre-execution mesh refinement
-        # Grab all lines up to the timestep line
-        if i == 0:
-            ts_to_bounds[0] = (0, ts_line-1)
-        # Case 2: Last mesh refinement
+        # Case 1: Last mesh refinement
         # Grab all lines after the timestep line
-        elif i == n_mesh_refinements - 1:
+        if i == n_mesh_refinements - 1:
             ts = get_timestep_from_line(lines[ts_line])
             ts_to_bounds[ts] = (ts_line, n_lines-1)
-        # Case 3: Interior mesh refinements
+        # Case 2: Interior mesh refinements
         else:
             ts = get_timestep_from_line(lines[ts_line])
             ts_to_bounds[ts] = ( ts_line, timestep_lines[i+1]-1 )
@@ -209,7 +325,7 @@ def make_lb_event(lb_idx, lines):
             rank_to_sent_blocks[rank] = sent_blocks
 
     
-    lb_event = load_balance_event(lb_idx, timestamp, imbalance, rank_to_sent_blocks, recv_blocks)
+    lb_event = local_load_balance_event(lb_idx, timestamp, imbalance, rank_to_sent_blocks, recv_blocks)
     return lb_event
 
 def get_load_balance_events(lines):
@@ -226,25 +342,39 @@ def parse_logfile(logfile_raw_lines):
     cleaned = clean_raw_lines( logfile_raw_lines )
     timestep_to_event_lines = group_by_timestep( cleaned )
     timestep_to_events = {ts:parse_event_lines(lines) for ts,lines in timestep_to_event_lines.items()}
+    mr_events = []
     for ts,lb_events in timestep_to_events.items():
-        mr_event = mesh_refine_event(ts, lb_events)
-        print(mr_event)
-        print()
-    exit()
+        mr_event = local_mesh_refine_event(ts, lb_events)
+        mr_events.append(mr_event)
+    return mr_events
+
+
+def get_rank_from_path(path):
+    return int(path.split("_")[-1].split(".")[0])
 
 def load_single_run(trace_dir):
     pattern = re.compile("^[\w\/]+miniAMR_\d+\.log$")
     candidates = glob.glob(trace_dir+"/*.log")
     logfile_paths = filter(lambda x: pattern.match(x), candidates)
-    logfile_raw_lines = [ load_logfile(x) for x in logfile_paths ]
-    logfile_data = [ parse_logfile(x) for x in logfile_raw_lines ]
-    return logfile_data
+    rank_to_raw_lines = { get_rank_from_path(path):load_logfile(path) for path in logfile_paths }
+    rank_to_data = { rank:parse_logfile(lines) for rank,lines in rank_to_raw_lines.items() }
+    return rank_to_data
 
 
 def analyze_single_run(trace_dir):
-    logs = load_single_run( trace_dir )
-    pprint.pprint(logs[0])
-    exit()
+    rank_to_data = load_single_run( trace_dir )
+    
+    rank_to_n_mesh_refine_events = {rank:len(data) for rank,data in rank_to_data.items()}
+    assert(len(set(rank_to_n_mesh_refine_events.values()))==1)
+    
+    n_mesh_refine_events = len(rank_to_data[0])
+    for i in range(n_mesh_refine_events):
+        curr_rank_to_events = {rank:events[i] for rank,events in rank_to_data.items()}
+        gmre = global_mesh_refine_event( curr_rank_to_events )
+        #print(gmre)
+        gmre.make_plot()
+        exit()
+
 
 
 def main(args):
