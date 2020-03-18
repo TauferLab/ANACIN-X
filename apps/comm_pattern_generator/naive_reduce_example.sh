@@ -4,7 +4,7 @@ n_procs=$1
 run_idx_low=$2
 run_idx_high=$3
 
-anacin_x_root=$HOME/repos/ANACIN-X
+anacin_x_root=$HOME/ANACIN-X
 
 # Tracing
 pnmpi=${anacin_x_root}/submodules/PnMPI/build/lib/libpnmpi.so
@@ -24,9 +24,9 @@ compute_kdts_script=${anacin_x_root}/anacin-x/event_graph_analysis/compute_kerne
 graph_kernel=${anacin_x_root}/anacin-x/event_graph_analysis/graph_kernel_policies/wlst_5iters_logical_timestamp_label.json
 
 #message_sizes=(1 2 4 8 16 32 64 128 256 512 1024 2048)
-message_sizes=(1 512 1024 2048)
+message_sizes=(1 32 1024)
 
-results_root=/data/gclab/anacin-x/comm_pattern_examples/repro_naive_reduce/
+results_root=/data/gclab/anacin-k/comm_pattern_examples/repro_naive_reduce/
 
 # Non-NINJA Workflow
 for msg_size in ${message_sizes[@]};
