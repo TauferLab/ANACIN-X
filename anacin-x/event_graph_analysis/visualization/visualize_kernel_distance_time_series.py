@@ -462,7 +462,7 @@ def make_box_plots( slice_idx_to_data, slice_idx_lower, slice_idx_upper, wall_ti
     plot_title = "Kernel Distance Time Series"
     plt.title( plot_title )
 
-    #plt.show()
+    plt.show()
     plt.savefig( "kdts.png", 
                  bbox_inches="tight",
                  transparent=False,

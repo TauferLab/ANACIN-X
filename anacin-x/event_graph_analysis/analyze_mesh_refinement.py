@@ -4,8 +4,16 @@ import argparse
 import glob
 import re
 import pprint
+import os
+import pathlib
+import pickle as pkl
 
 import igraph
+
+import numpy as np
+import matplotlib
+matplotlib.use('TkAgg')
+import matplotlib.pyplot as plt
 
 class global_mesh_refine_event(object):
     def __init__(self, rank_to_local_mesh_refine_event, make_graph=False):
@@ -82,28 +90,51 @@ class global_mesh_refine_event(object):
                 edge_weights.append(n_blocks)
         graph.es[:]["n_blocks"] = edge_weights
         self._block_traffic_graph = graph
-        
 
-    def make_plot(self):
+    def block_traffic(self):
+        return self._total_block_traffic
+
+    def max_channel_traffic(self):
+        # Build graph if necessary
+        if self._block_traffic_graph is None:
+            self._make_block_traffic_graph()
+        return max(self._block_traffic_graph.es["n_blocks"])
+
+
+    def make_plot(self, run=None, mre_event=None, scaling="local", max_blocks=None):
         # Build graph if necessary
         if self._block_traffic_graph is None:
             self._make_block_traffic_graph()
         # Normalize edge weights
-        max_nb = max(self._block_traffic_graph.es["n_blocks"])
+        if scaling == "local":
+            max_nb = max(self._block_traffic_graph.es["n_blocks"])
+        elif scaling == "global" and max_blocks is not None:
+            max_nb = max_blocks
         normalized_nb = [ nb/max_nb for nb in self._block_traffic_graph.es["n_blocks"] ]
         edge_width_scale = 8
         edge_widths = [ nb*edge_width_scale for nb in normalized_nb ]
         # Make plot 
         n_vertices = len(self._block_traffic_graph.vs[:])
+        # Center rank IDs on vertices
         vertex_label_distances = [ 0 ] * n_vertices
-        
+        # Arrange vertices in a cirle
         layout = self._block_traffic_graph.layout_circle()
+        if run is not None:
+            save_root = "mesh_refinement_visualizations_run_{}/".format(run)
+        else:
+            save_root = "mesh_refinement_visualizations/"
+        if not os.path.isdir(save_root):
+            pathlib.Path(save_root).mkdir(parents=True, exist_ok=True)
+        if run is not None and mre_event is not None:
+            save_path = save_root + "/miniAMR_run_{}_mesh_refinement_event_{}.png".format(run,mre_event)
+        else:
+            save_path = save_root + "/miniAMR_mesh_refinement_event.png"
         igraph.plot( self._block_traffic_graph, 
                      layout = layout,
                      vertex_label=self._block_traffic_graph.vs[:]["rank"],
                      vertex_label_dist=vertex_label_distances,
                      edge_width=edge_widths,
-                     target="miniAMR_run_0_mre_0.png"
+                     target=save_path
                    )
 
 
@@ -112,9 +143,9 @@ class local_mesh_refine_event(object):
     def __init__(self, timestep, load_balance_events):
         self._ts = timestep
         self._lb_events = load_balance_events
-        self._begin_timestamp = None
-        self._end_timestamp = None
-        self._elapsed_time = None
+        self._begin_timestamp = 0
+        self._end_timestamp = 0
+        self._elapsed_time = 0
         self._set_timestamps()
         self._total_recv = 0
         self._total_sent = 0
@@ -138,11 +169,10 @@ class local_mesh_refine_event(object):
 
     def _set_timestamps(self):
         n_lb_events = len(self._lb_events)
-        # Get timestamp from first load balance event
-        self._begin_timestamp = self._lb_events[0].wtime()
-        # Get timestamp from last load balance event
-        self._end_timestamp = self._lb_events[n_lb_events-1].wtime()
-        self._elapsed_time = self._end_timestamp - self._begin_timestamp
+        if len(self._lb_events) > 0:
+            self._begin_timestamp = self._lb_events[0].wtime()
+            self._end_timestamp = self._lb_events[n_lb_events-1].wtime()
+            self._elapsed_time = self._end_timestamp - self._begin_timestamp
 
     def _set_total_block_traffic(self):
         for _,lb_event in self._lb_events.items():
@@ -361,32 +391,153 @@ def load_single_run(trace_dir):
     return rank_to_data
 
 
-def analyze_single_run(trace_dir):
+def analyze_single_run(trace_dir, run_idx, make_plots=False, plot_scaling="global"):
+    print("Analyzing mesh refinement events for run: {}".format(run_idx ))
     rank_to_data = load_single_run( trace_dir )
     
     rank_to_n_mesh_refine_events = {rank:len(data) for rank,data in rank_to_data.items()}
     assert(len(set(rank_to_n_mesh_refine_events.values()))==1)
     
     n_mesh_refine_events = len(rank_to_data[0])
+    global_mesh_refinement_events = []
     for i in range(n_mesh_refine_events):
         curr_rank_to_events = {rank:events[i] for rank,events in rank_to_data.items()}
-        gmre = global_mesh_refine_event( curr_rank_to_events )
-        #print(gmre)
-        gmre.make_plot()
-        exit()
+        gmre = global_mesh_refine_event( curr_rank_to_events, make_graph=True )
+        global_mesh_refinement_events.append(gmre)
+    
+    if make_plots:
+        print("Generating plots")
+        global_max_blocks_per_channel = max([ gmre.max_channel_traffic() for gmre in global_mesh_refinement_events ])
+        for i in range(len(global_mesh_refinement_events)):
+            gmre = global_mesh_refinement_events[i]
+            gmre.make_plot(run=run_idx, mre_event=i, scaling=plot_scaling, max_blocks=global_max_blocks_per_channel)
 
+    return global_mesh_refinement_events
+
+def get_run_from_path(path):
+    run = int(path.split("/")[-1].split("_")[-1])
+    return run
+
+
+def get_requested_trace_dirs(traces_root_dir, run_range_lower, run_range_upper, runs):
+    # Get all trace directories' paths
+    trace_dirs = [ pathlib.Path(p) for p in glob.glob( traces_root_dir + "/run*/" ) ]
+    trace_dirs = sorted( trace_dirs, key=lambda p: p.name )
+    # Case 1: Retain only an explicitly specified subset of runs
+    if runs is not None:
+        requested_trace_dirs = [ trace_dirs[idx-1] for idx in runs ]
+    # Case 2: Retain a contiguous range of runs
+    elif run_range_lower is not None and run_range_upper is not None:
+        run_indices = range( run_range_lower-1, run_range_upper )
+        requested_trace_dirs = [ trace_dirs[idx] for idx in run_indices ]
+    # Case 3: Retain all runs
+    else:
+        requested_trace_dirs = trace_dirs
+    return [ str(td) for td in requested_trace_dirs ]
+
+
+def analyze_multiple_runs(traces_root_dir, run_range_lower, run_range_upper, runs, make_plots=False):
+    trace_dirs = get_requested_trace_dirs(traces_root_dir, run_range_lower, run_range_upper, runs)
+    run_to_dir = { get_run_from_path(p):p for p in trace_dirs }
+    run_to_mre_seq = {run:analyze_single_run(td,run) for run,td in run_to_dir.items()}
+    # Check that each run has the same number of MREs
+    run_to_n_mres = {run:len(mre_seq) for run,mre_seq in run_to_mre_seq.items()}
+    assert(len(set(run_to_n_mres.values()))==1)
+    n_mres = list(run_to_n_mres.values())[0]
+    # Extract block traffic for each MRE across all runs
+    mre_to_block_traffic = []
+    for i in range(n_mres):
+        block_traffic = []
+        for run,mre_seq in run_to_mre_seq.items():
+            block_traffic.append( mre_seq[i].block_traffic() )
+        mre_to_block_traffic.append( block_traffic )
+    if make_plots:
+        make_block_traffic_boxplot(mre_to_block_traffic)
+    return mre_to_block_traffic
+
+def get_scatter_plot_points(mre_to_block_traffic):
+    x_vals = []
+    y_vals = []
+    for i in range(len(mre_to_block_traffic)):
+        for bt in mre_to_block_traffic[i]:
+            x_val = i + np.random.uniform(-0.25,0.25)
+            y_val = bt
+            x_vals.append( x_val )
+            y_vals.append( y_val )
+    return x_vals, y_vals
+
+def make_block_traffic_boxplot(mre_to_block_traffic, overlay_points=False):
+    aspect_ratio = "widescreen"
+    figure_scale = 1.5
+    if aspect_ratio == "widescreen":
+        base_figure_size = (16, 9)
+    else:
+        base_figure_size = (4, 3)
+    figure_size = (figure_scale*base_figure_size[0], figure_scale*base_figure_size[1] )
+
+    fig, ax = plt.subplots(figsize=figure_size)
+
+    box_positions = range(len(mre_to_block_traffic))
+    box_width = 1.0
+    flier_props = { "marker" : "+",
+                   "markersize" : 4
+                 }
+    box_props = { "alpha" : 0.25
+               } 
+    bp = ax.boxplot( mre_to_block_traffic,
+                     widths=box_width,
+                     positions=box_positions,
+                     patch_artist=True,
+                     showfliers=True,
+                     boxprops=box_props,
+                     flierprops=flier_props )
+    if overlay_points:
+        scatter_x_vals, scatter_y_vals = get_scatter_plot_points( mre_to_block_traffic )
+        marker_size = 2
+        ax.scatter( scatter_x_vals, 
+                    scatter_y_vals,
+                    s=marker_size)
+    plt.savefig("block_traffic_seq.png",
+                 bbox_inches="tight")
 
 
 def main(args):
     trace_dir = args.trace_dir
-    analyze_single_run(trace_dir)
-
+    mode = args.mode
+    make_plots = args.plot
+    if mode == "single":
+        if run_idx is not None:
+            run_idx = int(args.run_idx)
+        else:
+            raise ValueError("Run Index must be specified in single-run mode")
+        analyze_single_run(trace_dir, run_idx, make_plots=make_plots)
+    elif mode == "multiple" or mode == "multi":
+        run_range_lower = args.run_range_lower
+        run_range_upper = args.run_range_upper
+        runs = args.runs
+        mre_to_block_traffic = analyze_multiple_runs(trace_dir, run_range_lower=run_range_lower, run_range_upper=run_range_upper, runs=runs, make_plots=make_plots)
+        output = { "mesh_refinement_rate" : 5,  # TODO make this configurable
+                   "mre_to_block_traffic" : mre_to_block_traffic }
+        print("Writing block traffic data to file")
+        with open( trace_dir + "/block_traffic_data.pkl", "wb" ) as outfile:
+            pkl.dump( output, outfile, pkl.HIGHEST_PROTOCOL )
 
 if __name__ == "__main__":
     desc = ""
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("trace_dir", 
                         help="Directory containing traces from a single run")
-
+    parser.add_argument("-m", "--mode", 
+            help="Run the analysis on trace data from a single run or multiple runs. Options: single, multiple")
+    parser.add_argument("-i", "--run_idx", required=False, default=None)
+    parser.add_argument("-p", "--plot", required=False, default=False, action="store_true",
+                        help="Generate plots")
+    # Args to select subset of runs
+    parser.add_argument("-r", "--runs", nargs="+", required=False, default=None, type=int,
+                        help="Which runs to compute pairwise kernel distances for")
+    parser.add_argument("-l", "--run_range_lower", type=int, required=False, default=None,
+                        help="lower bound of range of runs")
+    parser.add_argument("-u", "--run_range_upper", type=int, required=False, default=None,
+                        help="lower bound of range of runs")
     args = parser.parse_args()
     main(args)

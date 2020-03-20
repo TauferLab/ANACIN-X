@@ -211,6 +211,8 @@ Check that each slice directory has appropriate contents
 def validate_slice_dirs( slice_dirs ):
     slice_counts = set()
     for sd in slice_dirs:
+        print(sd)
+        assert( os.path.isdir(str(sd)) )
         assert( sd.is_dir() )
         slice_counts.add( len(list(sd.glob("*.graphml"))) )
     assert( len( slice_counts ) == 1 )
