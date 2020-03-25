@@ -42,8 +42,9 @@ def parse_report( report_path ):
 
 
 def make_callstack_frequency_bar_plot( callstack_to_count, y_axis="normalized" ):
-    fig, ax = plt.subplots()
-    spacing_factor = 20
+    figure_size = ( 42, 18 )
+    fig, ax = plt.subplots( figsize = figure_size )
+    spacing_factor = 80
     bar_positions = [ x*spacing_factor for x in range(len(sorted(callstack_to_count))) ]
     bar_heights = sorted(callstack_to_count.values())
     bar_width = 0.4*spacing_factor
@@ -53,20 +54,28 @@ def make_callstack_frequency_bar_plot( callstack_to_count, y_axis="normalized" )
         ax.set_ylim(0, 1.0)
     # Annotate x-axis
     x_axis_label = "Call-Stack"
-    x_tick_labels = []
+    long_x_tick_labels = []
     for callstack in sorted(callstack_to_count.keys()):
         callstack_str = ""
         for idx,fn in enumerate(callstack):
             callstack_str += fn
             if idx != len(callstack)-1:
                 callstack_str += "\n"
-        x_tick_labels.append( callstack_str )
+        long_x_tick_labels.append( callstack_str )
+
     ax.set_xlabel( x_axis_label )
     ax.set_xticks( bar_positions )
-    ax.set_xticklabels( x_tick_labels, rotation=0, fontsize=8 )
+    ax.set_xlim(-0.5*spacing_factor, max(bar_positions)+(0.5*spacing_factor))
+    
+    # Determine short xtick labels
+    long_to_short_x_tick_label = {}
+    #x_tick_labels = [ long_to_short_x_tick_label[x] for x in long_x_tick_labels ]
+
+    ax.set_xticklabels( long_x_tick_labels, rotation=0, fontsize=8 )
     # Annotate y-axis
     y_axis_label = "Frequency"
     ax.set_ylabel( y_axis_label )
+    ax.set_ylim(0, 0.15)
     
     #plt.show()
 
@@ -149,13 +158,13 @@ def make_call_graph( callstack_to_count ):
 def main( report_path, plot_type, y_axis, global_callstack_distribution ):
     callstack_to_count, fn_to_location = parse_report( report_path )
     
-    g = make_call_graph( callstack_to_count )
+    #g = make_call_graph( callstack_to_count )
 
-    #if y_axis == "normalized":
-    #    callstack_to_freq = normalize_counts( callstack_to_count )
-    #    make_callstack_frequency_bar_plot( callstack_to_freq )
-    #elif y_axis == "raw":
-    #    make_callstack_frequency_bar_plot( callstack_to_count, y_axis=y_axis )
+    if y_axis == "normalized":
+        callstack_to_freq = normalize_counts( callstack_to_count )
+        make_callstack_frequency_bar_plot( callstack_to_freq )
+    elif y_axis == "raw":
+        make_callstack_frequency_bar_plot( callstack_to_count, y_axis=y_axis )
 
 if __name__ == "__main__":
     desc = ""

@@ -9,6 +9,7 @@
 import argparse
 import pickle as pkl
 import json
+import os
 
 import numpy as np
 
@@ -39,7 +40,7 @@ def kernel_json_to_key( kernel_json ):
         raise NotImplementedError("Translation not implemented for kernel: {}".format(kernel_name))
 
 
-def main( kdts_data_path, kernel_file_path, block_traffic_data_path=None, flagged_slices=None ):
+def main( kdts_data_path, kernel_file_path, block_traffic_data_path=None, flagged_slices=None, kdts_ymax=None, mre_ymax=None, output="mini_amr_kdts.png"):
 
     # Read in kernel distance time series data
     with open( kdts_data_path, "rb" ) as infile:
@@ -74,15 +75,47 @@ def main( kdts_data_path, kernel_file_path, block_traffic_data_path=None, flagge
     box_width = 0.5
     box_props = { "alpha" : 0.5 }
     flier_props = { "marker" : "+", "markersize" : 4 }
+        
+    if flagged_slices is not None:
+        with open( flagged_slices, "rb" ) as infile:
+            flagged_indices = pkl.load( infile )["increasing_median"]  # TODO undo hardcode
 
-    # Create base kernel distance boxplot
-    kdts_boxes = kdts_ax.boxplot( kdts_box_data,
-                                  widths = box_width,
-                                  positions = kdts_box_positions,
-                                  patch_artist = True,
-                                  showfliers = True,
-                                  boxprops = box_props,
-                                  flierprops = flier_props )
+        non_flagged_box_positions = sorted(set(kdts_box_positions) - set(flagged_indices))
+        flagged_box_positions = sorted(flagged_indices)
+
+        non_flagged_box_data = [ kdts_box_data[i] for i in non_flagged_box_positions ]
+        flagged_box_data = [ kdts_box_data[i] for i in flagged_box_positions ]
+        
+        non_flagged_box_props = box_props
+        flagged_box_props = { "alpha" : 0.5, "facecolor" : "r" }
+
+        non_flagged_kdts_boxes = kdts_ax.boxplot( non_flagged_box_data,
+                                      widths = box_width,
+                                      positions = non_flagged_box_positions,
+                                      patch_artist = True,
+                                      showfliers = True,
+                                      boxprops = non_flagged_box_props,
+                                      flierprops = flier_props )
+        
+        flagged_kdts_boxes = kdts_ax.boxplot( flagged_box_data,
+                                              widths = box_width,
+                                              positions = flagged_box_positions,
+                                              patch_artist = True,
+                                              showfliers = True,
+                                              boxprops = flagged_box_props,
+                                              flierprops = flier_props )
+
+    else:
+        # Create base kernel distance boxplot
+        kdts_boxes = kdts_ax.boxplot( kdts_box_data,
+                                      widths = box_width,
+                                      positions = kdts_box_positions,
+                                      patch_artist = True,
+                                      showfliers = True,
+                                      boxprops = box_props,
+                                      flierprops = flier_props )
+    
+
 
     # Read in mesh refinement block traffic data and plot, if available
     if block_traffic_data_path is not None:
@@ -112,20 +145,28 @@ def main( kdts_data_path, kernel_file_path, block_traffic_data_path=None, flagge
                      markersize=12 )
         # Configure MRE y-axis appearance
         mre_ax.set_ylabel("Number of Blocks Transferred")
-
+        if mre_ymax is not None:
+            mre_ax.set_ylim(0, mre_ymax)
+    
      
     # Configure axes text appearance
     tick_label_fontdict = { "fontsize" : 12 } 
 
     # Configure x-axis appearance
     x_ticks = slice_indices
+    if block_traffic_data_path is None:
+        mesh_refinement_rate = 5
     x_tick_labels = [ str(x+1) if (x+1) % mesh_refinement_rate == 0 else '' for x in x_ticks ]
     kdts_ax.set_xticks( x_ticks )
     kdts_ax.set_xticklabels( x_tick_labels, rotation=0, fontdict=tick_label_fontdict )
+    x_axis_padding = 5
+    kdts_ax.set_xlim( -1*x_axis_padding, len(kdts_box_positions) + x_axis_padding )
     kdts_ax.set_xlabel("Slice Index")
 
     # Configure kernel distance time series y-axis appearance
     kdts_ax.set_ylabel("Kernel Distance (Higher == Runs Less Similar)")
+    if kdts_ymax is not None:
+        kdts_ax.set_ylim(0, kdts_ymax)
 
     # Configure title appearance
     # TODO
@@ -133,8 +174,8 @@ def main( kdts_data_path, kernel_file_path, block_traffic_data_path=None, flagge
     # Annotate 
     # TODO
 
-    # Save figure
-    plt.savefig( "mini_amr_kdts_lb_2.png",
+    # Save figureS
+    plt.savefig( output,
                  bbox_inches = "tight",
                  pad_inches = 0.25 )
 
@@ -150,9 +191,19 @@ if __name__ == "__main__":
                         help="Path to pickle file of block traffic data")
     parser.add_argument("--flagged_slices", required=False, default=None,
                         help="A list of slice indices indicating which slices have been flagged by anomaly detection and should be marked with a contrasting color. (Optional)")
+    parser.add_argument("--kdts_ymax", required=False, type=int, default=None, 
+                        help="Y-axis maximum for the kernel distance time series data")
+    parser.add_argument("--mre_ymax", required=False, type=int, default=None,
+                        help="Y-axis maximum for the mesh refinement block traffic data")
+    parser.add_argument("-o", "--output", required=False, default="mini_amr_kdts.png",
+                        help="Output file name")
     args = parser.parse_args()
 
     main( args.kdts_data, 
           args.kernel_file,
           args.block_traffic_data, 
-          args.flagged_slices )
+          args.flagged_slices,
+          args.kdts_ymax,
+          args.mre_ymax,
+          args.output
+          )
