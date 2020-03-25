@@ -40,69 +40,105 @@ def get_elapsed_times( run_dirs ):
             run_idx_to_elapsed_time[ run_idx ] = None
     return run_idx_to_elapsed_time
 
-def main( trace_dir, mode ):
-    base_runs = sorted(glob.glob( trace_dir + "/base/run*/" ))
-    dumpi_runs = sorted(glob.glob( trace_dir + "/dumpi/run*/" ))
-    dumpi_csmpi_runs = sorted(glob.glob( trace_dir + "/dumpi_csmpi/run*/" ))
-    run_idx_to_base_elapsed_times = get_elapsed_times( base_runs )
-    run_idx_to_dumpi_elapsed_times = get_elapsed_times( dumpi_runs )
-    run_idx_to_dumpi_csmpi_elapsed_times = get_elapsed_times( dumpi_csmpi_runs )
-    cfg_to_overheads = {}
-    for idx in run_idx_to_base_elapsed_times.keys():
-        for cfg in [ "base", "dumpi", "dumpi_csmpi" ]:
-            if cfg == "base":
-                overhead = 1.0
-            elif cfg == "dumpi":
-                overhead = run_idx_to_dumpi_elapsed_times[idx] / run_idx_to_base_elapsed_times[idx]
-            elif cfg == "dumpi_csmpi":
-                overhead = run_idx_to_dumpi_csmpi_elapsed_times[idx] / run_idx_to_base_elapsed_times[idx]
-            if cfg not in cfg_to_overheads:
-                cfg_to_overheads[cfg] = [ overhead ]
-            else:
-                cfg_to_overheads[cfg].append( overhead )
 
-    cfg_to_elapsed_times = { "base" : run_idx_to_base_elapsed_times.values(),
-                             "dumpi" : run_idx_to_dumpi_elapsed_times.values(),
-                             "dumpi_csmpi" : run_idx_to_dumpi_csmpi_elapsed_times.values() }
+def get_scale_from_scale_dir( sd ):
+    base_name = os.path.basename( os.path.realpath(sd) )
+    scale = int(base_name.split("_")[-1])
+    return scale
+
+def get_cfg_from_cfg_dir( cfg_dir ):
+    base_name = os.path.basename( os.path.realpath(cfg_dir) )
+    return base_name
+
+def get_scale_to_cfg_dirs( trace_dir, scales ):
+    scale_dirs = sorted(glob.glob(trace_dir+"/nprocs_*/"))
+    scale_to_scale_dirs = { get_scale_from_scale_dir(sd):sd for sd in scale_dirs }
+    selected_scale_to_scale_dirs = { np:scale_to_scale_dirs[np] for np in scales }
+    scale_to_cfg_dirs = { np:{ get_cfg_from_cfg_dir(cfg_dir):cfg_dir for cfg_dir in glob.glob(sd+"/*/") } for np,sd in selected_scale_to_scale_dirs.items() }
+    return scale_to_cfg_dirs
+
+def get_scale_to_elapsed_times( scale_to_cfg_dirs ):
+    scale_to_run_dirs =  { np : { cfg : sorted(glob.glob(cfg_dir+"/run*/")) for cfg,cfg_dir in cfg_dirs.items() } for np,cfg_dirs in scale_to_cfg_dirs.items() }
+    scale_to_elapsed_times = { np : { cfg : get_elapsed_times(run_dirs) for cfg,run_dirs in cfg_dirs.items() } for np,cfg_dirs in scale_to_run_dirs.items() }
+    return scale_to_elapsed_times
+
+def get_scale_to_overheads( scale_to_elapsed_times ):
+    scale_to_overheads = {}
+    for np in scale_to_elapsed_times:
+        cfg_to_elapsed_times = scale_to_elapsed_times[np]
+        n_run_indices_set = set()
+        for cfg, run_to_time in cfg_to_elapsed_times.items():
+            n_run_indices_set.add( len(run_to_time.keys()) )
+        assert(len(n_run_indices_set) == 1 )
+        run_indices = sorted(run_to_time.keys())
+        cfg_to_overheads = {}
+        for idx in run_indices:
+            for cfg in cfg_to_elapsed_times.keys():
+                if cfg == "base":
+                    overhead = 1.0
+                elif cfg == "dumpi":
+                    overhead = cfg_to_elapsed_times["dumpi"][idx] / cfg_to_elapsed_times["base"][idx]
+                elif cfg == "dumpi_csmpi":
+                    overhead = cfg_to_elapsed_times["dumpi_csmpi"][idx] / cfg_to_elapsed_times["base"][idx]
+                if cfg not in cfg_to_overheads:
+                    cfg_to_overheads[cfg] = [ overhead ]
+                else:
+                    cfg_to_overheads[cfg].append( overhead )
+        scale_to_overheads[np] = cfg_to_overheads
+    return scale_to_overheads
+
+def main( trace_dir, scales ):
+    scale_to_cfg_dirs = get_scale_to_cfg_dirs( trace_dir, scales )
+    scale_to_elapsed_times = get_scale_to_elapsed_times( scale_to_cfg_dirs )
+    scale_to_overheads = get_scale_to_overheads( scale_to_elapsed_times )
+    
     figure_size = (16, 9)
     fig, ax = plt.subplots(figsize=figure_size)
-    configs = ["dumpi", "dumpi_csmpi"]
-    box_position = [0]
-    box_width = 1.0
-    cfg_to_color = { "base" : "g", "dumpi" : "b", "dumpi_csmpi" : "r" }
+    box_width = 0.8
+    cfg_to_color = { "dumpi" : "b", "dumpi_csmpi" : "r" }
     flier_props = { "marker" : "+", "markersize" : 4 }
-    for cfg in configs:
-        if mode == "overhead":
-            box_data = list(filter(lambda x: x is not None, cfg_to_overheads[cfg]))
-        elif mode == "raw":
-            box_data = list(filter(lambda x: x is not None, cfg_to_elapsed_times[cfg]))
+    cfgs_to_plot = [ "dumpi", "dumpi_csmpi" ]
+    cfg_to_label = { "dumpi" : "DUMPI", "dumpi_csmpi" : "DUMPI + CSMPI" }
 
-        box_props = { "alpha" : 0.5, "facecolor" : cfg_to_color[cfg] }
-        ax.boxplot( box_data,
-                    positions=box_position,
-                    patch_artist=True,
-                    showfliers=True,
-                    boxprops=box_props,
-                    flierprops=flier_props )
-        box_position[0] += 1
+    curr_box_position = 0
+    y_max = 0
+    all_bps = []
+    all_labels = []
+    have_legend_data = False
+    for np in scales:
+        for cfg in cfgs_to_plot:
+            box_data = scale_to_overheads[np][cfg]
+            box_data = [ y*100 for y in box_data ]
+            y_max = max(y_max, max(box_data))
+            box_position = [ curr_box_position ]
+            box_props = { "alpha" : 0.5, "facecolor" : cfg_to_color[cfg] }
+            bp = ax.boxplot( box_data,
+                                positions=box_position,
+                                widths=box_width,
+                                patch_artist=True,
+                                showfliers=True,
+                                boxprops=box_props,
+                                flierprops=flier_props)
+            if not have_legend_data:
+                all_bps.append(bp)
+                all_labels.append( cfg_to_label[cfg] )
+            curr_box_position += 1
+        have_legend_data = True
+        curr_box_position += 1
     # Configure x-axis
-    x_ticks = range(len(configs))
-    x_tick_labels = configs
-    x_axis_label = "Tracing Configuration"
+    n_configs = len(cfgs_to_plot)
+    x_ticks = [ 0.5 + i*(n_configs+1) for i in range(n_configs) ]
+    x_tick_labels = sorted( scales )
+    x_axis_label = "Scale (# MPI Processes)"
     ax.set_xticks( x_ticks )
     ax.set_xticklabels( x_tick_labels )
     ax.set_xlabel(x_axis_label)
-    #ax.set_xlim(-1, len(x_ticks)+1)
     # Configure y-axis
-    if mode == "overhead":
-        y_max = max( [ max(y) for y in cfg_to_overheads.values() ] )
-        y_axis_label = "Overhead (% base runtime)"
-        ax.set_ylim(1.0, y_max * 1.01 )
-    elif mode == "raw":
-        y_max = max( [ max(y) for y in cfg_to_elapsed_times.values() ] )
-        y_axis_label = "Elapsed Time (s)"
-        ax.set_ylim(0, y_max * 1.05)
+    y_axis_label = "Overhead (% base runtime)"
+    ax.set_ylim(100, y_max * 1.01 )
     ax.set_ylabel(y_axis_label)
+    # Configure legend
+    ax.legend([bp["boxes"][0] for bp in all_bps], all_labels, loc="best")
     # Persist
     plt.savefig("overhead_study.png",
                 bbox_inches="tight",
@@ -113,7 +149,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("trace_dir", 
                         help="")
-    parser.add_argument("-m", "--mode", required=False, default="overhead",
+    parser.add_argument("-s", "--scales", nargs="+", type=int,
                         help="")
     args = parser.parse_args()
-    main( args.trace_dir, args.mode )
+    main( args.trace_dir, args.scales )
