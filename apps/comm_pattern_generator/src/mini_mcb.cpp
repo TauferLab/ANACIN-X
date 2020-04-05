@@ -501,7 +501,7 @@ int compute_global_hash()
 double compute_global_hash_d()
 {
   int i;
-  double hash = -1.0;
+  double hash = 0.0;
 
   final_kv_d = (struct key_val_double*)malloc(sizeof(struct key_val_double) * NUM_KV_PER_RANK * size);
 //  memset(final_kv_d, 0, sizeof(final_kv_d));
@@ -522,7 +522,7 @@ double compute_global_hash_d()
 #endif
 
     for (i = 0; i < size * NUM_KV_PER_RANK; i++) {
-      hash = get_hash(hash * final_kv_d[i].val + final_kv_d[i].key + hash_count++, 1000000.0);
+      hash += get_hash(hash * final_kv_d[i].val + final_kv_d[i].key + hash_count++, 1000000.0);
 //              fprintf(stdout, "hash: %d (hash_count: %d)\n", hash, hash_count);
     }
   }
