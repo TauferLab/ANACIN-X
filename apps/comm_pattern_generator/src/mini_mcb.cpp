@@ -8,11 +8,15 @@
 #include <signal.h>
 #include <string.h>
 #include <unistd.h>
+#include <math.h>
 
 #include <cstdlib>
 #include <ctime>
 
 #include <iostream>
+#include <limits>
+#include <random>
+#include <functional>
 
 double get_time(void)
 {
@@ -44,6 +48,11 @@ int get_hash(int original_val, int max) {
   return (original_val * original_val + original_val % 23) % max;
 }
 
+double get_hash(double original_val, double max) {
+  std::hash<double> hasher;
+  return hasher(original_val);
+}
+
 #define NUM_ITE (2)
 #define NUM_KV_PER_RANK (3)
 #define MAX_VAL (100)
@@ -65,10 +74,19 @@ static double start, end, overall_start, overall_end;
 int recv_msg_count[NUM_KV_PER_RANK], send_msg_count[NUM_KV_PER_RANK];
 int my_rank;
 int size;
+int seed;
+double min_range;
+double max_range;
+bool compute;
 
 struct key_val{
   int key;
   int val;
+};
+
+struct key_val_double{
+  double key;
+  double val;
 };
 
 int num_iterations = 0;
@@ -83,6 +101,10 @@ int reduction_comm_steps = 0;
 struct key_val *my_kv, *final_kv;
 struct key_val recv_kv[NUM_KV_PER_RANK];
 struct key_val sendrecv_kv[NUM_KV_PER_RANK];
+
+struct key_val_double *my_kv_d, *final_kv_d;
+struct key_val_double recv_kv_d[NUM_KV_PER_RANK];
+struct key_val_double sendrecv_kv_d[NUM_KV_PER_RANK];
 
 MPI_Status status[NUM_KV_PER_RANK];
 MPI_Request request[NUM_KV_PER_RANK];
@@ -271,13 +293,23 @@ void do_work()
 void neighbor_communication_init()
 {
   int i;
-  int seed;
-  seed = time(0);//my_rank;
-  init_rand(seed);
-  my_kv = (struct key_val*)malloc(sizeof(struct key_val) * NUM_KV_PER_RANK);
-  for (i = 0; i < NUM_KV_PER_RANK; i++) {
-    sendrecv_kv[i].key = my_rank * NUM_KV_PER_RANK + i;
-    sendrecv_kv[i].val = my_rank;//get_rand(MAX_VAL);
+//  int seed;
+//  seed = time(0);//my_rank;
+//  init_rand(seed);
+  if(compute) {
+    std::default_random_engine generator(seed);
+    std::uniform_real_distribution<double> unif_rand(min_range, max_range);
+    my_kv_d = (struct key_val_double*) malloc(sizeof(struct key_val_double) * NUM_KV_PER_RANK);
+    for(i=0; i<NUM_KV_PER_RANK; i++) {
+      sendrecv_kv_d[i].key = my_rank * NUM_KV_PER_RANK + i;
+      sendrecv_kv_d[i].val = unif_rand(generator);
+    }
+  } else {
+    my_kv = (struct key_val*)malloc(sizeof(struct key_val) * NUM_KV_PER_RANK);
+    for (i = 0; i < NUM_KV_PER_RANK; i++) {
+      sendrecv_kv[i].key = my_rank * NUM_KV_PER_RANK + i;
+      sendrecv_kv[i].val = my_rank;//get_rand(MAX_VAL);
+    }
   }
   return;
 }
@@ -303,21 +335,56 @@ void neighbor_communication(int non_deterministic)
   }
   printf("\n");
 
-  for (i = 0; i < NUM_KV_PER_RANK; i++) {
-    MPI_Irecv(&recv_kv[i], 8, MPI_CHAR, (my_rank + size - (i + 1))        % size, 33, MPI_COMM_WORLD, &request[i]);
-  }
-
-  for (i = 0; i < NUM_KV_PER_RANK; i++) {
-    int idx = indices[i];
-    MPI_Isend(&sendrecv_kv[idx], 8, MPI_CHAR, (my_rank + (idx + 1))        % size, 33, MPI_COMM_WORLD, &send_req);
-//    MPI_Isend(&sendrecv_kv[i], 8, MPI_CHAR, (my_rank + (i + 1))        % size, 33, MPI_COMM_WORLD, &send_req);
-    flag = 0;
-    while (flag == 0) {
-      MPI_Test(&send_req, &flag, &send_stat); 
+  int num_bytes = 8;
+  if(compute) {
+    num_bytes = 16;
+    for (i = 0; i < NUM_KV_PER_RANK; i++) {
+      MPI_Irecv(&recv_kv_d[i], num_bytes, MPI_CHAR, (my_rank + size - (i + 1)) % size, 33, MPI_COMM_WORLD, &request[i]);
     }
-//    send_msg_count[i]++;
-    send_msg_count[idx]++;
+
+    for (i = 0; i < NUM_KV_PER_RANK; i++) {
+      int idx = indices[i];
+      MPI_Isend(&sendrecv_kv_d[idx], num_bytes, MPI_CHAR, (my_rank + (idx + 1)) % size, 33, MPI_COMM_WORLD, &send_req);
+      flag = 0;
+      while (flag == 0) {
+        MPI_Test(&send_req, &flag, &send_stat); 
+      }
+//      send_msg_count[i]++;
+      send_msg_count[idx]++;
+    }
+  } else {
+    num_bytes = 8;
+    for (i = 0; i < NUM_KV_PER_RANK; i++) {
+      MPI_Irecv(&recv_kv[i], num_bytes, MPI_CHAR, (my_rank + size - (i + 1)) % size, 33, MPI_COMM_WORLD, &request[i]);
+    }
+
+    for (i = 0; i < NUM_KV_PER_RANK; i++) {
+      int idx = indices[i];
+      MPI_Isend(&sendrecv_kv[i], 8, MPI_CHAR, (my_rank + (i + 1))        % size, 33, MPI_COMM_WORLD, &send_req);
+      flag = 0;
+      while (flag == 0) {
+        MPI_Test(&send_req, &flag, &send_stat); 
+      }
+//      send_msg_count[i]++;
+      send_msg_count[idx]++;
+    }
   }
+//    num_bytes = 16;
+//  for (i = 0; i < NUM_KV_PER_RANK; i++) {
+//    MPI_Irecv(&recv_kv[i], num_bytes, MPI_CHAR, (my_rank + size - (i + 1))        % size, 33, MPI_COMM_WORLD, &request[i]);
+//  }
+//
+//  for (i = 0; i < NUM_KV_PER_RANK; i++) {
+//    int idx = indices[i];
+//    MPI_Isend(&sendrecv_kv[idx], num_bytes, MPI_CHAR, (my_rank + (idx + 1))        % size, 33, MPI_COMM_WORLD, &send_req);
+////    MPI_Isend(&sendrecv_kv[i], 8, MPI_CHAR, (my_rank + (i + 1))        % size, 33, MPI_COMM_WORLD, &send_req);
+//    flag = 0;
+//    while (flag == 0) {
+//      MPI_Test(&send_req, &flag, &send_stat); 
+//    }
+////    send_msg_count[i]++;
+//    send_msg_count[idx]++;
+//  }
   
   while (!is_finished()) {
     int testsome_outcount;
@@ -351,16 +418,29 @@ void neighbor_communication(int non_deterministic)
       int recv_index;
       int send_dest;
       recv_index = testsome_array_of_indices[i];
-      memcpy(&sendrecv_kv[recv_index], &recv_kv[recv_index], sizeof(struct key_val));
+      if(compute) {
+        memcpy(&sendrecv_kv_d[recv_index], &recv_kv_d[recv_index], sizeof(struct key_val_double));
+      } else {
+        memcpy(&sendrecv_kv[recv_index], &recv_kv[recv_index], sizeof(struct key_val));
+      }
       recv_msg_count[recv_index]++;
       if (recv_msg_count[recv_index] < neighbor_comm_steps) {
-        MPI_Irecv(&recv_kv[recv_index], 8, MPI_CHAR, (my_rank + size - (recv_index + 1)) % size, 33, MPI_COMM_WORLD, &request[recv_index]);
+        if(compute) {
+          MPI_Irecv(&recv_kv_d[recv_index], sizeof(struct key_val_double), MPI_CHAR, (my_rank + size - (recv_index + 1)) % size, 33, MPI_COMM_WORLD, &request[recv_index]);
+        } else {
+          MPI_Irecv(&recv_kv[recv_index], 8, MPI_CHAR, (my_rank + size - (recv_index + 1)) % size, 33, MPI_COMM_WORLD, &request[recv_index]);
+        }
       }
 
 
       if (send_msg_count[recv_index] < neighbor_comm_steps) {
-        sendrecv_kv[recv_index].val = get_hash(sendrecv_kv[recv_index].val + hash_count++, MAX_VAL);
-        MPI_Isend(&sendrecv_kv[recv_index], 8, MPI_CHAR, (my_rank + (recv_index + 1)) % size, 33, MPI_COMM_WORLD, &send_req);
+        if(compute) {
+          sendrecv_kv_d[recv_index].val = get_hash(sendrecv_kv_d[recv_index].val + hash_count++, static_cast<double>(MAX_VAL));
+          MPI_Isend(&sendrecv_kv_d[recv_index], sizeof(struct key_val_double), MPI_CHAR, (my_rank + (recv_index + 1)) % size, 33, MPI_COMM_WORLD, &send_req);
+        } else {
+          sendrecv_kv[recv_index].val = get_hash(sendrecv_kv[recv_index].val + hash_count++, MAX_VAL);
+          MPI_Isend(&sendrecv_kv[recv_index], 8, MPI_CHAR, (my_rank + (recv_index + 1)) % size, 33, MPI_COMM_WORLD, &send_req);
+        }
         flag = 0;
         while (flag == 0) {
           MPI_Test(&send_req, &flag, &send_stat);
@@ -377,7 +457,11 @@ void neighbor_communication(int non_deterministic)
 
 void neighbor_communication_finalize()
 {
-  free(my_kv);
+  if(compute) {
+    free(my_kv_d);
+  } else {
+    free(my_kv);
+  }
   return;
 }
 
@@ -414,6 +498,38 @@ int compute_global_hash()
   return hash;
 }
 
+double compute_global_hash_d()
+{
+  int i;
+  double hash = -1.0;
+
+  final_kv_d = (struct key_val_double*)malloc(sizeof(struct key_val_double) * NUM_KV_PER_RANK * size);
+//  memset(final_kv_d, 0, sizeof(final_kv_d));
+  memset(final_kv_d, 0, sizeof(key_val_double));
+  MPI_Gather(recv_kv_d, 2 * NUM_KV_PER_RANK, MPI_DOUBLE, final_kv_d, 2 * NUM_KV_PER_RANK, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+  if (my_rank == 0) {
+#if 0
+    int print_key = 0;
+    while(print_key < size * NUM_KV_PER_RANK) {
+      for (i = 0; i < size * NUM_KV_PER_RANK; i++) {
+   	if (final_kv_d[i].key == print_key) {
+    	  fprintf(stdout, "key: %d, val: %d\n", final_kv_d[i].key, final_kv_d[i].val);
+    	  print_key++;
+    	}
+      }
+    }
+#endif
+
+    for (i = 0; i < size * NUM_KV_PER_RANK; i++) {
+      hash = get_hash(hash * final_kv_d[i].val + final_kv_d[i].key + hash_count++, 1000000.0);
+//              fprintf(stdout, "hash: %d (hash_count: %d)\n", hash, hash_count);
+    }
+  }
+  free(final_kv_d);
+  return hash;
+}
+
 void print_usage(char *bin)
 {
   if (my_rank == 0) {
@@ -422,10 +538,10 @@ void print_usage(char *bin)
   return;
 }
 
-void comm_pattern_mini_mcb( int n_iters, int n_grid_steps, int n_reduction_steps, double nd_fraction, int interleave )
+void comm_pattern_mini_mcb( int n_iters, int n_grid_steps, int n_reduction_steps, double nd_fraction, int interleave, bool compute_flag, double min, double max, int seed_val )
 {
   int i, k;
-  int hash;
+//  int hash;
 
   /* Init */
   start = MPI_Wtime();
@@ -437,6 +553,10 @@ void comm_pattern_mini_mcb( int n_iters, int n_grid_steps, int n_reduction_steps
   reduction_comm_steps = n_reduction_steps;
   neighbor_comm_steps  = n_grid_steps;
   float non_det = nd_fraction;
+  compute = compute_flag;
+  min_range = min;
+  max_range = max;
+  seed = seed_val + my_rank;
 
   //if (my_rank == 0) {
   //  rempi_test_dbg_print("=====================================");
@@ -500,17 +620,31 @@ void comm_pattern_mini_mcb( int n_iters, int n_grid_steps, int n_reduction_steps
   //  rempi_test_dbgi_print(0, " Finalizing ");
 
   //MPI_Barrier(MPI_COMM_WORLD);
-  hash = compute_global_hash();
+  if(compute_flag) {
+    double hash = 0.0;
+    hash = compute_global_hash_d();
+    if(my_rank == 0) {
+      std::cout.precision(std::numeric_limits<double>::max_digits10);
+      std::cout << "Hash " << hash;
+    }
+  } else {
+    int hash = 0;
+    hash = compute_global_hash();
+    if(my_rank == 0) {
+      std::cout << "Hash " << hash;
+    }
+  }
 
   bin_reduction_finalize();
   neighbor_communication_finalize();
+
 
   end = MPI_Wtime();
   //MPI_Finalize();
   overall_end = get_time();
 
   if (my_rank == 0) {
-    fprintf(stdout, "Hash %u, Time (Main loop): %f\n", (unsigned int)hash, end - start);
+    fprintf(stdout, ", Time (Main loop): %f\n", end - start);
   }
 
 }

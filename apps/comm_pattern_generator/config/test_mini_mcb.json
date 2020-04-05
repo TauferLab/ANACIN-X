@@ -4,7 +4,7 @@
             {
                 "pattern_name" : "mini_mcb",
                 "n_iters" : 1,
-                "nd_fraction" : 0.5,
+                "nd_fraction" : 1.0,
                 "params" : [
                               { 
                                 "key" : "n_sub_iters",
@@ -20,6 +20,22 @@
                               },
                               { 
                                 "key" : "interleave_nd_iters",
+                                "val" : "0"
+                              },
+                              {
+                                "key" : "compute",
+                                "val" : "true"
+                              },
+                              {
+                                "key" : "min",
+                                "val" : "0.0"
+                              },
+                              {
+                                "key" : "max",
+                                "val" : "1.0"
+                              },
+                              {
+                                "key" : "seed",
                                 "val" : "0"
                               }
                            ]

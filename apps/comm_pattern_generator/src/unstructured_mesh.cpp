@@ -8,6 +8,8 @@
 #include <vector>
 #include <unordered_set>
 #include <iostream>
+#include <random>
+#include <limits>
 
 #include "debug.hpp"
 
@@ -50,7 +52,8 @@ int rank_to_dist( int src_rank, int dst_rank, int n_procs_x, int n_procs_y, int 
 
 void comm_pattern_unstructured_mesh( int iter, double nd_fraction_neighbors, double nd_fraction_recvs,
                                      int n_procs_x, int n_procs_y, int n_procs_z, 
-                                     int min_deg, int max_deg, int max_dist, int msg_size )
+                                     int min_deg, int max_deg, int max_dist, int msg_size,
+                                     bool compute, double min, double max, int seed )
 {
   int mpi_rc, rank, comm_size;
   mpi_rc = MPI_Comm_rank( MPI_COMM_WORLD, &rank );
@@ -183,49 +186,98 @@ void comm_pattern_unstructured_mesh( int iter, double nd_fraction_neighbors, dou
   // Determine split of deterministic vs. non-deterministic receives
   int n_nd_recvs = (int) in_degree * nd_fraction_recvs;
   int n_det_recvs = in_degree - n_nd_recvs; 
-  
-  // Allocate send and receive buffers 
-  char* send_buffer = (char*) malloc (degree * msg_size * sizeof(char));
-  char* det_recv_buffer = (char*) malloc (n_det_recvs * msg_size * sizeof(char));
-  char* nd_recv_buffer = (char*) malloc (n_nd_recvs * msg_size * sizeof(char));
+
+  // Send and receive buffers
+  char* send_buffer, *det_recv_buffer, *nd_recv_buffer;
+  double* double_send_buffer, *double_det_recv_buffer, *double_nd_recv_buffer;
   
   // Allocate requests
   MPI_Request * send_reqs = new MPI_Request[ degree ];
   MPI_Request * det_recv_reqs = new MPI_Request[ n_det_recvs ];
   MPI_Request * nd_recv_reqs = new MPI_Request[ n_nd_recvs  ];
-
-  // Post deterministic receives
-  for (int j = 0; j < n_det_recvs; j++) {
-    MPI_Irecv( &det_recv_buffer[j * msg_size], 
-               msg_size, 
-               MPI_CHAR, 
-               senders[j], 
-               iter,
-               MPI_COMM_WORLD, 
-               &det_recv_reqs[j] );
-  }
   
-  // Post non-deterministic receives
-  for (int j = 0; j < n_nd_recvs; j++) {
-    MPI_Irecv( &nd_recv_buffer[j * msg_size], 
-               msg_size, 
-               MPI_CHAR, 
-               MPI_ANY_SOURCE, 
-               iter,
-               MPI_COMM_WORLD, 
-               &nd_recv_reqs[j] );
-  }
+  if(compute) {
+    // Allocate send and receive buffers 
+    double_send_buffer = (double*) malloc (degree * msg_size * sizeof(double));
+    double_det_recv_buffer = (double*) malloc (n_det_recvs * msg_size * sizeof(double));
+    double_nd_recv_buffer = (double*) malloc (n_nd_recvs * msg_size * sizeof(double));
+    std::default_random_engine generator(seed);
+    std::uniform_real_distribution<double> unif_rand(min, max);
+    for(int j=0; j<degree*msg_size; j++) {
+      double_send_buffer[j] = unif_rand(generator);
+    }
 
-  // Post sends
-  for (int j = 0; j < degree; j++) {
-    MPI_Isend( &send_buffer[j * msg_size], 
-               msg_size, 
-               MPI_CHAR, 
-               destinations[j], 
-               iter,
-               MPI_COMM_WORLD, 
-               &send_reqs[j] );
-  } 
+    // Post deterministic receives
+    for (int j = 0; j < n_det_recvs; j++) {
+      MPI_Irecv( &double_det_recv_buffer[j * msg_size], 
+                 msg_size, 
+                 MPI_DOUBLE, 
+                 senders[j], 
+                 iter,
+                 MPI_COMM_WORLD, 
+                 &det_recv_reqs[j] );
+    }
+    
+    // Post non-deterministic receives
+    for (int j = 0; j < n_nd_recvs; j++) {
+      MPI_Irecv( &double_nd_recv_buffer[j * msg_size], 
+                 msg_size, 
+                 MPI_DOUBLE, 
+                 MPI_ANY_SOURCE, 
+                 iter,
+                 MPI_COMM_WORLD, 
+                 &nd_recv_reqs[j] );
+    }
+
+    // Post sends
+    for (int j = 0; j < degree; j++) {
+      MPI_Isend( &double_send_buffer[j * msg_size], 
+                 msg_size, 
+                 MPI_DOUBLE, 
+                 destinations[j], 
+                 iter,
+                 MPI_COMM_WORLD, 
+                 &send_reqs[j] );
+    } 
+  } else {
+    // Allocate send and receive buffers 
+    send_buffer = (char*) malloc (degree * msg_size * sizeof(char));
+    det_recv_buffer = (char*) malloc (n_det_recvs * msg_size * sizeof(char));
+    nd_recv_buffer = (char*) malloc (n_nd_recvs * msg_size * sizeof(char));
+
+    // Post deterministic receives
+    for (int j = 0; j < n_det_recvs; j++) {
+      MPI_Irecv( &det_recv_buffer[j * msg_size], 
+                 msg_size, 
+                 MPI_CHAR, 
+                 senders[j], 
+                 iter,
+                 MPI_COMM_WORLD, 
+                 &det_recv_reqs[j] );
+    }
+    
+    // Post non-deterministic receives
+    for (int j = 0; j < n_nd_recvs; j++) {
+      MPI_Irecv( &nd_recv_buffer[j * msg_size], 
+                 msg_size, 
+                 MPI_CHAR, 
+                 MPI_ANY_SOURCE, 
+                 iter,
+                 MPI_COMM_WORLD, 
+                 &nd_recv_reqs[j] );
+    }
+
+    // Post sends
+    for (int j = 0; j < degree; j++) {
+      MPI_Isend( &send_buffer[j * msg_size], 
+                 msg_size, 
+                 MPI_CHAR, 
+                 destinations[j], 
+                 iter,
+                 MPI_COMM_WORLD, 
+                 &send_reqs[j] );
+    } 
+  }
   
   // Complete sends
   MPI_Waitall(degree, &send_reqs[0], MPI_STATUSES_IGNORE);
@@ -243,6 +295,54 @@ void comm_pattern_unstructured_mesh( int iter, double nd_fraction_neighbors, dou
     mpi_rc = MPI_Wait( &nd_recv_reqs[i], &nd_recv_status );
     std::cout << "(NON-DETERMINISTIC) Rank: " << rank << " received from: " << nd_recv_status.MPI_SOURCE << std::endl;
   }
+
+  if(compute) {
+    double sum = 0.0f;
+    double* compute_buffer = (double*) malloc(sizeof(double)*(n_det_recvs+n_nd_recvs));
+    // Compute elementwise multiplication
+    for(int i=0; i<n_det_recvs; i++) {
+      compute_buffer[i] = double_det_recv_buffer[i]*double_det_recv_buffer[i];
+    }
+    for(int i=n_det_recvs; i<n_nd_recvs+n_det_recvs; i++) {
+      compute_buffer[i] = double_nd_recv_buffer[i]*double_nd_recv_buffer[i];
+    }
+    // Inner product
+    for(int i=0; i<n_det_recvs+n_nd_recvs; i++) {
+      sum += compute_buffer[i];
+    }
+    // Compute prefix sum
+    for(int i=1; i<n_det_recvs+n_nd_recvs; i++) {
+      compute_buffer[i] = compute_buffer[i] + compute_buffer[i-1];
+    }
+    // Square values
+    for(int i=0; i<n_det_recvs+n_nd_recvs; i++) {
+      compute_buffer[i] *= compute_buffer[i];
+    }
+    // Normalize
+    double max = compute_buffer[0];
+    for(int i=0; i<n_det_recvs+n_nd_recvs; i++) {
+      if(std::abs(compute_buffer[i]) > max)
+        max = std::abs(compute_buffer[i]);
+    }
+    for(int i=0; i<n_det_recvs+n_nd_recvs; i++) {
+      compute_buffer[i] = compute_buffer[i]/max;
+    }
+    // Reduction
+    for(int i=0; i<n_det_recvs+n_nd_recvs; i++) {
+      sum += compute_buffer[i];
+    }
+    double g_sum = 0.0;
+    MPI_Reduce(&sum, &g_sum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    if(rank == 0) {
+      std::cout.precision(std::numeric_limits<double>::max_digits10);
+      std::cout << "Iteration: " << iter << " Computed: " << g_sum  << std::endl;
+    }
+
+    free(double_send_buffer);
+    free(double_det_recv_buffer);
+    free(double_nd_recv_buffer);
+    free(compute_buffer);
+  } 
 
   //MPI_Status recv_statuses[ n_neighbors ];
   //MPI_Waitall(n_neighbors, &recv_reqs[0], &recv_statuses[0]);

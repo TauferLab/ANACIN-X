@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <string>
 #include <iostream>
+#include <nlohmann/json.hpp>
 
 #include "configuration.hpp"
 #include "debug.hpp"
@@ -56,11 +57,67 @@ int main( int argc, char** argv )
     for ( int i=0; i<n_iters; ++i ) {
       if ( pattern_name == "naive_reduce" ) {
         auto msg_size = std::stoi( comm_pattern.params.at("msg_size") );
-        comm_pattern_naive_reduce( i, nd_fraction, msg_size, false );
+        bool compute;
+        double min;
+        double max;
+        int seed;
+        try {
+          compute = (comm_pattern.params.at("compute") == "true");
+        } catch (...) {
+          std::cout << "Invalid compute parameter. Expected true or false\n";
+          compute = false;
+        }
+        try {
+          min = std::stod( comm_pattern.params.at("min") );
+        } catch (...) {
+          std::cout << "Invalid min parameter. Expected double\n";
+          min = 0.0;
+        }
+        try {
+          max = std::stod( comm_pattern.params.at("max") );
+        } catch (...) {
+          std::cout << "Invalid max parameter. Expected double\n";
+          max = 0.0;
+        }
+        try {
+          seed = std::stoi( comm_pattern.params.at("seed") );
+        } catch (...) {
+          std::cout << "Invalid seed parameter. Expected double\n";
+          seed = 0;
+        }
+        comm_pattern_naive_reduce( i, nd_fraction, msg_size, false, compute, min, max, seed );
       } 
       else if ( pattern_name == "amg2013" ) {
         auto msg_size = std::stoi( comm_pattern.params.at("msg_size") );
-        comm_pattern_amg2013( i, nd_fraction, msg_size );
+        bool compute;
+        double min;
+        double max;
+        int seed;
+        try {
+          compute = (comm_pattern.params.at("compute") == "true");
+        } catch (...) {
+          std::cout << "Invalid compute parameter. Expected true or false\n";
+          compute = false;
+        }
+        try {
+          min = std::stod( comm_pattern.params.at("min") );
+        } catch (...) {
+          std::cout << "Invalid min parameter. Expected double\n";
+          min = 0.0;
+        }
+        try {
+          max = std::stod( comm_pattern.params.at("max") );
+        } catch (...) {
+          std::cout << "Invalid max parameter. Expected double\n";
+          max = 0.0;
+        }
+        try {
+          seed = std::stoi( comm_pattern.params.at("seed") );
+        } catch (...) {
+          std::cout << "Invalid seed parameter. Expected double\n";
+          seed = 0;
+        }
+        comm_pattern_amg2013( i, nd_fraction, msg_size, compute, min, max, seed );
       }
       else if ( pattern_name == "unstructured_mesh" ) {
         auto nd_fraction_recvs = nd_fraction;
@@ -72,16 +129,73 @@ int main( int argc, char** argv )
         auto max_deg = std::stoi( comm_pattern.params.at("max_deg") );
         auto max_dist = std::stoi( comm_pattern.params.at("max_dist") );
         auto msg_size = std::stoi( comm_pattern.params.at("msg_size") );
+        bool compute;
+        double min;
+        double max;
+        int seed;
+        try {
+          compute = (comm_pattern.params.at("compute") == "true");
+        } catch (...) {
+          std::cout << "Invalid compute parameter. Expected true or false\n";
+          compute = false;
+        }
+        try {
+          min = std::stod( comm_pattern.params.at("min") );
+        } catch (...) {
+          std::cout << "Invalid min parameter. Expected double\n";
+          min = 0.0;
+        }
+        try {
+          max = std::stod( comm_pattern.params.at("max") );
+        } catch (...) {
+          std::cout << "Invalid max parameter. Expected double\n";
+          max = 0.0;
+        }
+        try {
+          seed = std::stoi( comm_pattern.params.at("seed") );
+        } catch (...) {
+          std::cout << "Invalid seed parameter. Expected double\n";
+          seed = 0;
+        }
         comm_pattern_unstructured_mesh( i, nd_fraction_neighbors, nd_fraction_recvs,
                                         n_procs_x, n_procs_y, n_procs_z, 
-                                        min_deg, max_deg, max_dist, msg_size );
+                                        min_deg, max_deg, max_dist, msg_size,
+                                        compute, min, max, seed );
       }
       else if ( pattern_name == "mini_mcb" ) {
         auto n_sub_iters = std::stoi( comm_pattern.params.at("n_sub_iters") );
         auto n_grid_steps = std::stoi( comm_pattern.params.at("n_grid_steps") );
         auto n_reduction_steps = std::stoi( comm_pattern.params.at("n_reduction_steps") );
         auto interleave_nd_iters = std::stoi( comm_pattern.params.at("interleave_nd_iters") );
-        comm_pattern_mini_mcb( n_sub_iters, n_grid_steps, n_reduction_steps, nd_fraction, interleave_nd_iters );
+        bool compute;
+        double min;
+        double max;
+        int seed;
+        try {
+          compute = (comm_pattern.params.at("compute") == "true");
+        } catch (...) {
+          std::cout << "Invalid compute parameter. Expected true or false\n";
+          compute = false;
+        }
+        try {
+          min = std::stod( comm_pattern.params.at("min") );
+        } catch (...) {
+          std::cout << "Invalid min parameter. Expected double\n";
+          min = 0.0;
+        }
+        try {
+          max = std::stod( comm_pattern.params.at("max") );
+        } catch (...) {
+          std::cout << "Invalid max parameter. Expected double\n";
+          max = 0.0;
+        }
+        try {
+          seed = std::stoi( comm_pattern.params.at("seed") );
+        } catch (...) {
+          std::cout << "Invalid seed parameter. Expected double\n";
+          seed = 0;
+        }
+        comm_pattern_mini_mcb( n_sub_iters, n_grid_steps, n_reduction_steps, nd_fraction, interleave_nd_iters, compute, min, max, seed );
       }
     }
     mpi_rc = MPI_Barrier( MPI_COMM_WORLD );

@@ -22,7 +22,8 @@ int get_neighbor( int my_rank, int comm_size, int neighbor_idx )
 }
 
 void comm_pattern_mcb_grid( int iter, double nd_fraction_send, double nd_fraction_recv,
-                            int n_neighbors, int n_steps, int msg_size )
+                            int n_neighbors, int n_steps, int msg_size,
+                            bool compute, double min, double max, int seed )
 {
   int mpi_rc, rank, comm_size;
   mpi_rc = MPI_Comm_rank( MPI_COMM_WORLD, &rank );
