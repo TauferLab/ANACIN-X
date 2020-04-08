@@ -5,15 +5,26 @@ import pickle
 import json
 import os
 import numpy as np
-from scipy.stats import chisquare
+from scipy.stats import chisquare, ks_2samp
 
 import pprint
 
 ### Change-point analysis libraries
 import ruptures as rpt
 
+import sys
+sys.path.append(".")
 
+from graph_kernel_postprocessing import flatten_distance_matrix
 from utilities import timer
+
+"""
+Return the critical value for the 2-sample Kolmogorov-Smirnov test given 
+the sample sizes of the two compared distributions
+"""
+def ks_2samp_critical_value( n_samples_a, n_samples_b ):
+    pass
+
 
 """
 Returns a list of pairwise kernel distances from a kernel distance matrix
@@ -69,15 +80,32 @@ def detect_anomalies( kernel_distance_seq, policy ):
     # Detect anomalies based on whether the median kernel distance increases
     # from slice to slice or not
     elif policy_name == "increasing_median":
+        threshold = policy_params["threshold"]
         flagged_slice_indices = []
         prev_median_distance = 0
         curr_median_distance = 0
         for slice_idx,distance_mat in enumerate( kernel_distance_seq ):
             distances = get_flat_distances( distance_mat )
             curr_median_distance = np.median( distances )
-            if curr_median_distance > prev_median_distance:
+            #if curr_median_distance > prev_median_distance:
+            if curr_median_distance - prev_median_distance > threshold:
                 flagged_slice_indices.append( slice_idx )
             prev_median_distance = curr_median_distance
+        return flagged_slice_indices
+    
+    elif policy_name == "kolmogorov_smirnov":
+        flagged_slice_indices = []
+        prev_distribution = None
+        next_distribution = None
+        for slice_idx in range(len(kernel_distance_seq))[1:-1]:
+            prev_dist = flatten_distance_matrix(kernel_distance_seq[ slice_idx - 1 ])
+            curr_dist = flatten_distance_matrix(kernel_distance_seq[ slice_idx  ])
+            next_dist = flatten_distance_matrix(kernel_distance_seq[ slice_idx + 1 ])
+            ks2_stat_prev, p_val_prev = ks_2samp( prev_dist, curr_dist )
+            ks2_stat_next, p_val_next = ks_2samp( next_dist, curr_dist )
+            thresh = 0.01
+            if p_val_prev < thresh and p_val_next < thresh:
+                flagged_slice_indices.append( slice_idx )
         return flagged_slice_indices
 
     # Flag slices if the median kernel distance exceeds a user-supplied 
@@ -156,7 +184,9 @@ def detect_anomalies( kernel_distance_seq, policy ):
         
         flagged_slice_indices = [ cp-1 for cp in change_points ]
         return flagged_slice_indices
-            
+    
+
+
     else:
         raise NotImplementedError("Anomaly detection policy: {} is not implemented".format(policy_name))
     
@@ -189,7 +219,7 @@ def main( kernel_distance_data_path, policy_file_path, output_path ):
         policy_key = policy["name"]
         policy_to_flagged_slice_indices[ policy_key ] = flagged_indices
 
-    #pprint.pprint( policy_to_flagged_slice_indices )
+    pprint.pprint( policy_to_flagged_slice_indices )
     #exit()
 
     # Determine output path
