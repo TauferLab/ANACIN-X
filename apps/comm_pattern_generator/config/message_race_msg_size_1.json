@@ -4,11 +4,22 @@
             {
                 "pattern_name" : "naive_reduce",
                 "n_iters" : 10,
+                "nd_fraction" : 0.0,
+                "params" : [
+                                { 
+                                  "key" : "msg_size",
+                                  "val" : "1"
+                                }
+                           ]
+            },
+            {
+                "pattern_name" : "naive_reduce",
+                "n_iters" : 10,
                 "nd_fraction" : 0.1,
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : "1024"
+                                  "val" : "1"
                                 }
                            ]
             },
@@ -19,7 +30,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : "1024"
+                                  "val" : "1"
                                 }
                            ]
             },
@@ -30,7 +41,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : "1024"
+                                  "val" : "1"
                                 }
                            ]
             },
@@ -41,7 +52,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : "1024"
+                                  "val" : "1"
                                 }
                            ]
             },
@@ -52,7 +63,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : "1024"
+                                  "val" : "1"
                                 }
                            ]
             },
@@ -63,7 +74,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : "1024"
+                                  "val" : "1"
                                 }
                            ]
             },
@@ -74,7 +85,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : "1024"
+                                  "val" : "1"
                                 }
                            ]
             },
@@ -85,7 +96,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : "1024"
+                                  "val" : "1"
                                 }
                            ]
             },
@@ -96,7 +107,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : "1024"
+                                  "val" : "1"
                                 }
                            ]
             },
@@ -107,7 +118,7 @@
                 "params" : [
                                 { 
                                   "key" : "msg_size",
-                                  "val" : "1024"
+                                  "val" : "1"
                                 }
                            ]
             }
