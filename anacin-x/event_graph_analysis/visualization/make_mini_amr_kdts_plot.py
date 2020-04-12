@@ -16,6 +16,7 @@ import numpy as np
 import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
+from scipy.stats.stats import pearsonr, spearmanr
 
 import pprint
 
@@ -78,7 +79,8 @@ def main( kdts_data_path, kernel_file_path, block_traffic_data_path=None, flagge
         
     if flagged_slices is not None:
         with open( flagged_slices, "rb" ) as infile:
-            flagged_indices = pkl.load( infile )["increasing_median"]  # TODO undo hardcode
+            #flagged_indices = pkl.load( infile )["increasing_median"]  # TODO undo hardcode
+            flagged_indices = pkl.load( infile )["kolmogorov_smirnov"]  # TODO undo hardcode
 
         non_flagged_box_positions = sorted(set(kdts_box_positions) - set(flagged_indices))
         flagged_box_positions = sorted(flagged_indices)
@@ -127,26 +129,47 @@ def main( kdts_data_path, kernel_file_path, block_traffic_data_path=None, flagge
         # Copy axis
         mre_ax  = kdts_ax.twinx()
         # Get x-axis positions for block traffic data
-        mre_data_positions = [ (x*mesh_refinement_rate)+x-1 for x in range( len( mre_to_block_traffic ) ) ]
+        mre_data_positions = [ (x*mesh_refinement_rate)+x-1 for x in range( len( mre_to_block_traffic ) ) ][1:]
         # Get boxplot data
-        mre_box_data = mre_to_block_traffic
-        mre_data = [ np.mean(x) for x in mre_to_block_traffic ]
+        mre_box_data = mre_to_block_traffic[1:]
+        mre_data = [ np.mean(x) for x in mre_to_block_traffic ][1:]
         # Configure boxplot appearance
         mre_box_width = 0.5
         mre_box_props = { "alpha" : 0.5, "facecolor" : "r" }
         mre_flier_props = { "marker" : "*", "markersize" : 4 }
         # Create MRE block traffic line plot
-        mre_ax.plot( mre_data_positions, 
-                     mre_data,
-                     color="r",
-                     marker="o",
-                     linestyle="dashed",
-                     linewidth=2,
-                     markersize=12 )
+        mre_plot_handle = mre_ax.plot( mre_data_positions, 
+                                       mre_data,
+                                       color="r",
+                                       marker="o",
+                                       linestyle="dashed",
+                                       linewidth=2,
+                                       markersize=12,
+                                       label="Mesh Refinement Blocks Traffic"
+                                     )
         # Configure MRE y-axis appearance
-        mre_ax.set_ylabel("Number of Blocks Transferred")
+        mre_ax.set_ylabel("Number of Blocks Transferred During Mesh Refinement")
         if mre_ymax is not None:
             mre_ax.set_ylim(0, mre_ymax)
+        # Compute correlation coefficients between block traffic and kernel distance
+        kernel_distance_seq = []
+        block_traffic_seq = []
+        for i in range(len(mre_data_positions)):
+            distance_data = kdts_box_data[ mre_data_positions[i] ]
+            block_traffic_data = mre_box_data[i]
+            kernel_distance_seq.append( np.var( distance_data ) )
+            block_traffic_seq.append( np.median( block_traffic_data ) )
+            #for dist,traffic in zip(distance_data, block_traffic_data):
+            #    kernel_distance_seq.append(dist)
+            #    block_traffic_seq.append(traffic)
+        pearson_r, pearson_p = pearsonr( block_traffic_seq, kernel_distance_seq )
+        spearman_r, spearman_p = spearmanr( block_traffic_seq, kernel_distance_seq )
+        pearson_correlation_txt = "Pearson's r = {}, p = {}\n".format(np.round(pearson_r, 2), pearson_p)
+        spearman_correlation_txt = "Spearman's ρ = {}, p = {}\n".format(np.round(spearman_r, 2), spearman_p)
+        print( pearson_correlation_txt )
+        print( spearman_correlation_txt )
+
+
     
      
     # Configure axes text appearance
@@ -174,7 +197,13 @@ def main( kdts_data_path, kernel_file_path, block_traffic_data_path=None, flagge
     # Annotate 
     # TODO
 
-    # Save figureS
+    # Configure legend appearance
+    kdts_ax.legend( [ kdts_boxes["boxes"][0], mre_plot_handle[0] ], 
+                    ["Kernel Distance Distrbutions", "Mesh Refinement Block Traffic"], 
+                    loc="upper left" 
+                  )
+
+    # Save figure
     plt.savefig( output,
                  bbox_inches = "tight",
                  pad_inches = 0.25 )
