@@ -1,5 +1,6 @@
 from functools import wraps
 from time import time
+import json
 import multiprocessing as mp
 import psutil
 import igraph
@@ -19,6 +20,11 @@ def timer(f):
         print("{} - Elapsed time: {}".format(f, end-start))
         return result                                                              
     return wrapper
+
+
+def read_run_params( run_params_path ):
+    with open(run_params_path, "r") as infile:
+        return json.load(infile)
 
 # A function to read in a single graph file via igraph
 #@timer

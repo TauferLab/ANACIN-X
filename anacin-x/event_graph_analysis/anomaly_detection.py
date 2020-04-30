@@ -103,7 +103,7 @@ def detect_anomalies( kernel_distance_seq, policy ):
             next_dist = flatten_distance_matrix(kernel_distance_seq[ slice_idx + 1 ])
             ks2_stat_prev, p_val_prev = ks_2samp( prev_dist, curr_dist )
             ks2_stat_next, p_val_next = ks_2samp( next_dist, curr_dist )
-            thresh = 0.01
+            thresh = 0.0001
             if p_val_prev < thresh and p_val_next < thresh:
                 flagged_slice_indices.append( slice_idx )
         return flagged_slice_indices
@@ -141,6 +141,53 @@ def detect_anomalies( kernel_distance_seq, policy ):
         n_slices = len(kernel_distance_seq)
         return list( range( n_slices ) )
     
+
+    elif policy_name == "ruptures_binary_segmentation":
+        # Unpack policy
+        model = policy_params[ "model" ]
+        #width = policy_params[ "width" ]
+        n_change_points = policy_params[ "n_change_points" ]
+        penalty = policy_params[ "penalty" ]
+        epsilon = policy_params[ "epsilon" ]
+
+        # Get list of distance distributions
+        distance_distribution_seq = []
+        for slice_idx,distance_mat in enumerate( kernel_distance_seq ):
+            distances = get_flat_distances( distance_mat )
+            distance_distribution_seq.append( distances )
+
+        # Get some properties about the distances needed by Ruptures
+        n_distributions = len( distance_distribution_seq )
+        dim = len( distances )
+        all_distances = []
+        for d in distance_distribution_seq:
+            all_distances += d
+        sigma = np.std( all_distances )
+
+        # Make into ndarray for ruptures
+        #signal = np.array( [ np.array(d) for d in distance_distribution_seq ] )
+        signal = np.array( [ np.array(d) for d in distance_distribution_seq ] )
+
+        # Set up model
+        algo = rpt.Binseg( model=model ).fit( signal )
+
+        # Find change-points
+        if n_change_points == "unknown":
+            if penalty == True and epsilon == False:
+                penalty_value = np.log( n_distributions ) * dim * sigma**2 
+                change_points = algo.predict( pen=penalty_value )
+            elif penalty == False and epsilon == True:
+                threshold = 3 * n_distributions * sigma**2
+                change_points = algo.predict( epsilon=threshold )
+            else:
+                raise ValueError("Invalid policy for window-based change-point detection: {}".format(policy_params))
+        else:
+            change_points = algo.predict( n_bkps=n_change_points )
+        
+        flagged_slice_indices = [ cp-1 for cp in change_points ]
+        return flagged_slice_indices
+
+
     elif policy_name == "ruptures_window_based":
         # Unpack policy
         model = policy_params[ "model" ]
@@ -202,7 +249,7 @@ def main( kernel_distance_data_path, policy_file_path, output_path ):
         anomaly_detection_policies = json.load( infile )
 
     # Choose a kernel
-    chosen_kernel = ( "wlst", "logical_time", 5 )
+    chosen_kernel = ( "wlst", "logical_time", 40 )
 
     # Filter down to a kernel distance time series w/r/t that kernel
     kernel_distances_seq = []

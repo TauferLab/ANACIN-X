@@ -520,7 +520,8 @@ def main(args):
                    "mre_to_block_traffic" : mre_to_block_traffic }
         print("Writing block traffic data to file")
         with open( trace_dir + "/block_traffic_data.pkl", "wb" ) as outfile:
-            pkl.dump( output, outfile, pkl.HIGHEST_PROTOCOL )
+            #pkl.dump( output, outfile, pkl.HIGHEST_PROTOCOL )
+            pkl.dump( output, outfile )
 
 if __name__ == "__main__":
     desc = ""

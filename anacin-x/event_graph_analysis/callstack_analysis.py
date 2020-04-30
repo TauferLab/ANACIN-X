@@ -22,7 +22,7 @@ from utilities import timer, read_graphs_parallel, read_graphs_serial, merge_dic
 
 # Check that input contains sufficient information to proceed:
 # 1. Executable has DWARF info
-def validate( elf_file ):
+def validate_executable( elf_file ):
     # Check DWARF info is present
     if not elf_file.has_dwarf_info():
         raise RuntimeError("Executable does not have DWARF info")
@@ -96,9 +96,7 @@ def lookup_location( dwarf_info, address ):
 
 
 
-def get_callstacks( slice_indices, slice_idx_to_data ):
-    # Filter down to callstack data only
-    slice_idx_to_callstacks = { k:v["callstack"] for k,v in slice_idx_to_data.items() }
+def get_callstack_to_count( slice_indices, slice_idx_to_callstacks ):
     callstack_to_total = {}
     for slice_idx in slice_indices:
         run_idx_to_callstacks = slice_idx_to_callstacks[ slice_idx ]
@@ -108,9 +106,73 @@ def get_callstacks( slice_indices, slice_idx_to_data ):
                     callstack_to_total[ cs ] = count
                 else:
                     callstack_to_total[ cs ] += count
-    return callstack_to_total
+    return clean_callstacks(callstack_to_total)
+
+def clean_callstacks( callstack_to_count ):
+    cleaned_callstack_to_count = {}
+    for cs,count in callstack_to_count.items():
+        frames = [ frame.strip() for frame in cs[0].strip().split(",") ]
+        frames.append( cs[-1] )
+        cleaned_callstack_to_count[ tuple(frames) ] = count
+    return cleaned_callstack_to_count
+        
+
+def get_call_set( translated_callstack_to_count ):
+    unique_calls = set()
+    for callstack in translated_callstack_to_count:
+        for call in callstack:
+            unique_calls.add( call )
+    return unique_calls
 
 
+def get_caller_callee_pairs( translated_callstack_to_count ):
+    pair_to_count = {}
+    for callstack,count in translated_callstack_to_count.items():
+        for i in range(1, len(callstack)):
+            caller = callstack[i-1]
+            callee = callstack[i]
+            pair = ( caller, callee )
+            if pair not in pair_to_count:
+                pair_to_count[ pair ] = count
+            else:
+                pair_to_count[ pair ] += count
+    return pair_to_count
+
+def translate_callstacks( callstack_to_count, executable_path, address_to_translation=None ):
+    translated_callstack_to_count = {}
+    with open( executable_path, "rb" ) as executable_infile:
+        # Load in the executable
+        elf_file = ELFFile( executable_infile )
+        # Get its debug info
+        dwarf_info = elf_file.get_dwarf_info()
+        ## Translate 
+        if address_to_translation is None:
+            address_to_translation = {}
+        for callstack,count in callstack_to_count.items():
+            translated_callstack = []
+            for address in callstack[:-1]:
+                # If we haven't translated this address before, do so
+                if address not in address_to_translation:
+                    func_name = decode_address( dwarf_info, address )
+                    if func_name is not None:
+                        func_name = str( func_name, encoding="ascii" )
+                        address_to_translation[ address ] = func_name
+                # If we have, just look it up
+                else:
+                    func_name = address_to_translation[ address ]
+                # Append the newly translated callstack
+                translated_callstack.append( func_name )
+
+            # Filter out any parts of the callstack that were not translated, 
+            translated_callstack = list( filter( lambda x: x is not None, translated_callstack ) )
+            # Tack MPI function back on
+            translated_callstack = [ callstack[-1] ] + translated_callstack
+            # Convert back to strings
+            # Make tuple so key-able
+            translated_callstack = tuple( reversed(translated_callstack) )
+            translated_callstack_to_count[ translated_callstack ] = count
+    return translated_callstack_to_count, address_to_translation
+    
 
 #def main( flagged_slices_path, traces_root_dir, slicing_policy_path, executable_path ):    
 def main( flagged_slices_path, kdts_path, executable_path ):    
@@ -124,25 +186,30 @@ def main( flagged_slices_path, kdts_path, executable_path ):
     # Ingest mapping from slice indices to callstack data
     with open( kdts_path, "rb" ) as infile:
         slice_idx_to_data = pickle.load( infile )
-        #slice_idx_to_callstacks = { k:v["callstack"] for k,v in kdts.items() }
+        slice_idx_to_callstacks = { k:v["callstack"] for k,v in slice_idx_to_data.items() }
 
     # Validate executable we'll be querying later
     with open( executable_path, "rb" ) as executable_infile:
         elf_file = ELFFile( executable_infile )
-        validate( elf_file )
+        validate_executable( elf_file )
     
     # For each anomaly detection policy, load in the slice subgraphs 
     # corresponding to the flagged slice indices
     for policy,slice_indices in policy_to_flagged_indices.items():
-        
-        callstack_to_count = get_callstacks( slice_indices, slice_idx_to_data )
-                    
-        # Clean up callstacks
-        cleaned_callstack_to_count = {}
-        for cs,count in callstack_to_count.items():
-            frames = [ frame.strip() for frame in cs.strip().split(",") ]
-            cleaned_callstack_to_count[ tuple(frames) ] = count
+       
+        all_slice_indices = set( slice_idx_to_data.keys() )
+        non_flagged_indices = all_slice_indices - set(slice_indices)
 
+        #callstack_to_count = get_callstack_to_count( slice_indices, slice_idx_to_callstacks )
+        callstack_to_count = get_callstack_to_count( non_flagged_indices, slice_idx_to_callstacks )
+                    
+        ## Clean up callstacks
+        #cleaned_callstack_to_count = {}
+        #for cs,count in callstack_to_count.items():
+        #    frames = [ frame.strip() for frame in cs[0].strip().split(",") ]
+        #    frames.append( cs[-1] )
+        #    cleaned_callstack_to_count[ tuple(frames) ] = count
+                
 
         print("Collected callstack counts. Starting callstack translation...") 
         address_to_translation = {}
@@ -158,9 +225,9 @@ def main( flagged_slices_path, kdts_path, executable_path ):
             #translated_callstack_to_count = {}
             ## Get locations
             #fn_to_location = {}
-            for callstack,count in cleaned_callstack_to_count.items():
+            for callstack,count in callstack_to_count.items():
                 translated_callstack = []
-                for address in callstack:
+                for address in callstack[:-1]:
                     # If we haven't translated this address before, do so
                     if address not in address_to_translation:
                         func_name = decode_address( dwarf_info, address )
@@ -179,7 +246,9 @@ def main( flagged_slices_path, kdts_path, executable_path ):
                     translated_callstack.append( func_name )
 
                 # Filter out any parts of the callstack that were not translated, 
-                translated_callstack = filter( lambda x: x is not None, translated_callstack ) 
+                translated_callstack = list( filter( lambda x: x is not None, translated_callstack ) )
+                # Tack MPI function back on
+                translated_callstack = [ callstack[-1] ] + translated_callstack
                 # Convert back to strings
                 # Make tuple so key-able
                 translated_callstack = tuple( translated_callstack )
@@ -188,7 +257,8 @@ def main( flagged_slices_path, kdts_path, executable_path ):
 
 
         traces_dir = os.path.dirname( kdts_path )
-        report_file = traces_dir + "/anomaly_report_for_policy_" + policy + ".txt"
+        report_file = traces_dir + "/non_anomaly_report_for_policy_" + policy + ".txt"
+        #report_file = traces_dir + "/anomaly_report_for_policy_" + policy + ".txt"
         with open( report_file, "w" ) as outfile:
             ### Print out report of potential root causes of non-determinism
             outfile.write("Report for anomaly detection policy: {}\n".format( policy ))

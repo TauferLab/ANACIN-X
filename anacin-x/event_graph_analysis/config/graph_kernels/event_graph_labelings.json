@@ -1,0 +1,5 @@
+[
+    {"vertex" : "process_id", "edge" : null},
+    {"vertex" : "logical_time", "edge" : null},
+    {"vertex" : "logical_tick", "edge" : null}
+]
