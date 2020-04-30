@@ -345,7 +345,7 @@ def main(base_dir,
          max_run_idx, 
          kernel_matrices_cache, 
          kernel_matrices_output, 
-         run_params_output, 
+         run_params_output_path, 
          wl_iters=None,
          graphlet_sampling_dims=None,
          graphlet_sampling_counts=None
@@ -357,10 +357,13 @@ def main(base_dir,
     run_params = []
     print("Loaded runs:")
     for rd,data in run_dir_to_data.items():
-        print("\t{}".format(rd))
+        #print("\t{}".format(rd))
         event_graphs.append( data["event_graph"] )
         run_params.append( data["run_params"] )
 
+    with open(run_params_output_path, "wb") as outfile:
+        pkl.dump(run_params, outfile, 0)
+    
     gk_manager = graph_kernel_manager(event_graphs, 
                                       kernels,
                                       labeling_path, 
@@ -370,6 +373,7 @@ def main(base_dir,
                                       graphlet_sampling_dims,
                                       graphlet_sampling_counts
                                      )
+    print("Computing graph kernels")
     gk_manager.compute_kernels()
 
 

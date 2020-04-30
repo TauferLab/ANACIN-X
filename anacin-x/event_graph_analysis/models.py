@@ -33,19 +33,8 @@ class model_manager(object):
         self._kernel_to_model = {}
 
     def build_models(self):
-        params = []
-        self._build_models_helper(self._kernel_matrices, params)
-
-    def _build_models_helper(self, mapping, params):
-        for k,v in mapping.items():
-            # Base case: actually a kernel matrix
-            if isinstance(v,np.ndarray):
-                new_params = params + [k]
-                self._build_model(v, new_params)
-            # Continue recursing
-            else:
-                new_params = params + [k]
-                self._build_models_helper(v, new_params)
+        for kernel,mat in self._kernel_matrices.items():
+            self._build_model(kernel, mat)
 
     def _get_k_train(self, k_mat, train_indices):
         n = len(train_indices)
@@ -64,8 +53,8 @@ class model_manager(object):
                 k_test[i][j] = k_mat[test_indices[i]][train_indices[j]]
         return k_test
 
-    def _build_model(self, kernel_matrix, kernel_params):
-        print("Build model for kernel: {}".format(kernel_params))
+    def _build_model(self, kernel, k_mat):
+        print("Build model for kernel: {}".format(kernel))
         print("Predicting: {}".format(self._target))
         target = [ y[self._target] for y in self._graph_labels ]
         n_graphs = len(self._graph_labels)
