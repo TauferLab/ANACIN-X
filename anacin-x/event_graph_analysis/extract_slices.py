@@ -465,25 +465,31 @@ def main( graph_path, slicing_policy_path, output_dir, output_format ):
                                                     output_dir, 
                                                     output_format )
 
-    # Extract subgraphs delimited on one end by a barrier and consisting of a 
-    # fixed number of vertices. 
-    elif slicing_policy["policy"] == "barrier_delimited_fixed_size_num_vertices":
-        n_vertices = slicing_policy["slice_size_vertices"]
-        extract_barrier_delimited_fixed_size_slices( graph, ranks, n_vertices )
+    # Extract sequence of overlapping slices based on logical time stamps
+
     
-        
-        
-    elif slicing_policy["policy"] == "wall_time":
-        time_unit = slicing_policy["time_unit"]
-        slice_len = slicing_policy["slice_len"]
-        slice_overlap = slicing_policy["slice_overlap"]
-        slice_seq = get_wall_time_slice_seq( graph, time_unit, slice_len, slice_overlap )
 
-    elif slicing_policy["policy"] == "logical_time_dense":
-        slice_len = slicing_policy["slice_len"]
-        slice_overlap = slicing_policy["slice_overlap"]
-        slice_seq = get_logical_time_slice_seq_dense( graph, slice_len, slice_overlap, ranks, include_endpoints )
 
+    ## Extract subgraphs delimited on one end by a barrier and consisting of a 
+    ## fixed number of vertices. 
+    #elif slicing_policy["policy"] == "barrier_delimited_fixed_size_num_vertices":
+    #    n_vertices = slicing_policy["slice_size_vertices"]
+    #    extract_barrier_delimited_fixed_size_slices( graph, ranks, n_vertices )
+    #
+    #    
+    #    
+    #elif slicing_policy["policy"] == "wall_time":
+    #    time_unit = slicing_policy["time_unit"]
+    #    slice_len = slicing_policy["slice_len"]
+    #    slice_overlap = slicing_policy["slice_overlap"]
+    #    slice_seq = get_wall_time_slice_seq( graph, time_unit, slice_len, slice_overlap )
+
+    #elif slicing_policy["policy"] == "logical_time_dense":
+    #    slice_len = slicing_policy["slice_len"]
+    #    slice_overlap = slicing_policy["slice_overlap"]
+    #    slice_seq = get_logical_time_slice_seq_dense( graph, slice_len, slice_overlap, ranks, include_endpoints )
+    
+    comm.barrier()
                                
 
 if __name__ == "__main__":

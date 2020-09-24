@@ -14,7 +14,7 @@ elif [ ${system} == "catalyst" ]; then
 fi
 # Determine where to write results data (trace files, event graphs, etc.)
 if [ ${system} == "quartz" ] || [ ${system} == "catalyst" ]; then
-    results_root="/p/lscratchh/chapp1/comm_patterns/naive_reduce/system_${system}/"
+    results_root="/p/lscratchh/chapp1/paper_results/comm_patterns/message_race/system_${system}/"
 fi
 
 # Comm pattern proxy app
@@ -31,7 +31,7 @@ job_script_build_graph=${anacin_x_root}/apps/comm_pattern_generator/build_graph.
 extract_slices_script=${anacin_x_root}/anacin-x/event_graph_analysis/extract_slices.py
 slicing_policy=${anacin_x_root}/anacin-x/event_graph_analysis/slicing_policies/barrier_delimited_full.json
 job_script_extract_slices=${anacin_x_root}/apps/comm_pattern_generator/extract_slices.sh
-n_procs_extract_slices=10
+n_procs_extract_slices=11
 n_nodes_extract_slices=$(echo "(${n_procs_extract_slices} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
 
 # Convenience function for making the dependency lists for the kernel distance
@@ -41,27 +41,17 @@ function join_by { local IFS="$1"; shift; echo "$*"; }
 # Kernel distance time series computation
 compute_kdts_script=${anacin_x_root}/anacin-x/event_graph_analysis/compute_kernel_distance_time_series.py
 job_script_compute_kdts=${anacin_x_root}/apps/comm_pattern_generator/compute_kdts.sh
-n_procs_compute_kdts=10
+n_procs_compute_kdts=11
 n_nodes_compute_kdts=$(echo "(${n_procs_compute_kdts} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
 
 # Define which graph kernels we'll compute KDTS for 
-graph_kernel=${anacin_x_root}/anacin-x/event_graph_analysis/graph_kernel_policies/wlst_5iters_logical_timestamp_label.json
+#graph_kernel=${anacin_x_root}/anacin-x/event_graph_analysis/graph_kernel_policies/wlst_5iters_logical_timestamp_label.json
+graph_kernel=${anacin_x_root}/anacin-x/event_graph_analysis/graph_kernel_policies/test_kernels.json
 
-# Visualizations
-make_plot_script=${anacin_x_root}/anacin-x/event_graph_analysis/visualization/make_naive_reduce_example_plot.py
-job_script_make_plot=${anacin_x_root}/apps/comm_pattern_generator/make_plot.sh
-
-#proc_placement=("pack" "spread")
-#run_scales=(11 21 41 81)
-#message_sizes=(1 512 1024 2048)
-
-#proc_placement=("pack")
-#run_scales=(11)
-#message_sizes=(1)
 
 proc_placement=("pack" "spread")
-run_scales=(21)
-message_sizes=(1)
+run_scales=(31)
+message_sizes=(1 1024)
 
 for proc_placement in ${proc_placement[@]};
 do
@@ -82,7 +72,7 @@ do
                 cd ${run_dir}
 
                 # Trace execution
-                config=${anacin_x_root}/apps/comm_pattern_generator/config/naive_reduce_example_msg_size_${msg_size}.json
+                config=${anacin_x_root}/apps/comm_pattern_generator/config/message_race_msg_size_${msg_size}.json
                 if [ ${proc_placement} == "pack" ]; then
                     n_nodes_trace=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
                     trace_stdout=$( sbatch -N${n_nodes_trace} ${job_script_trace_pack_procs} ${n_procs} ${app} ${config} )
@@ -108,13 +98,7 @@ do
             kdts_job_dep_str=$( join_by : ${kdts_job_deps[@]} )
             cd ${runs_root}
             compute_kdts_stdout=$( sbatch -N${n_nodes_compute_kdts} --dependency=afterok:${kdts_job_dep_str} ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} )
-            #compute_kdts_stdout=$( sbatch -N${n_nodes_compute_kdts} ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} )
             compute_kdts_job_id=$( echo ${compute_kdts_stdout} | sed 's/[^0-9]*//g' )
-
-            # Generate plot
-            make_plot_stdout=$( sbatch -N1 --dependency=afterok:${compute_kdts_job_id} ${job_script_make_plot} ${make_plot_script} "${runs_root}/kdts.pkl" )
-            #make_plot_stdout=$( sbatch -N1 ${job_script_make_plot} ${make_plot_script} "${runs_root}/kdts.pkl" )
-
         done # msg sizes
     done # num procs
 done # proc placement

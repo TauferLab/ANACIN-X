@@ -1,0 +1,98 @@
+{ 
+    "random_walk" : 
+    { 
+        "constraints"   : {"vertex_label" : "ignores", "edge_labels" : "ignores", "vertex_attributes" : "ignores", "edge_attributes" : "ignores"}, 
+        "params" : {"name" : "random_walk", "with_labels" : false} 
+    },
+    "random_walk_labeled" : 
+    {
+        "constraints"   : {"vertex_label" : "needs", "edge_labels" : "ignores", "vertex_attributes" : "ignores", "edge_attributes" : "ignores"}, 
+        "params" : {"name" : "random_walk", "with_labels" : true}
+    },
+    "shortest_path" : 
+    { 
+        "constraints"   : {"vertex_label" : "ignores", "edge_labels" : "ignores", "vertex_attributes" : "ignores", "edge_attributes" : "ignores"}, 
+        "params" : {"name" : "shortest_path", "with_labels" : false}
+    },
+    "shortest_path_labeled" : 
+    { 
+        "constraints"   : {"vertex_label" : "needs", "edge_labels" : "ignores", "vertex_attributes" : "nonce", "edge_attributes" : "ignores"}, 
+        "params" : {"name" : "shortest_path", "with_labels" : true}
+    },
+    "shortest_path_attributes" : 
+    { 
+        "constraints"   : {"vertex_label" : "slow", "edge_labels" : "ignores", "vertex_attributes" : "needs", "edge_attributes" : "ignores"}, 
+        "params" : {"name" : "shortest_path", "as_attributes" : true}
+    },
+    "graphlet_sampling" : 
+    { 
+        "constraints"   : {"vertex_label" : "ignores", "edge_labels" : "ignores", "vertex_attributes" : "ignores", "edge_attributes" : "ignores"}, 
+        "params" : {"name" : "graphlet_sampling"}
+    },
+    "multiscale_laplacian" :
+    { 
+        "constraints"   : {"vertex_label" : "forbids", "edge_labels" : "ignores", "vertex_attributes" : "needs", "edge_attributes" : "ignores"}, 
+        "params" : {"name" : "multiscale_laplacian"}
+    },
+    "lovasz_theta" : 
+    { 
+        "constraints"   : {"vertex_label" : "ignores", "edge_labels" : "ignores", "vertex_attributes" : "ignores", "edge_attributes" : "ignores"}, 
+        "params" : {"name" : "lovasz_theta"}
+    },
+    "svm_theta" : 
+    { 
+        "constraints"   : {"vertex_label" : "ignores", "edge_labels" : "ignores", "vertex_attributes" : "ignores", "edge_attributes" : "ignores"}, 
+        "params" : {"name" : "svm_theta"}
+    },
+    "neighborhood_hash" :
+    { 
+        "constraints"   : {"vertex_label" : "needs", "edge_labels" : "ignores", "vertex_attributes" : "nonce", "edge_attributes" : "ignores"}, 
+        "params" : {"name" : "neighborhood_hash"}
+    },
+    "neighborhood_subgraph_pairwise_distance" :
+    { 
+        "constraints"   : {"vertex_label" : "needs", "edge_labels" : "needs", "vertex_attributes" : "nonce", "edge_attributes" : "nonce"}, 
+        "params" : {"name" : "neighborhood_hash"}
+    },
+    "odd_sth" :
+    { 
+        "constraints"   : {"vertex_label" : "needs", "edge_labels" : "ignores", "vertex_attributes" : "nonce", "edge_attributes" : "ignores"}, 
+        "params" : {"name" : "odd_sth"}
+    },
+    "propagation" :
+    { 
+        "constraints"   : {"vertex_label" : "needs", "edge_labels" : "ignores", "vertex_attributes" : "nonce", "edge_attributes" : "ignores"}, 
+        "params" : {"name" : "propagation", "with_attributes" : false}
+    },
+    "propagation_attributes" :
+    { 
+        "constraints"   : {"vertex_label" : "nonce", "edge_labels" : "ignores", "vertex_attributes" : "needs", "edge_attributes" : "ignores"}, 
+        "params" : {"name" : "propagation", "with_attributes" : true}
+    },
+    "pyramid_match" :
+    { 
+        "constraints"   : {"vertex_label" : "needs", "edge_labels" : "ignores", "vertex_attributes" : "nonce", "edge_attributes" : "ignores"}, 
+        "params" : {"name" : "pyramid_match"}
+    },
+    "vertex_histogram" :
+    { 
+        "constraints"   : {"vertex_label" : "needs", "edge_labels" : "ignores", "vertex_attributes" : "nonce", "edge_attributes" : "ignores"}, 
+        "params" : {"name" : "vertex_histogram"}
+    },
+    "subtree_wl" :
+    { 
+        "constraints"   : {"vertex_label" : "needs", "edge_labels" : "ignores", "vertex_attributes" : "nonce", "edge_attributes" : "ignores"}, 
+        "params" : {"name" : "subtree_wl"}
+    },
+    "edge_histogram" :
+    { 
+        "constraints"   : {"vertex_label" : "ignores", "edge_labels" : "needs", "vertex_attributes" : "ignores", "edge_attributes" : "nonce"}, 
+        "params" : {"name" : "edge_histogram"}
+    },
+    "graph_hopper" :
+    { 
+        "constraints"   : {"vertex_label" : "nonce", "edge_labels" : "ignores", "vertex_attributes" : "needs", "edge_attributes" : "ignores"}, 
+        "params" : {"name" : "graph_hopper"}
+    }
+}
+

@@ -1,0 +1,11 @@
+{ "vertex_attributes" : [ "process_id",
+                          "event_type",
+                          "logical_time",
+                          "wall_time",
+                          "callstack"
+                        ],
+  "edge_attributes" : [ "logical_time_latency",
+                        "wall_time_latency",
+                        "mpi_tag"
+                      ]
+}

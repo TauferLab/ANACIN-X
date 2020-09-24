@@ -70,12 +70,12 @@ def make_output_path( traces_root_dir, slicing_policy, kernel_params ):
 ################################################################################
 
 #@timer 
-def compute_kernel_distance_matrices( slice_subgraphs, kernel_params ):
+def compute_kernel_similarity_matrices( slice_subgraphs, kernel_params ):
     # Relabel based on requested graph kernels
     kernel_label_pair_to_relabeled_graphs = get_relabeled_graphs( slice_subgraphs, kernel_params )
 
-    # Actually compute the kernel distance matrices
-    kernel_to_distance_matrix = {}
+    # Actually compute the kernel similarity matrices
+    kernel_to_similarity_matrix = {}
     for kp in kernel_params:
         kernel = kp["name"]
         params = kp["params"]
@@ -85,30 +85,27 @@ def compute_kernel_distance_matrices( slice_subgraphs, kernel_params ):
             label   = params["label"]
             kernel_label_pair = ( kernel, label )
             relabeled_graphs = kernel_label_pair_to_relabeled_graphs[ kernel_label_pair ]
-            kernel_mat = gk.CalculateWLKernel( relabeled_graphs, n_iters )
-            distance_mat = convert_to_distance_matrix( kernel_mat )
+            similarity_mat = gk.CalculateWLKernel( relabeled_graphs, n_iters )
             kernel_params_key = ( kernel, label, n_iters )
-            kernel_to_distance_matrix[ kernel_params_key ] = distance_mat
+            kernel_to_similarity_matrix[ kernel_params_key ] = similarity_mat
         # Compute edge-histogram kernel
         elif kernel == "eh":
             label = params["label"]
             kernel_label_pair = ( kernel, label )
             relabeled_graphs = kernel_label_pair_to_relabeled_graphs[ kernel_label_pair ]
-            kernel_mat = gk.CalculateEdgeHistKernel( relabeled_graphs )
-            distance_mat = convert_to_distance_matrix( kernel_mat )
+            similarity_mat = gk.CalculateEdgeHistKernel( relabeled_graphs )
             kernel_key = ( kernel, label )
-            kernel_to_distance_matrix[ kernel_key ] = distance_mat
+            kernel_to_similarity_matrix[ kernel_key ] = similarity_mat
         # Compute vertex-histogram kernel
         elif kernel == "vh":
             label = params["label"]
             key = (kernel, label)
             relabeled_graphs = kernel_label_pair_to_relabeled_graphs[ key ]
-            kernel_mat = gk.CalculateVertexHistKernel( relabeled_graphs )
-            distance_mat = convert_to_distance_matrix( kernel_mat )
-            kernel_to_distance_matrix[ key ] = distance_mat
+            similarity_mat = gk.CalculateVertexHistKernel( relabeled_graphs )
+            kernel_to_similarity_matrix[ key ] = similarity_mat
         else:
             raise NotImplementedError("Kernel: {} not supported".format(kernel))
-    return kernel_to_distance_matrix
+    return kernel_to_similarity_matrix
             
 
 ################################################################################
@@ -155,9 +152,9 @@ def get_slice_data( slice_dirs, slice_idx, kernel_params, callstacks_available )
     # Compute extra labels (e.g., logical time increment)
     slice_subgraphs = [ compute_extra_labels(g) for g in slice_subgraphs ]
 
-    # Compute the requested kernel distance matrices
-    print("Computing kernel distances for slice: {}".format( slice_idx ))
-    kernel_distance_data = compute_kernel_distance_matrices( slice_subgraphs, 
+    # Compute the requested kernel similarity matrices
+    print("Computing kernel similarities for slice: {}".format( slice_idx ))
+    kernel_distance_data = compute_kernel_similarity_matrices( slice_subgraphs, 
                                                              kernel_params )
     
     # Extract wall-time information for correlating with application events

@@ -150,7 +150,9 @@ def visualize( graph, barrier_adjustment=False ):
                                                     linestyle="dashed",
                                                     zorder=5
                                                   )
-    fig, ax = plt.subplots()
+
+    figure_size = ( 48, 8 )
+    fig, ax = plt.subplots( figsize = figure_size )
 
     #ax.add_collection( barrier_collection )
     ax.add_collection( send_collection )
@@ -163,7 +165,10 @@ def visualize( graph, barrier_adjustment=False ):
     ax.set_aspect("equal")
     ax.autoscale_view()
 
-    plt.show()
+    #plt.show()
+    plt.savefig("event_graph_slice.png",
+                bbox_inches="tight",
+                pad_inches=0.25 )
 
 
 def extract_slice( graph, lower_bound, upper_bound, ranks, partials ):
