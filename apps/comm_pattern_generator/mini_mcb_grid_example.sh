@@ -3,53 +3,13 @@
 run_idx_low=$1
 run_idx_high=$2
 
-# Orient ourselves
-anacin_x_root=$HOME/ANACIN-X
-system=$(hostname | sed 's/[0-9]*//g')
-# Determine node capacity
-if [ ${system} == "quartz" ]; then
-    n_procs_per_node=36
-elif [ ${system} == "catalyst" ]; then
-    n_procs_per_node=24
-fi
-# Determine where to write results data (trace files, event graphs, etc.)
-if [ ${system} == "quartz" ] || [ ${system} == "catalyst" ]; then
-    results_root="/p/lscratchh/chapp1/comm_patterns/mini_mcb_grid/system_${system}/"
-fi
-
-# Comm pattern proxy app
-app=${anacin_x_root}/apps/comm_pattern_generator/build_${system}/comm_pattern_generator
-job_script_trace_pack_procs=${anacin_x_root}/apps/comm_pattern_generator/trace_pattern_pack_procs.sh
-job_script_trace_spread_procs=${anacin_x_root}/apps/comm_pattern_generator/trace_pattern_spread_procs.sh
-
-# Event graph construction
-dumpi_to_graph_bin=${anacin_x_root}/submodules/dumpi_to_graph/build_${system}/dumpi_to_graph
-dumpi_to_graph_config=${anacin_x_root}/submodules/dumpi_to_graph/config/dumpi_only.json
-job_script_build_graph=${anacin_x_root}/apps/comm_pattern_generator/build_graph.sh
-
-# Slice extraction
-extract_slices_script=${anacin_x_root}/anacin-x/event_graph_analysis/extract_slices.py
-slicing_policy=${anacin_x_root}/anacin-x/event_graph_analysis/slicing_policies/barrier_delimited_full.json
-job_script_extract_slices=${anacin_x_root}/apps/comm_pattern_generator/extract_slices.sh
-n_procs_extract_slices=11
-n_nodes_extract_slices=$(echo "(${n_procs_extract_slices} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
+source $HOME/Src_ANACIN-X/apps/comm_pattern_generator/example_paths.config
 
 # Convenience function for making the dependency lists for the kernel distance
 # time series job
 function join_by { local IFS="$1"; shift; echo "$*"; }
 
-# Kernel distance time series computation
-compute_kdts_script=${anacin_x_root}/anacin-x/event_graph_analysis/compute_kernel_distance_time_series.py
-job_script_compute_kdts=${anacin_x_root}/apps/comm_pattern_generator/compute_kdts.sh
-n_procs_compute_kdts=11
-n_nodes_compute_kdts=$(echo "(${n_procs_compute_kdts} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
-
-# Define which graph kernels we'll compute KDTS for 
-graph_kernel=${anacin_x_root}/anacin-x/event_graph_analysis/graph_kernel_policies/wlst_5iters_logical_timestamp_label.json
-
-# Visualizations
-make_plot_script=${anacin_x_root}/anacin-x/event_graph_analysis/visualization/make_mini_mcb_example_plot.py
-job_script_make_plot=${anacin_x_root}/apps/comm_pattern_generator/make_plot.sh
+results_root=/data/gclab/anacin-n/anacin_results/mini_mcb_grid
 
 #proc_placement=("pack" "spread")
 #run_scales=(11 21 41 81)
@@ -68,6 +28,8 @@ proc_placement=("spread")
 run_scales=(36)
 #interleave_options=("non_interleaved")
 interleave_options=("interleaved", "non_interleaved")
+
+
 
 for proc_placement in ${proc_placement[@]};
 do
@@ -118,8 +80,8 @@ do
             compute_kdts_job_id=$( echo ${compute_kdts_stdout} | sed 's/[^0-9]*//g' )
 
             ## Generate plot
-            #make_plot_stdout=$( sbatch -N1 --dependency=afterok:${compute_kdts_job_id} ${job_script_make_plot} ${make_plot_script} "${runs_root}/kdts.pkl" )
-            ##make_plot_stdout=$( sbatch -N1 ${job_script_make_plot} ${make_plot_script} "${runs_root}/kdts.pkl" )
+            #make_plot_stdout=$( sbatch -N1 --dependency=afterok:${compute_kdts_job_id} ${job_script_make_plot} ${make_plot_script_mini_mcb} "${runs_root}/kdts.pkl" )
+            ##make_plot_stdout=$( sbatch -N1 ${job_script_make_plot} ${make_plot_script_mini_mcb} "${runs_root}/kdts.pkl" )
 
         done # msg sizes
     done # num procs
