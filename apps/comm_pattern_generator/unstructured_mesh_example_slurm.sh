@@ -2,14 +2,13 @@
 
 run_idx_low=$1
 run_idx_high=$2
+results_root=$3
 
-source $HOME/Src_ANACIN-X/apps/comm_pattern_generator/example_paths.config
+source ./example_paths.config
 
 # Convenience function for making the dependency lists for the kernel distance
 # time series job
 function join_by { local IFS="$1"; shift; echo "$*"; }
-
-results_root=/data/gclab/anacin-n/anacin_results/unstructured_mesh
 
 #proc_placement=("pack" "spread")
 proc_placement=("pack")
