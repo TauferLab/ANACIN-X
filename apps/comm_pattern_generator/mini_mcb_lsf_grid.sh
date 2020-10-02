@@ -8,7 +8,8 @@ source ./example_paths.config
 
 # Convenience function for making the dependency lists for the kernel distance
 # time series job
-function join_by { local IFS="$1"; shift; echo "$*"; }
+#function join_by { local IFS="$1"; shift; echo "$*"; }
+function join_by { local d=$1; shift; local f=$1; shift; printf %s "$f" "${@/#/$d}"; }
 
 #proc_placement=("pack" "spread")
 #run_scales=(11 21 41 81)
@@ -60,18 +61,18 @@ do
                 trace_job_id=$( echo ${trace_stdout} | sed 's/[^0-9]*//g' )
                 # Build event graph
                 n_nodes_build_graph=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
-                build_graph_stdout=$( sbatch -N${n_nodes_build_graph} --dependency=afterok:${trace_job_id} ${job_script_build_graph} ${n_procs} ${dumpi_to_graph_bin} ${dumpi_to_graph_config} ${run_dir} )
+                build_graph_stdout=$( bsub -nnodes ${n_nodes_build_graph} -w "done(${trace_job_id})" ${job_script_build_graph} ${n_procs} ${dumpi_to_graph_bin} ${dumpi_to_graph_config} ${run_dir} )
                 build_graph_job_id=$( echo ${build_graph_stdout} | sed 's/[^0-9]*//g' )
                 event_graph=${run_dir}/event_graph.graphml
 
                 # Extract slices
                 extract_slices_stdout=$( sbatch -N${n_nodes_extract_slices} --dependency=afterok:${build_graph_job_id} ${job_script_extract_slices} ${n_procs_extract_slices} ${extract_slices_script} ${event_graph} ${slicing_policy} )
                 extract_slices_job_id=$( echo ${extract_slices_stdout} | sed 's/[^0-9]*//g' ) 
-                kdts_job_deps+=(${extract_slices_job_id})
+                kdts_job_deps+=("done(${extract_slices_job_id})")
             done # runs
 
             # Compute kernel distances for each slice
-            kdts_job_dep_str=$( join_by : ${kdts_job_deps[@]} )
+            kdts_job_dep_str=$( join_by "&&" ${kdts_job_deps[@]} )
             cd ${runs_root}
             compute_kdts_stdout=$( sbatch -N${n_nodes_compute_kdts} --dependency=afterok:${kdts_job_dep_str} ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} )
             #compute_kdts_stdout=$( sbatch -N${n_nodes_compute_kdts} ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} )
