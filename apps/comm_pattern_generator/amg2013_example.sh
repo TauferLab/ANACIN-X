@@ -3,14 +3,13 @@
 n_procs=$1
 run_idx_low=$2
 run_idx_high=$3
+results_root=$4
 
-source $HOME/Src_ANACIN-X/apps/comm_pattern_generator/example_paths.config
+source ./example_paths.config
 
 ##message_sizes=(1 2 4 8 16 32 64 128 256 512 1024 2048)
 ##message_sizes=(1 512 1024 2048)
 message_sizes=(2048)
-
-results_root=/data/gclab/anacin-n/anacin_results/amg2013
 
 # Non-NINJA Workflow
 for msg_size in ${message_sizes[@]};
