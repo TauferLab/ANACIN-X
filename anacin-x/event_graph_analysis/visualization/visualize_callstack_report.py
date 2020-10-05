@@ -8,7 +8,7 @@ import igraph
 import re
 import pprint
 import matplotlib
-matplotlib.use('TkAgg')
+#matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 

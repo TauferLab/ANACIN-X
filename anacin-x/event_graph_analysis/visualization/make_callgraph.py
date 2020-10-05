@@ -9,7 +9,7 @@ import re
 import pprint
 import pickle as pkl
 import matplotlib
-matplotlib.use('TkAgg')
+#matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 from elftools.elf.elffile import ELFFile

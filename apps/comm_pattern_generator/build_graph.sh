@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-#SBATCH -o build_graph-%j.out
-#SBATCH -e build_graph-%j.err
+#BSUB -o build_graph-%j.out
+#BSUB -e build_graph-%j.err
 
 n_procs=$1
 dumpi_to_graph_bin=$2
@@ -17,4 +17,4 @@ elif [ ${system} == "catalyst" ]; then
 fi
 n_nodes=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
 
-srun -N${n_nodes} -n${n_procs} ${dumpi_to_graph_bin} ${dumpi_to_graph_config} ${trace_dir}
+mpirun -np ${n_procs} ${dumpi_to_graph_bin} ${dumpi_to_graph_config} ${trace_dir}

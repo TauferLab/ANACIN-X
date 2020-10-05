@@ -9,7 +9,7 @@ import igraph
 
 import pprint
 import matplotlib
-matplotlib.use('TkAgg')
+#matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from matplotlib import colors
 from matplotlib.patches import Circle

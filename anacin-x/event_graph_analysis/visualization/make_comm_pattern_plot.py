@@ -7,7 +7,7 @@ import json
 import argparse
 import numpy as np
 import matplotlib
-matplotlib.use('TkAgg')
+#matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 from scipy.stats.stats import pearsonr, spearmanr
@@ -15,8 +15,8 @@ from scipy.stats.stats import pearsonr, spearmanr
 import sys
 sys.path.append(".")
 sys.path.append("..")
-sys.path.append("/g/g12/chapp1/ANACIN-X/anacin-x/event_graph_analysis/")
-sys.path.append("/g/g12/chapp1/ANACIN-X/anacin-x/event_graph_analysis/visualization/")
+sys.path.append("/$HOME/Src_ANACIN-X/anacin-x/event_graph_analysis/")
+sys.path.append("/$HOME/Src_ANACIN-X/anacin-x/event_graph_analysis/visualization/")
 
 from graph_kernel_postprocessing import flatten_distance_matrix
 from kernel_distance_time_series_postprocessing import get_distances_seq
