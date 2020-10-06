@@ -14,4 +14,4 @@ rempi_mode=0 # Recording mode
 rempi_dir=${run_dir}/rempi
 rempi_encode=4 # Use clock-delta compression
 
-LD_PRELOAD=${rempi_lib} REMPI_MODE=${rempi_mode} REMPI_DIR=${rempi_dir} REMPI_ENCODE=${rempi_encode} srun -N${n_nodes} -n${n_procs} ${app} ${config}
+LD_PRELOAD=${rempi_lib} REMPI_MODE=${rempi_mode} REMPI_DIR=${rempi_dir} REMPI_ENCODE=${rempi_encode} srun -n${n_procs} ${app} ${config}
