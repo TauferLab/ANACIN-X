@@ -19,7 +19,7 @@ do
         # Trace execution
         run_dir=${results_root}/msg_size_${msg_size}/without_ninja/run_${run_idx}/
         mkdir -p ${run_dir}
-        app_config=${anacin_x_root}/apps/comm_pattern_generator/config/amg2013_example_msg_size_${msg_size}.json
+        app_config=${anacin_x_root}/apps/comm_pattern_generator/config/amg2013_msg_size_${msg_size}.json
         LD_PRELOAD=${pnmpi} PNMPI_LIB_PATH=${pnmpi_lib_path} PNMPI_CONF=${pnmpi_conf} mpirun -np ${n_procs} ${app_bin} ${app_config}
         mv dumpi-* ${run_dir}
         # Build event graph
