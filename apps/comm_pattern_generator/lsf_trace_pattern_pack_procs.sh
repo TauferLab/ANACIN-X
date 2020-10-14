@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-#BSUB -o /home/dsuarez1/ANACIN-X/apps/comm_pattern_generator/comm_pattern-%j.out
-#BSUB -e /home/dsuarez1/ANACIN-X/apps/comm_pattern_generator/comm_pattern-%j.err
+#BSUB -o comm_pattern-%j.out
+#BSUB -e comm_pattern-%j.err
 
 n_procs=$1
 app=$2
 config=$3
 
-source /home/dsuarez1/ANACIN-X/apps/comm_pattern_generator/lsf_kae_paths.config
+source example_paths.config
 
 # Determine number of nodes we need to run on
 #system=$(hostname | sed 's/[0-9]*//g')
