@@ -1,0 +1,870 @@
+
+DUMPI-to-Graph Configuration:
+Event Graph Options:
+	- Events represented in graph
+		- MPI_Allreduce
+		- MPI_Alltoall
+		- MPI_Alltoallv
+		- MPI_Barrier
+		- MPI_Cancel
+		- MPI_Comm_rank
+		- MPI_Comm_size
+		- MPI_Comm_split
+		- MPI_Irecv
+		- MPI_Isend
+		- MPI_Recv
+		- MPI_Reduce
+		- MPI_Request_free
+		- MPI_Send
+		- MPI_Test
+		- MPI_Testall
+		- MPI_Testany
+		- MPI_Testsome
+		- MPI_Wait
+		- MPI_Waitall
+		- MPI_Waitany
+		- MPI_Waitsome
+	- Orders represented in graph
+		- message
+		- program
+	- Vertex labels:
+		- lamport_time
+		- type
+		- wall_time
+	- Edge labels:
+		- lamport_time_diff
+		- tag
+		- wall_time_diff
+Graph Construction Options:
+	- Represent unmatched tests? false
+	- Condense unmatched tests? false
+	- Condense matched tests? false
+Trace Directories:
+	- /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_1/msg_size_1/run_000
+
+
+DUMPI-to-Graph Configuration:
+Event Graph Options:
+	- Events represented in graph
+		- MPI_Allreduce
+		- MPI_Alltoall
+		- MPI_Alltoallv
+		- MPI_Barrier
+		- MPI_Cancel
+		- MPI_Comm_rank
+		- MPI_Comm_size
+		- MPI_Comm_split
+		- MPI_Irecv
+		- MPI_Isend
+		- MPI_Recv
+		- MPI_Reduce
+		- MPI_Request_free
+		- MPI_Send
+		- MPI_Test
+		- MPI_Testall
+		- MPI_Testany
+		- MPI_Testsome
+		- MPI_Wait
+		- MPI_Waitall
+		- MPI_Waitany
+		- MPI_Waitsome
+	- Orders represented in graph
+		- message
+		- program
+	- Vertex labels:
+		- lamport_time
+		- type
+		- wall_time
+	- Edge labels:
+		- lamport_time_diff
+		- tag
+		- wall_time_diff
+Graph Construction Options:
+	- Represent unmatched tests? false
+	- Condense unmatched tests? false
+	- Condense matched tests? false
+Trace Directories:
+	- /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_1/msg_size_1/run_001
+
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@tellico-compute1>
+Subject: Job 25195: </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_1/msg_size_1/run_000> in cluster <tellico> Exited
+
+Job </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_1/msg_size_1/run_000> was submitted from host <tellico-master0> by user <pnbell> in cluster <tellico> at Wed Oct 14 17:00:55 2020
+Job was executed on host(s) <tellico-compute1>, in queue <normal>, as user <pnbell> in cluster <tellico> at Wed Oct 14 17:01:24 2020
+</home/pnbell> was used as the home directory.
+</home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh/n_procs_32/proc_placement_pack/neighbor_nd_fraction_1/msg_size_1/run_000> was used as the working directory.
+Started at Wed Oct 14 17:01:24 2020
+Terminated at Wed Oct 14 17:01:27 2020
+Results reported at Wed Oct 14 17:01:27 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_1/msg_size_1/run_000
+------------------------------------------------------------
+
+Exited with exit code 134.
+
+Resource usage summary:
+
+    CPU time :                                   3.00 sec.
+    Max Memory :                                 1 MB
+    Average Memory :                             1.00 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              1
+    Max Threads :                                1
+    Run time :                                   1 sec.
+    Turnaround time :                            32 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/debugging/build_graph_error.txt> for stderr output of this job.
+
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@tellico-compute1>
+Subject: Job 25198: </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_1/msg_size_1/run_001> in cluster <tellico> Exited
+
+Job </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_1/msg_size_1/run_001> was submitted from host <tellico-master0> by user <pnbell> in cluster <tellico> at Wed Oct 14 17:00:55 2020
+Job was executed on host(s) <tellico-compute1>, in queue <normal>, as user <pnbell> in cluster <tellico> at Wed Oct 14 17:01:23 2020
+</home/pnbell> was used as the home directory.
+</home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh/n_procs_32/proc_placement_pack/neighbor_nd_fraction_1/msg_size_1/run_001> was used as the working directory.
+Started at Wed Oct 14 17:01:23 2020
+Terminated at Wed Oct 14 17:01:28 2020
+Results reported at Wed Oct 14 17:01:28 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_1/msg_size_1/run_001
+------------------------------------------------------------
+
+Exited with exit code 134.
+
+Resource usage summary:
+
+    CPU time :                                   3.68 sec.
+    Max Memory :                                 1 MB
+    Average Memory :                             1.00 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              1
+    Max Threads :                                1
+    Run time :                                   2 sec.
+    Turnaround time :                            33 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/debugging/build_graph_error.txt> for stderr output of this job.
+
+
+DUMPI-to-Graph Configuration:
+Event Graph Options:
+	- Events represented in graph
+		- MPI_Allreduce
+		- MPI_Alltoall
+		- MPI_Alltoallv
+		- MPI_Barrier
+		- MPI_Cancel
+		- MPI_Comm_rank
+		- MPI_Comm_size
+		- MPI_Comm_split
+		- MPI_Irecv
+		- MPI_Isend
+		- MPI_Recv
+		- MPI_Reduce
+		- MPI_Request_free
+		- MPI_Send
+		- MPI_Test
+		- MPI_Testall
+		- MPI_Testany
+		- MPI_Testsome
+		- MPI_Wait
+		- MPI_Waitall
+		- MPI_Waitany
+		- MPI_Waitsome
+	- Orders represented in graph
+		- message
+		- program
+	- Vertex labels:
+		- lamport_time
+		- type
+		- wall_time
+	- Edge labels:
+		- lamport_time_diff
+		- tag
+		- wall_time_diff
+Graph Construction Options:
+	- Represent unmatched tests? false
+	- Condense unmatched tests? false
+	- Condense matched tests? false
+Trace Directories:
+	- /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.5/msg_size_1/run_000
+
+
+DUMPI-to-Graph Configuration:
+Event Graph Options:
+	- Events represented in graph
+		- MPI_Allreduce
+		- MPI_Alltoall
+		- MPI_Alltoallv
+		- MPI_Barrier
+		- MPI_Cancel
+		- MPI_Comm_rank
+		- MPI_Comm_size
+		- MPI_Comm_split
+		- MPI_Irecv
+		- MPI_Isend
+		- MPI_Recv
+		- MPI_Reduce
+		- MPI_Request_free
+		- MPI_Send
+		- MPI_Test
+		- MPI_Testall
+		- MPI_Testany
+		- MPI_Testsome
+		- MPI_Wait
+		- MPI_Waitall
+		- MPI_Waitany
+		- MPI_Waitsome
+	- Orders represented in graph
+		- message
+		- program
+	- Vertex labels:
+		- lamport_time
+		- type
+		- wall_time
+	- Edge labels:
+		- lamport_time_diff
+		- tag
+		- wall_time_diff
+Graph Construction Options:
+	- Represent unmatched tests? false
+	- Condense unmatched tests? false
+	- Condense matched tests? false
+Trace Directories:
+	- /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.5/msg_size_1/run_001
+
+
+DUMPI-to-Graph Configuration:
+Event Graph Options:
+	- Events represented in graph
+		- MPI_Allreduce
+		- MPI_Alltoall
+		- MPI_Alltoallv
+		- MPI_Barrier
+		- MPI_Cancel
+		- MPI_Comm_rank
+		- MPI_Comm_size
+		- MPI_Comm_split
+		- MPI_Irecv
+		- MPI_Isend
+		- MPI_Recv
+		- MPI_Reduce
+		- MPI_Request_free
+		- MPI_Send
+		- MPI_Test
+		- MPI_Testall
+		- MPI_Testany
+		- MPI_Testsome
+		- MPI_Wait
+		- MPI_Waitall
+		- MPI_Waitany
+		- MPI_Waitsome
+	- Orders represented in graph
+		- message
+		- program
+	- Vertex labels:
+		- lamport_time
+		- type
+		- wall_time
+	- Edge labels:
+		- lamport_time_diff
+		- tag
+		- wall_time_diff
+Graph Construction Options:
+	- Represent unmatched tests? false
+	- Condense unmatched tests? false
+	- Condense matched tests? false
+Trace Directories:
+	- /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0/msg_size_1/run_000
+
+
+DUMPI-to-Graph Configuration:
+Event Graph Options:
+	- Events represented in graph
+		- MPI_Allreduce
+		- MPI_Alltoall
+		- MPI_Alltoallv
+		- MPI_Barrier
+		- MPI_Cancel
+		- MPI_Comm_rank
+		- MPI_Comm_size
+		- MPI_Comm_split
+		- MPI_Irecv
+		- MPI_Isend
+		- MPI_Recv
+		- MPI_Reduce
+		- MPI_Request_free
+		- MPI_Send
+		- MPI_Test
+		- MPI_Testall
+		- MPI_Testany
+		- MPI_Testsome
+		- MPI_Wait
+		- MPI_Waitall
+		- MPI_Waitany
+		- MPI_Waitsome
+	- Orders represented in graph
+		- message
+		- program
+	- Vertex labels:
+		- lamport_time
+		- type
+		- wall_time
+	- Edge labels:
+		- lamport_time_diff
+		- tag
+		- wall_time_diff
+Graph Construction Options:
+	- Represent unmatched tests? false
+	- Condense unmatched tests? false
+	- Condense matched tests? false
+Trace Directories:
+	- /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.25/msg_size_1/run_000
+
+
+DUMPI-to-Graph Configuration:
+Event Graph Options:
+	- Events represented in graph
+		- MPI_Allreduce
+		- MPI_Alltoall
+		- MPI_Alltoallv
+		- MPI_Barrier
+		- MPI_Cancel
+		- MPI_Comm_rank
+		- MPI_Comm_size
+		- MPI_Comm_split
+		- MPI_Irecv
+		- MPI_Isend
+		- MPI_Recv
+		- MPI_Reduce
+		- MPI_Request_free
+		- MPI_Send
+		- MPI_Test
+		- MPI_Testall
+		- MPI_Testany
+		- MPI_Testsome
+		- MPI_Wait
+		- MPI_Waitall
+		- MPI_Waitany
+		- MPI_Waitsome
+	- Orders represented in graph
+		- message
+		- program
+	- Vertex labels:
+		- lamport_time
+		- type
+		- wall_time
+	- Edge labels:
+		- lamport_time_diff
+		- tag
+		- wall_time_diff
+Graph Construction Options:
+	- Represent unmatched tests? false
+	- Condense unmatched tests? false
+	- Condense matched tests? false
+Trace Directories:
+	- /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0/msg_size_1/run_001
+
+
+DUMPI-to-Graph Configuration:
+Event Graph Options:
+	- Events represented in graph
+		- MPI_Allreduce
+		- MPI_Alltoall
+		- MPI_Alltoallv
+		- MPI_Barrier
+		- MPI_Cancel
+		- MPI_Comm_rank
+		- MPI_Comm_size
+		- MPI_Comm_split
+		- MPI_Irecv
+		- MPI_Isend
+		- MPI_Recv
+		- MPI_Reduce
+		- MPI_Request_free
+		- MPI_Send
+		- MPI_Test
+		- MPI_Testall
+		- MPI_Testany
+		- MPI_Testsome
+		- MPI_Wait
+		- MPI_Waitall
+		- MPI_Waitany
+		- MPI_Waitsome
+	- Orders represented in graph
+		- message
+		- program
+	- Vertex labels:
+		- lamport_time
+		- type
+		- wall_time
+	- Edge labels:
+		- lamport_time_diff
+		- tag
+		- wall_time_diff
+Graph Construction Options:
+	- Represent unmatched tests? false
+	- Condense unmatched tests? false
+	- Condense matched tests? false
+Trace Directories:
+	- /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.25/msg_size_1/run_001
+
+
+DUMPI-to-Graph Configuration:
+Event Graph Options:
+
+DUMPI-to-Graph Configuration:
+Event Graph Options:
+	- Events represented in graph
+		- MPI_Allreduce
+		- MPI_Alltoall
+		- MPI_Alltoallv
+		- MPI_Barrier
+		- MPI_Cancel
+		- MPI_Comm_rank
+		- MPI_Comm_size
+	- Events represented in graph
+		- MPI_Comm_split
+		- MPI_Irecv
+		- MPI_Isend
+		- MPI_Recv
+		- MPI_Reduce
+		- MPI_Allreduce
+		- MPI_Alltoall
+		- MPI_Alltoallv
+		- MPI_Barrier
+		- MPI_Cancel
+		- MPI_Comm_rank
+		- MPI_Comm_size
+		- MPI_Comm_split
+		- MPI_Irecv
+		- MPI_Isend
+		- MPI_Recv
+		- MPI_Reduce
+		- MPI_Request_free
+		- MPI_Send
+		- MPI_Test
+		- MPI_Testall
+		- MPI_Testany
+		- MPI_Testsome
+		- MPI_Wait
+		- MPI_Waitall
+		- MPI_Waitany
+		- MPI_Waitsome
+	- Orders represented in graph
+		- message
+		- program
+	- Vertex labels:
+		- lamport_time
+		- type
+		- wall_time
+	- Edge labels:
+		- lamport_time_diff
+		- tag
+		- wall_time_diff
+Graph Construction Options:
+	- Represent unmatched tests? false
+	- Condense unmatched tests? false
+	- Condense matched tests? false
+Trace Directories:
+	- /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.75/msg_size_1/run_001
+
+		- MPI_Request_free
+		- MPI_Send
+		- MPI_Test
+		- MPI_Testall
+		- MPI_Testany
+		- MPI_Testsome
+		- MPI_Wait
+		- MPI_Waitall
+		- MPI_Waitany
+		- MPI_Waitsome
+	- Orders represented in graph
+		- message
+		- program
+	- Vertex labels:
+		- lamport_time
+		- type
+		- wall_time
+	- Edge labels:
+		- lamport_time_diff
+		- tag
+		- wall_time_diff
+Graph Construction Options:
+	- Represent unmatched tests? false
+	- Condense unmatched tests? false
+	- Condense matched tests? false
+Trace Directories:
+	- /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.75/msg_size_1/run_000
+
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@tellico-compute0>
+Subject: Job 25181: </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.5/msg_size_1/run_000> in cluster <tellico> Exited
+
+Job </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.5/msg_size_1/run_000> was submitted from host <tellico-master0> by user <pnbell> in cluster <tellico> at Wed Oct 14 17:00:55 2020
+Job was executed on host(s) <tellico-compute0>, in queue <normal>, as user <pnbell> in cluster <tellico> at Wed Oct 14 17:01:16 2020
+</home/pnbell> was used as the home directory.
+</home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh/n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.5/msg_size_1/run_000> was used as the working directory.
+Started at Wed Oct 14 17:01:16 2020
+Terminated at Wed Oct 14 17:01:32 2020
+Results reported at Wed Oct 14 17:01:32 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.5/msg_size_1/run_000
+------------------------------------------------------------
+
+Exited with exit code 134.
+
+Resource usage summary:
+
+    CPU time :                                   11.00 sec.
+    Max Memory :                                 90 MB
+    Average Memory :                             45.50 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              36
+    Max Threads :                                56
+    Run time :                                   22 sec.
+    Turnaround time :                            37 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/debugging/build_graph_error.txt> for stderr output of this job.
+
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@tellico-compute1>
+Subject: Job 25188: </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.75/msg_size_1/run_000> in cluster <tellico> Exited
+
+Job </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.75/msg_size_1/run_000> was submitted from host <tellico-master0> by user <pnbell> in cluster <tellico> at Wed Oct 14 17:00:55 2020
+Job was executed on host(s) <tellico-compute1>, in queue <normal>, as user <pnbell> in cluster <tellico> at Wed Oct 14 17:01:29 2020
+</home/pnbell> was used as the home directory.
+</home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh/n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.75/msg_size_1/run_000> was used as the working directory.
+Started at Wed Oct 14 17:01:29 2020
+Terminated at Wed Oct 14 17:01:33 2020
+Results reported at Wed Oct 14 17:01:33 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.75/msg_size_1/run_000
+------------------------------------------------------------
+
+Exited with exit code 134.
+
+Resource usage summary:
+
+    CPU time :                                   3.00 sec.
+    Max Memory :                                 4 MB
+    Average Memory :                             3.00 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   10 MB
+    Max Processes :                              1
+    Max Threads :                                1
+    Run time :                                   7 sec.
+    Turnaround time :                            38 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/debugging/build_graph_error.txt> for stderr output of this job.
+
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@tellico-compute1>
+Subject: Job 25191: </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.75/msg_size_1/run_001> in cluster <tellico> Exited
+
+Job </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.75/msg_size_1/run_001> was submitted from host <tellico-master0> by user <pnbell> in cluster <tellico> at Wed Oct 14 17:00:55 2020
+Job was executed on host(s) <tellico-compute1>, in queue <normal>, as user <pnbell> in cluster <tellico> at Wed Oct 14 17:01:29 2020
+</home/pnbell> was used as the home directory.
+</home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh/n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.75/msg_size_1/run_001> was used as the working directory.
+Started at Wed Oct 14 17:01:29 2020
+Terminated at Wed Oct 14 17:01:35 2020
+Results reported at Wed Oct 14 17:01:35 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.75/msg_size_1/run_001
+------------------------------------------------------------
+
+Exited with exit code 134.
+
+Resource usage summary:
+
+    CPU time :                                   3.17 sec.
+    Max Memory :                                 27 MB
+    Average Memory :                             18.33 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   10 MB
+    Max Processes :                              4
+    Max Threads :                                8
+    Run time :                                   7 sec.
+    Turnaround time :                            40 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/debugging/build_graph_error.txt> for stderr output of this job.
+
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@tellico-compute0>
+Subject: Job 25184: </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.5/msg_size_1/run_001> in cluster <tellico> Exited
+
+Job </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.5/msg_size_1/run_001> was submitted from host <tellico-master0> by user <pnbell> in cluster <tellico> at Wed Oct 14 17:00:55 2020
+Job was executed on host(s) <tellico-compute0>, in queue <normal>, as user <pnbell> in cluster <tellico> at Wed Oct 14 17:01:16 2020
+</home/pnbell> was used as the home directory.
+</home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh/n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.5/msg_size_1/run_001> was used as the working directory.
+Started at Wed Oct 14 17:01:16 2020
+Terminated at Wed Oct 14 17:01:36 2020
+Results reported at Wed Oct 14 17:01:36 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.5/msg_size_1/run_001
+------------------------------------------------------------
+
+Exited with exit code 134.
+
+Resource usage summary:
+
+    CPU time :                                   12.89 sec.
+    Max Memory :                                 120 MB
+    Average Memory :                             11.00 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              36
+    Max Threads :                                67
+    Run time :                                   26 sec.
+    Turnaround time :                            41 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/debugging/build_graph_error.txt> for stderr output of this job.
+
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@tellico-compute0>
+Subject: Job 25177: </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.25/msg_size_1/run_001> in cluster <tellico> Exited
+
+Job </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.25/msg_size_1/run_001> was submitted from host <tellico-master0> by user <pnbell> in cluster <tellico> at Wed Oct 14 17:00:55 2020
+Job was executed on host(s) <tellico-compute0>, in queue <normal>, as user <pnbell> in cluster <tellico> at Wed Oct 14 17:01:16 2020
+</home/pnbell> was used as the home directory.
+</home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh/n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.25/msg_size_1/run_001> was used as the working directory.
+Started at Wed Oct 14 17:01:16 2020
+Terminated at Wed Oct 14 17:01:36 2020
+Results reported at Wed Oct 14 17:01:36 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.25/msg_size_1/run_001
+------------------------------------------------------------
+
+Exited with exit code 134.
+
+Resource usage summary:
+
+    CPU time :                                   10.12 sec.
+    Max Memory :                                 106 MB
+    Average Memory :                             11.50 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              36
+    Max Threads :                                63
+    Run time :                                   26 sec.
+    Turnaround time :                            41 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/debugging/build_graph_error.txt> for stderr output of this job.
+
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@tellico-compute0>
+Subject: Job 25174: </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.25/msg_size_1/run_000> in cluster <tellico> Exited
+
+Job </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.25/msg_size_1/run_000> was submitted from host <tellico-master0> by user <pnbell> in cluster <tellico> at Wed Oct 14 17:00:54 2020
+Job was executed on host(s) <tellico-compute0>, in queue <normal>, as user <pnbell> in cluster <tellico> at Wed Oct 14 17:01:16 2020
+</home/pnbell> was used as the home directory.
+</home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh/n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.25/msg_size_1/run_000> was used as the working directory.
+Started at Wed Oct 14 17:01:16 2020
+Terminated at Wed Oct 14 17:01:37 2020
+Results reported at Wed Oct 14 17:01:37 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0.25/msg_size_1/run_000
+------------------------------------------------------------
+
+Exited with exit code 134.
+
+Resource usage summary:
+
+    CPU time :                                   11.39 sec.
+    Max Memory :                                 110 MB
+    Average Memory :                             11.00 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              36
+    Max Threads :                                59
+    Run time :                                   26 sec.
+    Turnaround time :                            43 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/debugging/build_graph_error.txt> for stderr output of this job.
+
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@tellico-compute0>
+Subject: Job 25170: </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0/msg_size_1/run_001> in cluster <tellico> Exited
+
+Job </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0/msg_size_1/run_001> was submitted from host <tellico-master0> by user <pnbell> in cluster <tellico> at Wed Oct 14 17:00:54 2020
+Job was executed on host(s) <tellico-compute0>, in queue <normal>, as user <pnbell> in cluster <tellico> at Wed Oct 14 17:01:16 2020
+</home/pnbell> was used as the home directory.
+</home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh/n_procs_32/proc_placement_pack/neighbor_nd_fraction_0/msg_size_1/run_001> was used as the working directory.
+Started at Wed Oct 14 17:01:16 2020
+Terminated at Wed Oct 14 17:01:38 2020
+Results reported at Wed Oct 14 17:01:38 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0/msg_size_1/run_001
+------------------------------------------------------------
+
+Exited with exit code 134.
+
+Resource usage summary:
+
+    CPU time :                                   10.77 sec.
+    Max Memory :                                 97 MB
+    Average Memory :                             11.50 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              36
+    Max Threads :                                57
+    Run time :                                   26 sec.
+    Turnaround time :                            44 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/debugging/build_graph_error.txt> for stderr output of this job.
+
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@tellico-compute0>
+Subject: Job 25167: </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0/msg_size_1/run_000> in cluster <tellico> Exited
+
+Job </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0/msg_size_1/run_000> was submitted from host <tellico-master0> by user <pnbell> in cluster <tellico> at Wed Oct 14 17:00:54 2020
+Job was executed on host(s) <tellico-compute0>, in queue <normal>, as user <pnbell> in cluster <tellico> at Wed Oct 14 17:01:16 2020
+</home/pnbell> was used as the home directory.
+</home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh/n_procs_32/proc_placement_pack/neighbor_nd_fraction_0/msg_size_1/run_000> was used as the working directory.
+Started at Wed Oct 14 17:01:16 2020
+Terminated at Wed Oct 14 17:01:39 2020
+Results reported at Wed Oct 14 17:01:39 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/lsf_build_graph.sh 32 /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/build_tellico-master/dumpi_to_graph /home/pnbell/Src_ANACIN-X/submodules/dumpi_to_graph/config/dumpi_only.json /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/results/unstructured_mesh//n_procs_32/proc_placement_pack/neighbor_nd_fraction_0/msg_size_1/run_000
+------------------------------------------------------------
+
+Exited with exit code 134.
+
+Resource usage summary:
+
+    CPU time :                                   12.06 sec.
+    Max Memory :                                 105 MB
+    Average Memory :                             11.50 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              36
+    Max Threads :                                62
+    Run time :                                   26 sec.
+    Turnaround time :                            45 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file </home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/debugging/build_graph_error.txt> for stderr output of this job.
+

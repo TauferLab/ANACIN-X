@@ -7,7 +7,7 @@ n_procs=$1
 app=$2
 config=$3
 
-source example_paths.config
+source /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/example_paths_lsf.config
 
 # Determine number of nodes we need to run on
 #system=$(hostname | sed 's/[0-9]*//g')

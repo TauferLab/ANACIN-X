@@ -17,4 +17,4 @@ n_nodes=${n_procs}
 #pnmpi_lib_path=${anacin_x_root}/anacin-x//pnmpi/patched_libs/
 #pnmpi_conf=${anacin_x_root}/anacin-x/pnmpi/configs/dumpi.conf
 
-LD_PRELOAD=${pnmpi} PNMPI_LIB_PATH=${pnmpi_lib_path} PNMPI_CONF=${pnmpi_conf} mpirun -N${n_nodes} -n${n_procs} --ntasks-per-node=1 ${app} ${config}
+LD_PRELOAD=${pnmpi} PNMPI_LIB_PATH=${pnmpi_lib_path} PNMPI_CONF=${pnmpi_conf} srun -N${n_nodes} -n${n_procs} --ntasks-per-node=1 ${app} ${config}

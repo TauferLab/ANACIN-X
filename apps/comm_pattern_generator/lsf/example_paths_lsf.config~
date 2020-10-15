@@ -7,14 +7,16 @@ elif [ ${system} == "catalyst" ]; then
     build_dir="./build_catalyst"
     n_procs_per_node=24
 fi
+build_dir=build_tellico-master
 
 anacin_x_root=$HOME/Src_ANACIN-X
 n_procs_extract_slices=11
 n_procs_compute_kdts=10
 
 #Standard IO
-a_output=${anacin_x_root}/apps/comm_patter_generator/anacin_output.txt
-a_error=${anacin_x_root}/apps/comm_patter_generator/anacin_error.txt
+debugging_path=${anacin_x_root}/apps/comm_pattern_generator/dubugging
+#a_output=${anacin_x_root}/apps/comm_patter_generator/anacin_output.txt
+#a_error=${anacin_x_root}/apps/comm_patter_generator/anacin_error.txt
 
 # Tracing                                                                                                                                                                                                                                    
 pnmpi=${anacin_x_root}/submodules/PnMPI/${build_dir}/lib/libpnmpi.so
@@ -42,12 +44,12 @@ graph_kernel=${anacin_x_root}/anacin-x/event_graph_analysis/graph_kernel_policie
 app=${anacin_x_root}/apps/comm_pattern_generator/${build_dir}/comm_pattern_generator
 
 # Job scripts
-job_script_trace_pack_procs=${anacin_x_root}/apps/comm_pattern_generator/lsf_trace_pattern_pack_procs.sh
-job_script_trace_spread_procs=${anacin_x_root}/apps/comm_pattern_generator/lsf_trace_pattern_spread_procs.sh
-job_script_build_graph=${anacin_x_root}/apps/comm_pattern_generator/lsf_build_graph.sh
-job_script_extract_slice=${anacin_x_root}/apps/comm_pattern_generator/lsf_extract_slices.sh
-job_script_compute_kdts=${anacin_x_root}/apps/comm_pattern_generator/lsf_compute_kdts.sh
-job_script_make_plot=${anacin_x_root}/apps/comm_pattern_generator/lsf_make_plot.sh
+job_script_trace_pack_procs=${anacin_x_root}/apps/comm_pattern_generator/lsf/lsf_trace_pattern_pack_procs.sh
+job_script_trace_spread_procs=${anacin_x_root}/apps/comm_pattern_generator/lsf/lsf_trace_pattern_spread_procs.sh
+job_script_build_graph=${anacin_x_root}/apps/comm_pattern_generator/lsf/lsf_build_graph.sh
+job_script_extract_slice=${anacin_x_root}/apps/comm_pattern_generator/lsf/lsf_extract_slices.sh
+job_script_compute_kdts=${anacin_x_root}/apps/comm_pattern_generator/lsf/lsf_compute_kdts.sh
+job_script_make_plot=${anacin_x_root}/apps/comm_pattern_generator/lsf/lsf_make_plot.sh
 
 # N nodes
 #n_nodes_compute_kdts=$(echo "(${n_procs_compute_kdts} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
