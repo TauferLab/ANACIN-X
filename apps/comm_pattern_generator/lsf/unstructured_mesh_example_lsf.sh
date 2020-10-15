@@ -9,7 +9,8 @@ source ./example_paths_lsf.config
 
 # Convenience function for making the dependency lists for the kernel distance
 # time series job
-function join_by { local IFS="$1"; shift; echo "$*"; }
+#function join_by { local IFS="$1"; shift; echo "$*"; }
+function join_by { local d=$1; shift; local f=$1; shift; printf %s "$f" "${@/#/$d}"; }
 
 #proc_placement=("pack" "spread")
 proc_placement=("pack")
@@ -68,17 +69,17 @@ do
 
 		    #echo "Starting Extract Slices"
                     # Extract slices
-                    extract_slices_stdout=$( bsub -R "span[ptile=16]" "done(${build_graph_job_id})" -o ${debugging_path}/extract_slices_output.txt -e ${debugging_path}/extract_slices_error.txt ${job_script_extract_slices} ${n_procs_extract_slices} ${extract_slices_script} ${event_graph} ${slicing_policy} )
+                    extract_slices_stdout=$( bsub -R "span[ptile=16]" -w "done(${build_graph_job_id})" -o ${debugging_path}/extract_slices_output.txt -e ${debugging_path}/extract_slices_error.txt ${job_script_extract_slices} ${n_procs_extract_slices} ${extract_slices_script} ${event_graph} ${slicing_policy} )
                     extract_slices_job_id=$( echo ${extract_slices_stdout} | sed 's/[^0-9]*//g' ) 
-                    kdts_job_deps+=(${extract_slices_job_id})
+                    kdts_job_deps+=("done(${extract_slices_job_id})")
                 done # runs
 
 		#echo "Start Computing Kernel Distances"
                 # Compute kernel distances for each slice
-                kdts_job_dep_str=$( join_by : ${kdts_job_deps[@]} )
+                kdts_job_dep_str=$( join_by "&&" ${kdts_job_deps[@]} )
 		echo ${kdts_job_dep_str}
                 cd ${runs_root}
-                compute_kdts_stdout=$( bsub -R "span[ptile=16]" -w ${kdts_job_dep_str} -o ${debugging_path}/compute_kdts_output.txt -e ${debugging_path}/compute_kdts_error.txt ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} )
+                compute_kdts_stdout=$( bsub -R "span[ptile=16]" -w ${kdts_job_dep_str} -o ${debugging_path}/compute_kdts_output.txt -e ${debugging_path}/compute_kdts_error.txt ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} ${slicing_policy} )
                 #compute_kdts_stdout=$( sbatch -N${n_nodes_compute_kdts} ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} )
                 compute_kdts_job_id=$( echo ${compute_kdts_stdout} | sed 's/[^0-9]*//g' )
 

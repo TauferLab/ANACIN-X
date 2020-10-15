@@ -42,7 +42,7 @@ do
         for option in ${interleave_options[@]};
         do
             echo "Launching jobs for: proc. placement = ${proc_placement}, # procs. = ${n_procs}, interleaving?  ${option}"
-            runs_root=$HOME/Src_ANACIN-X/apps/comm_pattern_generator/lsf/${results_root}/n_procs_${n_procs}/proc_placement_${proc_placement}/interleave_option_${option}/
+            runs_root=${results_root}/n_procs_${n_procs}/proc_placement_${proc_placement}/interleave_option_${option}/
 
             # Launch intra-execution jobs
             kdts_job_deps=()
@@ -77,7 +77,7 @@ do
 #		echo "exiting graph build"
                 
 		# Extract slices
-                extract_slices_stdout=$( bsub -R "span[ptile=16]" "done(${build_graph_job_id})" -o ${debugging_path}/extract_slices_output.txt -e ${debugging_path}/extract_slices_error.txt ${job_script_extract_slices} ${n_procs_extract_slices} ${extract_slices_script} ${event_graph} ${slicing_policy} )
+                extract_slices_stdout=$( bsub -R "span[ptile=16]" -w "done(${build_graph_job_id})" -o ${debugging_path}/extract_slices_output.txt -e ${debugging_path}/extract_slices_error.txt ${job_script_extract_slices} ${n_procs_extract_slices} ${extract_slices_script} ${event_graph} ${slicing_policy} )
                 extract_slices_job_id=$( echo ${extract_slices_stdout} | sed 's/[^0-9]*//g' ) 
                 kdts_job_deps+=("done(${extract_slices_job_id})")
 #		echo "exiting slice extraction"
@@ -87,8 +87,9 @@ do
             
 	    # Compute kernel distances for each slice
             kdts_job_dep_str=$( join_by "&&" ${kdts_job_deps[@]} )
+	    echo ${kdts_job_dep_str}
             cd ${runs_root}
-            compute_kdts_stdout=$( bsub -R "span[ptile=16]" -w ${kdts_job_dep_str} -o ${debugging_path}/compute_kdts_output.txt -e ${debugging_path}/compute_kdts_error.txt ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} )
+            compute_kdts_stdout=$( bsub -R "span[ptile=16]" -w ${kdts_job_dep_str} -o ${debugging_path}/compute_kdts_output.txt -e ${debugging_path}/compute_kdts_error.txt ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} ${slicing_policy} )
 #	    echo "exiting kdts"        
 	    #compute_kdts_stdout=$( sbatch -N${n_nodes_compute_kdts} ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} )
             compute_kdts_job_id=$( echo ${compute_kdts_stdout} | sed 's/[^0-9]*//g' )
