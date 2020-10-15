@@ -361,7 +361,7 @@ def main( traces_root_dir,
         # provided
         if output_path is None:
             output_path = make_output_path( traces_root_dir, 
-                                            slicing_policy, 
+                                            slicing_policy_path, 
                                             kernels )
         else:
             name,ext = os.path.splitext( output_path )
