@@ -15,7 +15,7 @@ function join_by { local d=$1; shift; local f=$1; shift; printf %s "$f" "${@/#/$
 #proc_placement=("pack" "spread")
 proc_placement=("pack")
 run_scales=(32)
-message_sizes=(1)
+message_sizes=(512)
 nd_neighbor_fractions=("0" "0.25" "0.5" "0.75" "1")
 #nd_neighbor_fractions=("0")
 

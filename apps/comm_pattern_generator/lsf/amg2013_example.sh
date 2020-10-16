@@ -9,7 +9,7 @@ source ./example_paths_lsf.config
 
 ##message_sizes=(1 2 4 8 16 32 64 128 256 512 1024 2048)
 ##message_sizes=(1 512 1024 2048)
-message_sizes=(2048)
+message_sizes=(512)
 
 # Non-NINJA Workflow
 for msg_size in ${message_sizes[@]};
