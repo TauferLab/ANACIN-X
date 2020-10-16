@@ -226,6 +226,7 @@ Determines the slice subdirectory's name
 """
 def get_slice_dir_suffix( slicing_policy_file, slice_dir_name ):
     # Case 1: Determine slice directory suffix from slicing policy
+    slicing_policy = None
     if slicing_policy_file is not None and slice_dir_name is None:
         with open( slicing_policy_file, "r" ) as infile:
             slicing_policy = json.load( infile )
@@ -243,16 +244,16 @@ def get_slice_dir_suffix( slicing_policy_file, slice_dir_name ):
     # use default
     else:
         slice_dir_suffix = "/slices/"
-    return slice_dir_suffix
+    return slice_dir_suffix, slicing_policy
 
 """
 Determines the location of event graph slices
 """
-def get_slice_dirs( trace_dirs, slicing_policy, slice_dir_name  ):
-    suffix = get_slice_dir_suffix( slicing_policy, slice_dir_name )
+def get_slice_dirs( trace_dirs, slicing_policy_path, slice_dir_name  ):
+    suffix, slicing_policy = get_slice_dir_suffix( slicing_policy_path, slice_dir_name )
     slice_dirs = [ str(td) + suffix for td in trace_dirs ]
     slice_dirs = [ Path(sd) for sd in slice_dirs ]
-    return slice_dirs
+    return slice_dirs, slicing_policy
 
 """
 Determines for which runs' traces to compute the kernel distance time series
@@ -285,11 +286,11 @@ def ingest_inputs( traces_root_dir, kernel_file,
     trace_dirs = get_requested_trace_dirs( traces_root_dir, runs, 
                                            run_range_lower, run_range_upper )
     # Determine what the subdirectory containing the slices is called
-    slice_dirs = get_slice_dirs( trace_dirs, slicing_policy_file, slice_dir_name )
+    slice_dirs, slicing_policy = get_slice_dirs( trace_dirs, slicing_policy_file, slice_dir_name )
     # Read in file describing all graph kernels to compute and their parameters
     with open( kernel_file, "r" ) as infile:
         kernels = json.load( infile )["kernels"]
-    return slice_dirs, kernels    
+    return slice_dirs, kernels, slicing_policy    
 
 ################################################################################
 
@@ -308,9 +309,10 @@ def main( traces_root_dir,
     # Get MPI rank
     rank = comm.Get_rank()
     # Ingest inputs on root process
+    slicing_policy = None
     if rank == 0:
         # Determine slice directories and kernels from inputs
-        slice_dirs, kernels = ingest_inputs( traces_root_dir, kernel_file, 
+        slice_dirs, kernels, slicing_policy = ingest_inputs( traces_root_dir, kernel_file, 
                                              runs, run_range_lower, run_range_upper,
                                              slicing_policy_path, slice_dir_name )
 
@@ -361,7 +363,7 @@ def main( traces_root_dir,
         # provided
         if output_path is None:
             output_path = make_output_path( traces_root_dir, 
-                                            slicing_policy_path, 
+                                            slicing_policy, 
                                             kernels )
         else:
             name,ext = os.path.splitext( output_path )
