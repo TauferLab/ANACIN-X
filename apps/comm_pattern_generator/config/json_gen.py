@@ -25,7 +25,7 @@ elif sys.argv[1] == "naive_reduce":
     print("e")
     for i in range(0, 11):
         out["comm_patterns"].append({"pattern_name": sys.argv[1],
-                                   "n_iters": 10,
+                                   "n_iters": sys.argv[3],
                                    "nd_fraction": round(nd_frac, 1),
                                    "params": [
                                        {
@@ -34,7 +34,7 @@ elif sys.argv[1] == "naive_reduce":
                                        }
                                    ]})
         nd_frac += 0.1
-    with open("message_race_msg_size_{}.json".format(int(sys.argv[2])), 'w+') as f:
+    with open("message_race_msg_size_{}_niters_{}.json".format(int(sys.argv[2]), int(sys.argv[3])), 'w+') as f:
         json.dump(out, f, indent=4)
 
 
