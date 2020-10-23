@@ -3,7 +3,7 @@
 run_idx_low=$1
 run_idx_high=$2
 n_nodes=$3
-results_root=$4
+results_root=$3
 
 #echo "sourcing"
 #source ./lsf_kae_paths.config
@@ -59,11 +59,11 @@ do
                 config=${anacin_x_root}/apps/comm_pattern_generator/config/mini_mcb_grid_example_${option}.json
                 if [ ${proc_placement} == "pack" ]; then
                     #n_nodes_trace=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
-                    echo "Starting Trace Execution"
+                    #echo "Starting Trace Execution"
 		    trace_stdout=$( bsub -R "span[ptile=16]" -o ${debugging_path}/trace_exec_output.txt -e ${debugging_path}/trace_exec_error.txt ${job_script_trace_pack_procs} ${n_procs} ${app} ${config} )
                 elif [ ${proc_placement} == "spread" ]; then
                     n_nodes_trace=${n_procs}
-                    trace_stdout=$( bsub -nnodes ${n_nodes_trace} ${job_script_trace_spread_procs} ${n_procs} ${app} ${config} )
+                    #trace_stdout=$( bsub -nnodes ${n_nodes_trace} ${job_script_trace_spread_procs} ${n_procs} ${app} ${config} )
                 fi
                 trace_job_id=$( echo ${trace_stdout} | sed 's/[^0-9]*//g' )
 #		echo "$trace_job_id is the id for this run of the tracer."
@@ -87,7 +87,7 @@ do
             
 	    # Compute kernel distances for each slice
             kdts_job_dep_str=$( join_by "&&" ${kdts_job_deps[@]} )
-	    echo ${kdts_job_dep_str}
+	    #echo ${kdts_job_dep_str}
             cd ${runs_root}
             compute_kdts_stdout=$( bsub -R "span[ptile=16]" -w ${kdts_job_dep_str} -o ${debugging_path}/compute_kdts_output.txt -e ${debugging_path}/compute_kdts_error.txt ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} ${slicing_policy} )
 #	    echo "exiting kdts"        
