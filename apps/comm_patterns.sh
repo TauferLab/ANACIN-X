@@ -3,9 +3,8 @@
 
 # To Make this Script Work
 # 1. Turn msg_sizes into a pass
-# 2. Turn n_iters into pass
-# 3. Make mini mcb and unstructured mesh take n_procs as pass
-# 4. Have generators use n_nodes dynamically
+# 2. Make mini mcb and unstructured mesh take n_procs as pass
+# 3. Have generators use n_nodes dynamically
 
 
 # User Input
@@ -40,21 +39,6 @@ results_path=/data/gclab/anacin-n/anacin_results/${comm_pattern}
 msg_sizes=(512 2048)
 n_iters=10
 nd_neighbor_fraction=0.2
-
-
-# Generate JSON config file to use
-for msg_size in ${msg_sizes[@]}; 
-do
-    if [ ${comm_pattern} == "message_race" ]; then
-	python3 ${config_path}/json_gen.py "message_race" ${msg_size} ${n_iters}
-    elif [ ${comm_pattern} == "amg2013" ]; then
-	python3 ${config_path}/json_gen.py "amg2013" ${msg_size} ${n_iters}
-    elif [ ${comm_pattern} == "mini_mcb" ]; then
-	python3 ${config_path}/json_gen.py "mini_mcb" ${msg_size} ${n_iters}
-    elif [ ${comm_pattern} == "unstructured_mesh" ]; then
-	python3 ${config_path}/json_gen.py "unstructured_mesh" ${nd_neighbor_fraction} 4 3 2 ${msg_size} ${n_iters}
-    fi
-done
 
 
 # Run Comm Pattern Script
