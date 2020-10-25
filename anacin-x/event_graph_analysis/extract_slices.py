@@ -414,7 +414,7 @@ def main( graph_path, slicing_policy_path, output_dir, output_format ):
     except:
         n_vertices = 0
         n_edges = 0
-    #print( "Rank: {}, ingestion time: {}, # vertices: {}, # edges: {}".format( my_rank, ingest_elapsed_time, n_vertices, n_edges ))
+    print( "Rank: {}, ingestion time: {}, # vertices: {}, # edges: {}".format( my_rank, ingest_elapsed_time, n_vertices, n_edges ))
     comm.barrier()
     
     # Determine, and if necessary, create output directory
