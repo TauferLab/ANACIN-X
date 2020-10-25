@@ -3,7 +3,8 @@
 run_idx_low=$1
 run_idx_high=$2
 n_nodes=$3
-results_root=$4
+n_iters=$4
+results_root=$5
 
 echo "Starting Unstructured Mesh Run"
 source ./example_paths_lsf.config
@@ -50,8 +51,13 @@ do
                     fi
 
 		    #echo "Starting Trace Execution"
-                    # Trace execution
+                    # Create config if doesn't exist
                     config=${anacin_x_root}/apps/comm_pattern_generator/config/unstructured_mesh_${proc_grid}_nd_neighbor_fraction_${nd_neighbor_fraction}_msg_size_${msg_size}.json
+		    if [ ! -f "config" ]; then
+			python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "unstructured_mesh" ${nd_neighbor_fraction} 4 3 2 ${msg_size} ${n_iters}
+		    fi
+
+		    # Trace execution
                     if [ ${proc_placement} == "pack" ]; then
                         #n_nodes_trace=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
                         trace_stdout=$( bsub -n 64 -R "span[ptile=32]" -o ${debugging_path}/trace_exec_output.txt -e ${debugging_path}/trace_exec_error.txt ${job_script_trace_pack_procs} ${n_procs} ${app} ${config} )

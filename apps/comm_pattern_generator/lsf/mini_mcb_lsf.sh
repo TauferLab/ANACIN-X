@@ -3,7 +3,8 @@
 run_idx_low=$1
 run_idx_high=$2
 n_nodes=$3
-results_root=$3
+n_iters=$4
+results_root=$5
 
 #echo "sourcing"
 #source ./lsf_kae_paths.config
@@ -55,8 +56,13 @@ do
                 cd ${run_dir}
 #		echo "Entering submission of generator"
  
+		# Create config if doesn't exist
+                config=${anacin_x_root}/apps/comm_pattern_generator/config/mini_mcb_${option}_niters_${n_iters}.json
+		if [ ! -f "config" ]; then
+		    python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "mini_mcb" ${option} ${n_iters}
+		fi
+
 		# Trace execution
-                config=${anacin_x_root}/apps/comm_pattern_generator/config/mini_mcb_grid_example_${option}.json
                 if [ ${proc_placement} == "pack" ]; then
                     #n_nodes_trace=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
                     #echo "Starting Trace Execution"
