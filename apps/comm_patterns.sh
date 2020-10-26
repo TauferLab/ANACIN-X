@@ -12,9 +12,10 @@
 comm_pattern=$1
 #scheduler=$2
 #n_nodes=$2
-run_idx_low=$2
-run_idx_high=$3
-results_path=$4
+#run_idx_low=$2
+#run_idx_high=$3
+run_count$2
+results_path=$3
 
 # Define Needed Paths
 root_path=$HOME/Src_ANACIN-X
@@ -51,11 +52,11 @@ n_nodes=1
 
 # Run Comm Pattern Script
 if [ ${comm_pattern} == "message_race" ]; then
-    sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${run_idx_low} ${run_idx_high} ${results_path} ${msg_sizes}
+    sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} 1 ${run_count} ${results_path} ${msg_sizes}
 elif [ ${comm_pattern} == "amg2013" ]; then
-    sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${run_idx_low} ${run_idx_high} ${results_path} ${msg_sizes}
+    sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} 1 ${runc_count} ${results_path} ${msg_sizes}
 elif [ ${comm_pattern} == "mini_mcb" ]; then
-    sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${run_idx_low} ${run_idx_high} ${n_nodes} ${n_iters} ${results_path} ${n_procs}
+    sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh 1 ${run_count} ${n_nodes} ${n_iters} ${results_path} ${n_procs}
 elif [ ${comm_pattern} == "unstructured_mesh" ]; then
-    sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${run_idx_low} ${run_idx_high} ${n_nodes} ${n_iters} ${results_path} ${n_procs} ${msg_sizes}
+    sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh 1 ${run_count} ${n_nodes} ${n_iters} ${results_path} ${n_procs} ${msg_sizes}
 fi
