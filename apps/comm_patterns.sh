@@ -8,19 +8,19 @@
 
 
 # User Input
-n_procs=$1
-n_nodes=$2
-comm_pattern=$3
-scheduler=$4
-run_idx_low=$5
-run_idx_high=$6
-
+#n_procs=$1
+comm_pattern=$1
+#scheduler=$2
+#n_nodes=$2
+run_idx_low=$2
+run_idx_high=$3
+results_path=$4
 
 # Define Needed Paths
 root_path=$HOME/Src_ANACIN-X
 config_path=${root_path}/apps/comm_pattern_generator/config
 comm_pattern_path=${root_path}/apps/comm_pattern_generator/${scheduler}
-results_path=/data/gclab/anacin-n/anacin_results/${comm_pattern}
+#results_path=/data/gclab/anacin-n/anacin_results/${comm_pattern}
 
 
 # Reset results path
@@ -30,15 +30,23 @@ results_path=/data/gclab/anacin-n/anacin_results/${comm_pattern}
 
 
 # Pick a scheduler
-#scheduler=lsf
+scheduler=lsf
 #scheduler=slurm
 
 
-# Decide the Message Sizes and Number of Iterations to Use
-# (Currently doesn't work with msg_size=1
+# Decide the Message Sizes to use
+# (Currently doesn't work with msg_size=1 unless on message race
 msg_sizes=(512 2048)
-n_iters=10
+
+# Decide number of iterations
+n_iters=(1)
+
+# Decide number of processes
+n_procs=(10)
+
+#Other variables needed
 nd_neighbor_fraction=0.2
+n_nodes=1
 
 
 # Run Comm Pattern Script
@@ -47,7 +55,7 @@ if [ ${comm_pattern} == "message_race" ]; then
 elif [ ${comm_pattern} == "amg2013" ]; then
     sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${run_idx_low} ${run_idx_high} ${results_path} ${msg_sizes}
 elif [ ${comm_pattern} == "mini_mcb" ]; then
-    sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${run_idx_low} ${run_idx_high} ${n_nodes} ${results_path}
+    sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${run_idx_low} ${run_idx_high} ${n_nodes} ${n_iters} ${results_path} ${n_procs}
 elif [ ${comm_pattern} == "unstructured_mesh" ]; then
-    sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${run_idx_low} ${run_idx_high} ${n_nodes} ${results_path}
+    sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${run_idx_low} ${run_idx_high} ${n_nodes} ${n_iters} ${results_path} ${n_procs} ${msg_sizes}
 fi

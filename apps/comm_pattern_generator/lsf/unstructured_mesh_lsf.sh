@@ -5,6 +5,8 @@ run_idx_high=$2
 n_nodes=$3
 n_iters=$4
 results_root=$5
+run_scales=$6
+message_sizes=$7
 
 echo "Starting Unstructured Mesh Run"
 source ./example_paths_lsf.config
@@ -16,8 +18,8 @@ function join_by { local d=$1; shift; local f=$1; shift; printf %s "$f" "${@/#/$
 
 #proc_placement=("pack" "spread")
 proc_placement=("pack")
-run_scales=(64)
-message_sizes=(512)
+#run_scales=(64)
+#message_sizes=(512)
 nd_neighbor_fractions=("0" "0.25" "0.5" "0.75" "1")
 #nd_neighbor_fractions=("0")
 
