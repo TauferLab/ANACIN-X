@@ -1,0 +1,433 @@
+{
+    "comm_patterns": [
+        {
+            "pattern_name": "unstructured_mesh",
+            "n_iters": 1,
+            "nd_fraction": 0.0,
+            "params": [
+                {
+                    "key": "nd_fraction_neighbors",
+                    "val": "0.5"
+                },
+                {
+                    "key": "n_procs_x",
+                    "val": "4"
+                },
+                {
+                    "key": "n_procs_y",
+                    "val": "3"
+                },
+                {
+                    "key": "n_procs_z",
+                    "val": "2"
+                },
+                {
+                    "key": "min_deg",
+                    "val": "10"
+                },
+                {
+                    "key": "max_deg",
+                    "val": "10"
+                },
+                {
+                    "key": "max_dist",
+                    "val": "4"
+                },
+                {
+                    "key": "msg_size",
+                    "val": "512"
+                }
+            ]
+        },
+        {
+            "pattern_name": "unstructured_mesh",
+            "n_iters": 1,
+            "nd_fraction": 0.1,
+            "params": [
+                {
+                    "key": "nd_fraction_neighbors",
+                    "val": "0.5"
+                },
+                {
+                    "key": "n_procs_x",
+                    "val": "4"
+                },
+                {
+                    "key": "n_procs_y",
+                    "val": "3"
+                },
+                {
+                    "key": "n_procs_z",
+                    "val": "2"
+                },
+                {
+                    "key": "min_deg",
+                    "val": "10"
+                },
+                {
+                    "key": "max_deg",
+                    "val": "10"
+                },
+                {
+                    "key": "max_dist",
+                    "val": "4"
+                },
+                {
+                    "key": "msg_size",
+                    "val": "512"
+                }
+            ]
+        },
+        {
+            "pattern_name": "unstructured_mesh",
+            "n_iters": 1,
+            "nd_fraction": 0.2,
+            "params": [
+                {
+                    "key": "nd_fraction_neighbors",
+                    "val": "0.5"
+                },
+                {
+                    "key": "n_procs_x",
+                    "val": "4"
+                },
+                {
+                    "key": "n_procs_y",
+                    "val": "3"
+                },
+                {
+                    "key": "n_procs_z",
+                    "val": "2"
+                },
+                {
+                    "key": "min_deg",
+                    "val": "10"
+                },
+                {
+                    "key": "max_deg",
+                    "val": "10"
+                },
+                {
+                    "key": "max_dist",
+                    "val": "4"
+                },
+                {
+                    "key": "msg_size",
+                    "val": "512"
+                }
+            ]
+        },
+        {
+            "pattern_name": "unstructured_mesh",
+            "n_iters": 1,
+            "nd_fraction": 0.3,
+            "params": [
+                {
+                    "key": "nd_fraction_neighbors",
+                    "val": "0.5"
+                },
+                {
+                    "key": "n_procs_x",
+                    "val": "4"
+                },
+                {
+                    "key": "n_procs_y",
+                    "val": "3"
+                },
+                {
+                    "key": "n_procs_z",
+                    "val": "2"
+                },
+                {
+                    "key": "min_deg",
+                    "val": "10"
+                },
+                {
+                    "key": "max_deg",
+                    "val": "10"
+                },
+                {
+                    "key": "max_dist",
+                    "val": "4"
+                },
+                {
+                    "key": "msg_size",
+                    "val": "512"
+                }
+            ]
+        },
+        {
+            "pattern_name": "unstructured_mesh",
+            "n_iters": 1,
+            "nd_fraction": 0.4,
+            "params": [
+                {
+                    "key": "nd_fraction_neighbors",
+                    "val": "0.5"
+                },
+                {
+                    "key": "n_procs_x",
+                    "val": "4"
+                },
+                {
+                    "key": "n_procs_y",
+                    "val": "3"
+                },
+                {
+                    "key": "n_procs_z",
+                    "val": "2"
+                },
+                {
+                    "key": "min_deg",
+                    "val": "10"
+                },
+                {
+                    "key": "max_deg",
+                    "val": "10"
+                },
+                {
+                    "key": "max_dist",
+                    "val": "4"
+                },
+                {
+                    "key": "msg_size",
+                    "val": "512"
+                }
+            ]
+        },
+        {
+            "pattern_name": "unstructured_mesh",
+            "n_iters": 1,
+            "nd_fraction": 0.5,
+            "params": [
+                {
+                    "key": "nd_fraction_neighbors",
+                    "val": "0.5"
+                },
+                {
+                    "key": "n_procs_x",
+                    "val": "4"
+                },
+                {
+                    "key": "n_procs_y",
+                    "val": "3"
+                },
+                {
+                    "key": "n_procs_z",
+                    "val": "2"
+                },
+                {
+                    "key": "min_deg",
+                    "val": "10"
+                },
+                {
+                    "key": "max_deg",
+                    "val": "10"
+                },
+                {
+                    "key": "max_dist",
+                    "val": "4"
+                },
+                {
+                    "key": "msg_size",
+                    "val": "512"
+                }
+            ]
+        },
+        {
+            "pattern_name": "unstructured_mesh",
+            "n_iters": 1,
+            "nd_fraction": 0.6,
+            "params": [
+                {
+                    "key": "nd_fraction_neighbors",
+                    "val": "0.5"
+                },
+                {
+                    "key": "n_procs_x",
+                    "val": "4"
+                },
+                {
+                    "key": "n_procs_y",
+                    "val": "3"
+                },
+                {
+                    "key": "n_procs_z",
+                    "val": "2"
+                },
+                {
+                    "key": "min_deg",
+                    "val": "10"
+                },
+                {
+                    "key": "max_deg",
+                    "val": "10"
+                },
+                {
+                    "key": "max_dist",
+                    "val": "4"
+                },
+                {
+                    "key": "msg_size",
+                    "val": "512"
+                }
+            ]
+        },
+        {
+            "pattern_name": "unstructured_mesh",
+            "n_iters": 1,
+            "nd_fraction": 0.7,
+            "params": [
+                {
+                    "key": "nd_fraction_neighbors",
+                    "val": "0.5"
+                },
+                {
+                    "key": "n_procs_x",
+                    "val": "4"
+                },
+                {
+                    "key": "n_procs_y",
+                    "val": "3"
+                },
+                {
+                    "key": "n_procs_z",
+                    "val": "2"
+                },
+                {
+                    "key": "min_deg",
+                    "val": "10"
+                },
+                {
+                    "key": "max_deg",
+                    "val": "10"
+                },
+                {
+                    "key": "max_dist",
+                    "val": "4"
+                },
+                {
+                    "key": "msg_size",
+                    "val": "512"
+                }
+            ]
+        },
+        {
+            "pattern_name": "unstructured_mesh",
+            "n_iters": 1,
+            "nd_fraction": 0.8,
+            "params": [
+                {
+                    "key": "nd_fraction_neighbors",
+                    "val": "0.5"
+                },
+                {
+                    "key": "n_procs_x",
+                    "val": "4"
+                },
+                {
+                    "key": "n_procs_y",
+                    "val": "3"
+                },
+                {
+                    "key": "n_procs_z",
+                    "val": "2"
+                },
+                {
+                    "key": "min_deg",
+                    "val": "10"
+                },
+                {
+                    "key": "max_deg",
+                    "val": "10"
+                },
+                {
+                    "key": "max_dist",
+                    "val": "4"
+                },
+                {
+                    "key": "msg_size",
+                    "val": "512"
+                }
+            ]
+        },
+        {
+            "pattern_name": "unstructured_mesh",
+            "n_iters": 1,
+            "nd_fraction": 0.9,
+            "params": [
+                {
+                    "key": "nd_fraction_neighbors",
+                    "val": "0.5"
+                },
+                {
+                    "key": "n_procs_x",
+                    "val": "4"
+                },
+                {
+                    "key": "n_procs_y",
+                    "val": "3"
+                },
+                {
+                    "key": "n_procs_z",
+                    "val": "2"
+                },
+                {
+                    "key": "min_deg",
+                    "val": "10"
+                },
+                {
+                    "key": "max_deg",
+                    "val": "10"
+                },
+                {
+                    "key": "max_dist",
+                    "val": "4"
+                },
+                {
+                    "key": "msg_size",
+                    "val": "512"
+                }
+            ]
+        },
+        {
+            "pattern_name": "unstructured_mesh",
+            "n_iters": 1,
+            "nd_fraction": 1.0,
+            "params": [
+                {
+                    "key": "nd_fraction_neighbors",
+                    "val": "0.5"
+                },
+                {
+                    "key": "n_procs_x",
+                    "val": "4"
+                },
+                {
+                    "key": "n_procs_y",
+                    "val": "3"
+                },
+                {
+                    "key": "n_procs_z",
+                    "val": "2"
+                },
+                {
+                    "key": "min_deg",
+                    "val": "10"
+                },
+                {
+                    "key": "max_deg",
+                    "val": "10"
+                },
+                {
+                    "key": "max_dist",
+                    "val": "4"
+                },
+                {
+                    "key": "msg_size",
+                    "val": "512"
+                }
+            ]
+        }
+    ]
+}
