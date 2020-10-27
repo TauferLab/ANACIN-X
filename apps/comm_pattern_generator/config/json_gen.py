@@ -22,7 +22,6 @@ if sys.argv[1] == "amg2013":
 
 elif sys.argv[1] == "naive_reduce":
     nd_frac = 0.0
-    print("e")
     for i in range(0, 11):
         out["comm_patterns"].append({"pattern_name": sys.argv[1],
                                    "n_iters": 10,
