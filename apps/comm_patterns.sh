@@ -2,8 +2,8 @@
 
 
 # To Make this Script Work
-# 1. Turn msg_sizes into a pass
-# 2. Make mini mcb and unstructured mesh take n_procs as pass
+# /1. Turn msg_sizes into a pass
+# /2. Make mini mcb and unstructured mesh take n_procs as pass
 # 3. Have generators use n_nodes dynamically
 
 
@@ -14,7 +14,7 @@ comm_pattern=$1
 #n_nodes=$2
 #run_idx_low=$2
 #run_idx_high=$3
-run_count$2
+run_count=$2
 results_path=$3
 
 # Define Needed Paths
@@ -51,6 +51,9 @@ n_nodes=1
 
 
 # Run Comm Pattern Script
+for iters
+
+
 if [ ${comm_pattern} == "message_race" ]; then
     sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} 1 ${run_count} ${results_path} ${msg_sizes}
 elif [ ${comm_pattern} == "amg2013" ]; then
