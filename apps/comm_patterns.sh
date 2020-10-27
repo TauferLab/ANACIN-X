@@ -37,13 +37,13 @@ scheduler=lsf
 
 # Decide the Message Sizes to use
 # (Currently doesn't work with msg_size=1 unless on message race
-msg_sizes=(512 2048)
+message_sizes=(512 2048)
 
 # Decide number of iterations
-n_iters=(1)
+num_iters=(1)
 
 # Decide number of processes
-n_procs=(10)
+num_procs=(10)
 
 #Other variables needed
 nd_neighbor_fraction=0.2
@@ -51,15 +51,21 @@ n_nodes=1
 
 
 # Run Comm Pattern Script
-for iters
-
-
-if [ ${comm_pattern} == "message_race" ]; then
-    sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} 1 ${run_count} ${results_path} ${msg_sizes}
-elif [ ${comm_pattern} == "amg2013" ]; then
-    sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} 1 ${runc_count} ${results_path} ${msg_sizes}
-elif [ ${comm_pattern} == "mini_mcb" ]; then
-    sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh 1 ${run_count} ${n_nodes} ${n_iters} ${results_path} ${n_procs}
-elif [ ${comm_pattern} == "unstructured_mesh" ]; then
-    sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh 1 ${run_count} ${n_nodes} ${n_iters} ${results_path} ${n_procs} ${msg_sizes}
-fi
+for n_iters in ${num_iters[@]};
+do
+    for n_procs in ${num_procs[@]};
+    do
+	for msg_sizes in ${message_sizes[@]};
+	do
+	    if [ ${comm_pattern} == "message_race" ]; then
+		sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} 1 ${run_count} ${results_path} ${msg_sizes}
+	    elif [ ${comm_pattern} == "amg2013" ]; then
+		sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} 1 ${runc_count} ${results_path} ${msg_sizes}
+	    elif [ ${comm_pattern} == "mini_mcb" ]; then
+		sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh 1 ${run_count} ${n_nodes} ${n_iters} ${results_path} ${n_procs}
+	    elif [ ${comm_pattern} == "unstructured_mesh" ]; then
+		sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh 1 ${run_count} ${n_nodes} ${n_iters} ${results_path} ${n_procs} ${msg_sizes}
+	    fi
+	done
+    done
+done
