@@ -11,7 +11,7 @@ results_root=$6
 #echo "sourcing"
 #source ./lsf_kae_paths.config
 source ./example_paths_lsf.config
-#echo "done"
+echo "done" sourcing
 
 # Convenience function for making the dependency lists for the kernel distance
 # time series job
@@ -37,7 +37,7 @@ run_scales=(32)
 interleave_options=("interleaved" "non_interleaved")
 
 
-#echo "before the loops"
+echo "before the loops"
 #for iters in ${n_iters[@]};
 #do
 for proc_placement in ${proc_placement[@]};
@@ -77,7 +77,8 @@ do
 	    if [ ${proc_placement} == "pack" ]; then
 		#n_nodes_trace=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
 		#echo "Starting Trace Execution"
-		trace_stdout=$( bsub -n ${n_procs} -R "span[ptile=16]" -o ${debugging_path}/trace_exec_output.txt -e ${debugging_path}/trace_exec_error.txt ${job_script_trace_pack_procs} ${n_procs} ${app} ${config} )
+		echo ${n_procs}
+		trace_stdout=$( bsub -n ${n_procs} -R "span[ptile=32]" -o ${debugging_path}/trace_exec_output.txt -e ${debugging_path}/trace_exec_error.txt ${job_script_trace_pack_procs} ${n_procs} ${app} ${config} )
 	    elif [ ${proc_placement} == "spread" ]; then
 		n_nodes_trace=${n_procs}
 		#trace_stdout=$( bsub -nnodes ${n_nodes_trace} ${job_script_trace_spread_procs} ${n_procs} ${app} ${config} )
@@ -85,16 +86,17 @@ do
 	    trace_job_id=$( echo ${trace_stdout} | sed 's/[^0-9]*//g' )
 	    #		echo "$trace_job_id is the id for this run of the tracer."
 	    
+	    echo ${n_procs}
 	    # Build event graph
 	    #n_nodes_build_graph=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
 	    #ptile_arg=$(echo "${n_procs} / ${n_nodes}" | bc)
-	    build_graph_stdout=$( bsub -n ${n_procs} -R "span[ptile=16]" -w "done(${trace_job_id})" -o ${debugging_path}/build_graph_output.txt -e ${debugging_path}/build_graph_error.txt ${job_script_build_graph} ${n_procs} ${dumpi_to_graph_bin} ${dumpi_to_graph_config} ${run_dir} )
+	    build_graph_stdout=$( bsub -n ${n_procs} -R "span[ptile=32]" -w "done(${trace_job_id})" -o ${debugging_path}/build_graph_output.txt -e ${debugging_path}/build_graph_error.txt ${job_script_build_graph} ${n_procs} ${dumpi_to_graph_bin} ${dumpi_to_graph_config} ${run_dir} )
 	    build_graph_job_id=$( echo ${build_graph_stdout} | sed 's/[^0-9]*//g' )
 	    event_graph=${run_dir}/event_graph.graphml
 	    #		echo "exiting graph build"
 	    
 	    # Extract slices
-	    extract_slices_stdout=$( bsub -n ${n_procs} -R "span[ptile=16]" -w "done(${build_graph_job_id})" -o ${debugging_path}/extract_slices_output.txt -e ${debugging_path}/extract_slices_error.txt ${job_script_extract_slices} ${n_procs_extract_slices} ${extract_slices_script} ${event_graph} ${slicing_policy} )
+	    extract_slices_stdout=$( bsub -n ${n_procs} -R "span[ptile=32]" -w "done(${build_graph_job_id})" -o ${debugging_path}/extract_slices_output.txt -e ${debugging_path}/extract_slices_error.txt ${job_script_extract_slices} ${n_procs_extract_slices} ${extract_slices_script} ${event_graph} ${slicing_policy} )
 	    extract_slices_job_id=$( echo ${extract_slices_stdout} | sed 's/[^0-9]*//g' ) 
 	    kdts_job_deps+=("done(${extract_slices_job_id})")
 	    #		echo "exiting slice extraction"
@@ -106,7 +108,7 @@ do
 	kdts_job_dep_str=$( join_by "&&" ${kdts_job_deps[@]} )
 	#echo ${kdts_job_dep_str}
 	cd ${runs_root}
-	compute_kdts_stdout=$( bsub -n ${n_procs} -R "span[ptile=16]" -w ${kdts_job_dep_str} -o ${debugging_path}/compute_kdts_output.txt -e ${debugging_path}/compute_kdts_error.txt ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} ${slicing_policy} )
+	compute_kdts_stdout=$( bsub -n ${n_procs} -R "span[ptile=32]" -w ${kdts_job_dep_str} -o ${debugging_path}/compute_kdts_output.txt -e ${debugging_path}/compute_kdts_error.txt ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} ${slicing_policy} )
 	#	    echo "exiting kdts"        
 	#compute_kdts_stdout=$( sbatch -N${n_nodes_compute_kdts} ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} )
 	compute_kdts_job_id=$( echo ${compute_kdts_stdout} | sed 's/[^0-9]*//g' )

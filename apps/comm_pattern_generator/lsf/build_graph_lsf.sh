@@ -17,4 +17,6 @@ trace_dir=$4
 #fi
 #n_nodes=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
 
+echo ${n_procs}
+
 mpirun -np ${n_procs} ${dumpi_to_graph_bin} ${dumpi_to_graph_config} ${trace_dir}

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Clean up previous installations
-rm -rf ./submodules/*
+#rm -rf ./submodules/*
 
 n_columns=$(stty size | awk '{print $2}')
 progress_delimiter=""
@@ -16,7 +16,7 @@ echo ${progress_delimiter}
 echo "Fetching submodules..."
 echo ${progress_delimiter}
 echo
-git submodule update --init --recursive
+#git submodule update --init --recursive
 echo
 echo ${progress_delimiter}
 echo "Done fetching submodules."
