@@ -77,7 +77,7 @@ do
 	    if [ ${proc_placement} == "pack" ]; then
 		#n_nodes_trace=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
 		#echo "Starting Trace Execution"
-		echo ${n_procs}
+#		echo ${n_procs}
 		trace_stdout=$( bsub -n ${n_procs} -R "span[ptile=32]" -o ${debugging_path}/trace_exec_output.txt -e ${debugging_path}/trace_exec_error.txt ${job_script_trace_pack_procs} ${n_procs} ${app} ${config} )
 	    elif [ ${proc_placement} == "spread" ]; then
 		n_nodes_trace=${n_procs}
@@ -86,7 +86,7 @@ do
 	    trace_job_id=$( echo ${trace_stdout} | sed 's/[^0-9]*//g' )
 	    #		echo "$trace_job_id is the id for this run of the tracer."
 	    
-	    echo ${n_procs}
+#	    echo ${n_procs}
 	    # Build event graph
 	    #n_nodes_build_graph=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
 	    #ptile_arg=$(echo "${n_procs} / ${n_nodes}" | bc)

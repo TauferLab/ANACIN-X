@@ -38,13 +38,17 @@ comm_pattern_path=${root_path}/apps/comm_pattern_generator/${scheduler}
 # Decide the Message Sizes to use
 # (Currently doesn't work with msg_size=1 unless on message race
 message_sizes=(512)
+#message_sizes=(2)
 
 # Decide number of iterations
-num_iters=(2 4 8)
+num_iters=(1)
+#num_iters=(2 4 8)
+#num_iters=(10)
 
 # Decide number of processes
 #num_procs=(4 8 16 32)
-num_procs=(4 8)
+num_procs=(16)
+#num_procs=(10)
 
 #Other variables needed
 nd_neighbor_fraction=0.2
@@ -62,14 +66,16 @@ do
             rm -rf ${results_path}/*
             #cd ${comm_pattern_path}
 	    if [ ${comm_pattern} == "message_race" ]; then
-		sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} 1 ${run_count} ${results_path}
+		#bash ${comm_pattern_path}/${comm_pattern}.sh ${n_procs} ${n_iters} ${msg_sizes} 1 ${run_count} ${results_path}
+		bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} 1 ${run_count} ${results_path}
 #		cp ${results_path}/msg_size_${msg_sizes}/without_ninja/run_${run_idx}/event_graph.graphml ${results_path}/../comm_pattern_graphs/graph_niters_${n_iters}_nprocs_${n_procs}_msg_size_${msg_sizes}_run_${run_idx}.graphml
 	    elif [ ${comm_pattern} == "amg2013" ]; then
-		sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} 1 ${run_count} ${results_path}
+		bash ${comm_pattern_path}/${comm_pattern}.sh ${n_procs} ${n_iters} ${msg_sizes} 1 ${run_count} ${results_path}
+		#bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} 1 ${run_count} ${results_path}
 	    elif [ ${comm_pattern} == "mini_mcb" ]; then
-		sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh 1 ${run_count} ${n_nodes} ${n_iters} ${n_procs} ${results_path}
+		bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh 1 ${run_count} ${n_nodes} ${n_iters} ${n_procs} ${results_path}
 	    elif [ ${comm_pattern} == "unstructured_mesh" ]; then
-		sh ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh 1 ${run_count} ${n_nodes} ${n_iters} ${n_procs} ${msg_sizes} ${results_path}
+		bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh 1 ${run_count} ${n_nodes} ${n_iters} ${n_procs} ${msg_sizes} ${results_path}
 	    fi
 	done
     done
