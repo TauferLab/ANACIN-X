@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Clean up previous installations
-#rm -rf ./submodules/*
+rm -rf ./submodules/*
 
 n_columns=$(stty size | awk '{print $2}')
 progress_delimiter=""
@@ -16,7 +16,7 @@ echo ${progress_delimiter}
 echo "Fetching submodules..."
 echo ${progress_delimiter}
 echo
-#git submodule update --init --recursive
+git submodule update --init --recursive
 echo
 echo ${progress_delimiter}
 echo "Done fetching submodules."
@@ -78,9 +78,9 @@ echo ${progress_delimiter}
 echo "Patching tracing libraries for use with PnMPI..."
 echo ${progress_delimiter}
 echo 
-./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/sst-dumpi/build/lib/libdumpi.so ./anacin-x/pnmpi/patched_libs/libdumpi.so
-./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/csmpi/build/libcsmpi.so ./anacin-x/pnmpi/patched_libs/libcsmpi.so
-./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/ninja/build/libninja.so ./anacin-x/pnmpi/patched_libs/libninja.so
+./submodules/PnMPI/build_tellico-master/bin/pnmpi-patch ./submodules/sst-dumpi/build_tellico-master/lib/libdumpi.so ./anacin-x/pnmpi/patched_libs/libdumpi.so
+./submodules/PnMPI/build_tellico-master/bin/pnmpi-patch ./submodules/csmpi/build/libcsmpi.so ./anacin-x/pnmpi/patched_libs/libcsmpi.so
+./submodules/PnMPI/build_tellico-master/bin/pnmpi-patch ./submodules/ninja/build/libninja.so ./anacin-x/pnmpi/patched_libs/libninja.so
 echo
 echo ${progress_delimiter}
 echo "Done patching tracing libraries for use with PnMPI..."
