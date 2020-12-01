@@ -11,4 +11,4 @@ source ./example_paths_lsf.config
 
 amg2013_script=${anacin_x_root}/apps/comm_pattern_generator/lsf/amg2013.sh
 
-bsub -n ${n_procs} > ${debugging_path}/lsf_output.txt 2> ${debugging_path}/lsf_error.txt ${amg2013_script} ${n_procs} ${n_iters} ${msg_size} ${run_idx_low} ${run_idx_high} ${results_root}
+bsub -n ${n_procs} -o ${debugging_path}/lsf_output.txt -e ${debugging_path}/lsf_error.txt ${amg2013_script} ${n_procs} ${n_iters} ${msg_size} ${run_idx_low} ${run_idx_high} ${results_root}
