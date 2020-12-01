@@ -44,6 +44,8 @@ do
     # Extract slices
     mpirun -np 10 > ${debugging_path}/extract_slices_output.txt 2> ${debugging_path}/extract_slices_error.txt ${extract_slices_script} ${event_graph} ${slicing_policy} -o "slices"
 
+    #cp ${event_graph} ${results_root}/../comm_pattern_graphs/graph_amg2013_niters_${n_iters}_nprocs_${n_procs}_msg_size_${msg_size}_run_${run_idx}.graphml
+
 done
 
 # Compute KDTS
