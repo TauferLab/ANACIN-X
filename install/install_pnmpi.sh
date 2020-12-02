@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 system=$( hostname | sed 's/[0-9]*//g' )
-build_dir="build_${system}/"
+#build_dir="build_${system}/"
+build_dir=build
 
 cd submodules/PnMPI
 git submodule update --init --recursive
