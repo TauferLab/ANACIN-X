@@ -54,12 +54,15 @@ do
 
 	    #echo "Starting Trace Execution"
             # Create config if doesn't exist
-            config=${anacin_x_root}/apps/comm_pattern_generator/config/unstructured_mesh_${proc_grid}_nd_neighbor_fraction_${nd_neighbor_fraction}_msg_size_${msg_size}.json
-#	    config=${anacin_x_root}/apps/comm_pattern_generator/config/unstructured_mesh_${proc_grid}_nd_neighbor_fraction_${nd_neighbor_fraction}_msg_size_${msg_size}_niters_${n_iters}.json
-#	    if [ ! -f "config" ]; then
-#		python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "unstructured_mesh" ${nd_neighbor_fraction} 4 3 2 ${msg_size} ${n_iters}
-#	    fi
-
+#            config=${anacin_x_root}/apps/comm_pattern_generator/config/unstructured_mesh_${proc_grid}_nd_neighbor_fraction_${nd_neighbor_fraction}_msg_size_${msg_size}.json
+	    config=${anacin_x_root}/apps/comm_pattern_generator/config/unstructured_mesh_${proc_grid}_nd_neighbor_fraction_${nd_neighbor_fraction}_msg_size_${msg_size}_niters_${n_iters}.json
+	    if [ ! -f "config" ]; then
+		old_dir=$PWD
+		cd ${anacin_x_root}/apps/comm_pattern_generator/config
+		python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "unstructured_mesh" ${nd_neighbor_fraction} 4 3 2 ${msg_size} ${n_iters}
+		cd ${old_dir}
+	    fi
+	    
 	    # Trace execution
 	    n_procs_per_node=$((n_procs/n_nodes))
             if [ ${proc_placement} == "pack" ]; then

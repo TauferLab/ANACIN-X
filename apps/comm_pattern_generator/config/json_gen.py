@@ -1,6 +1,8 @@
 import json
 import sys
+import os
 
+#print(os.getcwd())
 out = {"comm_patterns": []}
 
 
@@ -113,6 +115,6 @@ elif sys.argv[1] == "unstructured_mesh":
                                        }
                                    ]})
         nd_frac += 0.1
-    with open("../config/unstructured_mesh_{}x{}x{}_nd_neighbor_fraction_{}_msg_size_{}_niters_{}.json".format(sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[2], sys.argv[6], int(sys.argv[7])), 'w+') as f:
+    with open("../config/unstructured_mesh_{}x{}x{}_nd_neighbor_fraction_{}_msg_size_{}_niters_{}.json".format(int(sys.argv[3]), int(sys.argv[4]), int(sys.argv[5]), sys.argv[2], int(sys.argv[6]), int(sys.argv[7])), 'w+') as f:
         json.dump(out, f, indent=4)
 
