@@ -3,9 +3,10 @@
 n_procs=$1
 n_iters=$2
 msg_size=$3
-run_idx_low=$4
-run_idx_high=$5
-results_root=$6
+n_nodes=$4
+run_idx_low=$5
+run_idx_high=$6
+results_root=$7
 
 source ./example_paths_lsf.config
 
