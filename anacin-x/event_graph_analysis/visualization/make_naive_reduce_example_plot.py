@@ -124,11 +124,11 @@ def main( kdts_path ):
 
     # Tick labels
     tick_label_fontdict = {"fontsize" : 12}
-    x_tick_labels = [ "0", "20", "30", "40", "50", "60", "70", "80", "90", "100" ]
+    x_tick_labels = [ "0", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100" ]
     x_ticks = list(range(len(x_tick_labels)))
     ax.set_xticks( x_ticks )
     ax.set_xticklabels( x_tick_labels, rotation=0, fontdict=tick_label_fontdict )
-    y_ticks = [ 0, 5, 10, 15, 20, 25, 30, 35, 40 ]
+    y_ticks = [ 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80 ]
     y_tick_labels = [ str(y) for y in y_ticks ]
     ax.set_yticks( y_ticks )
     ax.set_yticklabels( y_tick_labels, rotation=0, fontdict=tick_label_fontdict )
@@ -141,7 +141,7 @@ def main( kdts_path ):
     ax.set_ylabel( y_axis_label, fontdict=axis_label_fontdict )
 
     # Plot Title
-    plot_title = "Percentage of Wildcard Receives vs. Kernel Distance - Communication Pattern: Naive Reduce"
+    plot_title = "Percentage of Wildcard Receives vs. Kernel Distance - Communication Pattern: Message Race"
     title_fontdict = {"fontsize" : 20}
     plt.title( plot_title, fontdict=title_fontdict )
 
