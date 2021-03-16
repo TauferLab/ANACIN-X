@@ -214,6 +214,8 @@ Check that each slice directory has appropriate contents
 """
 def validate_slice_dirs( slice_dirs ):
     slice_counts = set()
+    #for sd in slice_dirs:
+    #    print(str(sd))
     for sd in slice_dirs:
         assert( os.path.isdir(str(sd)) )
         assert( sd.is_dir() )

@@ -38,6 +38,19 @@ echo
 
 echo
 echo ${progress_delimiter}
+echo "Building Pluto..."
+echo ${progress_delimiter}
+echo
+./install/install_pluto.sh
+echo 
+echo ${progress_delimiter}
+echo "Done building Pluto."
+echo ${progress_delimiter}
+echo
+
+
+echo
+echo ${progress_delimiter}
 echo "Building NINJA Noise-Injection Agent..."
 echo ${progress_delimiter}
 echo
@@ -81,6 +94,8 @@ echo
 ./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/sst-dumpi/build/lib/libdumpi.so ./anacin-x/pnmpi/patched_libs/libdumpi.so
 ./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/csmpi/build/libcsmpi.so ./anacin-x/pnmpi/patched_libs/libcsmpi.so
 ./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/ninja/build/libninja.so ./anacin-x/pnmpi/patched_libs/libninja.so
+./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/Src_Pluto/build/libpluto.so ./anacin-x/pnmpi/patched_libs/libpluto.so
+
 echo
 echo ${progress_delimiter}
 echo "Done patching tracing libraries for use with PnMPI..."

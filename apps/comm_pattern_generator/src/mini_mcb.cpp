@@ -50,7 +50,7 @@ int get_hash(int original_val, int max) {
 #define MAX_MESG_PASS (10)
 
 //#define USE_MPI_ISEND
-#define USE_BIN_REDUCTION
+//#define USE_BIN_REDUCTION
 //#define USE_WAITALL
 #define USE_COMM_DUP
 
@@ -322,14 +322,22 @@ void neighbor_communication(int non_deterministic)
   while (!is_finished()) {
     int testsome_outcount;
     int testsome_array_of_indices[NUM_KV_PER_RANK];
-
+    testsome_array_of_indices[0] = 0;
+    testsome_array_of_indices[1] = 1;
+    testsome_array_of_indices[2] = 2;
     do_work();
 
     testsome_outcount = 0;
     memset(status, 0, sizeof(MPI_Status) * NUM_KV_PER_RANK);
-    
+
+    if(true){
+       MPI_Waitall(NUM_KV_PER_RANK, request, MPI_STATUS_IGNORE);
+       testsome_outcount = NUM_KV_PER_RANK;
+    }
+    else{    
     MPI_Testsome(NUM_KV_PER_RANK, request,
 		 &testsome_outcount, testsome_array_of_indices, status);
+    }
 
     if (testsome_outcount == 0) {
       hash_count++;

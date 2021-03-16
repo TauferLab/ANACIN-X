@@ -16,3 +16,6 @@
 [submodule "submodules/pmpi_timer"]
 	path = submodules/pmpi_timer
 	url = git@github.com:TauferLab/PMPI_timer.git
+[submodule "submodules/Src_Pluto"]
+	path = submodules/Src_Pluto
+	url = git@github.com:TauferLab/Src_Pluto.git

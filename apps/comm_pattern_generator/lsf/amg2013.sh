@@ -3,9 +3,9 @@
 n_procs=$1
 n_iters=$2
 msg_size=$3
-run_idx_low=$4
-run_idx_high=$5
-results_root=$6
+run_idx_low=$5
+run_idx_high=$6
+results_root=$7
 
 source ./example_paths_lsf.config
 
@@ -22,7 +22,6 @@ source ./example_paths_lsf.config
 #	do
 for run_idx in `seq -f "%03g" ${run_idx_low} ${run_idx_high}`; 
 do
-
     # Create needed paths
     run_dir=${results_root}/msg_size_${msg_size}/without_ninja/run_${run_idx}/
     mkdir -p ${run_dir}
@@ -36,6 +35,7 @@ do
     # Trace execution
     LD_PRELOAD=${pnmpi} PNMPI_LIB_PATH=${pnmpi_lib_path} PNMPI_CONF=${pnmpi_conf} mpirun -np ${n_procs} > ${debugging_path}/trace_exec_output.txt 2> ${debugging_path}/trace_exec_error.txt ${app_bin} ${app_config}
     mv dumpi-* ${run_dir}
+    mv pluto_out* ${run_dir}
 
     # Build event graph
     mpirun -np ${n_procs} > ${debugging_path}/build_graph_output.txt 2> ${debugging_path}/build_graph_error.txt ${dumpi_to_graph_bin} ${dumpi_to_graph_config} ${run_dir}
@@ -43,6 +43,8 @@ do
 
     # Extract slices
     mpirun -np 10 > ${debugging_path}/extract_slices_output.txt 2> ${debugging_path}/extract_slices_error.txt ${extract_slices_script} ${event_graph} ${slicing_policy} -o "slices"
+
+    #cp ${event_graph} ${results_root}/../comm_pattern_graphs/graph_amg2013_niters_${n_iters}_nprocs_${n_procs}_msg_size_${msg_size}_run_${run_idx}.graphml
 
 done
 

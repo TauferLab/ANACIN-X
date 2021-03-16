@@ -3,9 +3,10 @@
 n_procs=$1
 n_iters=$2
 msg_size=$3
-run_idx_low=$4
-run_idx_high=$5
-results_root=$6
+n_nodes=$4
+run_idx_low=$5
+run_idx_high=$6
+results_root=$7
 
 source ./example_paths_lsf.config
 
@@ -45,6 +46,8 @@ do
 
     # Extract slices
     mpirun -np 10 > ${debugging_path}/extract_slices_output.txt 2> ${debugging_path}/extract_slices_error.txt ${extract_slices_script} ${event_graph} ${slicing_policy} -o "slices"
+
+    cp ${event_graph} ${results_root}/../comm_pattern_graphs/graph_message_race_niters_${n_iters}_nprocs_${n_procs}_msg_size_${msg_size}_run_${run_idx}.graphml
 
 done
 
