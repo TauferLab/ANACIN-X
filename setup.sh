@@ -140,6 +140,19 @@ echo "Done Building miniAMR."
 echo ${progress_delimiter}
 echo
 
+# Build Comm Pattern Generator
+echo
+echo ${progress_delimiter}
+echo "Building Comm Pattern Generator..."
+echo ${progress_delimiter}
+echo
+./install/install_comm_pattern_generator.sh
+echo
+echo ${progress_delimiter}
+echo "Done Building Comm Pattern Generator."
+echo ${progress_delimiter}
+echo
+
 # Set vars for job script infrastructure
 touch ./anacin-x/base_vars.sh
 echo "anacin_x_root=$(pwd)" >> ./anacin-x/base_vars.sh
