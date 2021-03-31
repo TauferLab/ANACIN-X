@@ -32,20 +32,12 @@ do
 done
 
 
-# Things to Do
-#   Request whether user needs/has spack, conda, c compiler, or mpi.
-#   Request os version of conda
-#   Have Spack environment be named by user with default of anacin_spack_env
-#   Have user define conda and spack path
-#   Ensure user has ssh key set up (Needs to be in readme, but could optionally include a conditional here)
-#   Set MPI package name in external find
-#   Automate cflag updates for graphkernels
-
 
 ### Set Up Spack Package Manager
 # Clone Spack
+if [ "yes" = "no" ]; then
 echo
-if [ ${has_spack} = no ]; then
+if [ ${has_spack} = "no" ]; then
     echo "Cloning and Activating Spack"
     echo ${progress_delimiter}
     cd ${spack_path}
@@ -61,6 +53,7 @@ echo ". ${spack_path}/spack/share/spack/setup-env.sh" >> ~/.bashrc
 echo ${progress_delimiter}
 echo "Done Preparing Spack"
 echo
+fi
 
 # Install zlib
 echo
@@ -107,7 +100,15 @@ echo ${progress_delimiter}
 echo
 echo "Loading Spack Packages"
 echo ${progress_delimiter}
-source ./load_spack.sh
+#source ./load_spack.sh
+spack load ${mpi_name}
+spack load libunwind
+spack load boost
+spack load cmake
+spack load nlohmann-json
+spack load spdlog
+spack load igraph
+spack load eigen
 echo ${progress_delimiter}
 echo "Done Loading Spack Packages"
 echo
@@ -117,6 +118,7 @@ echo
 # wget Anaconda
 echo
 echo "Setting up Conda"
+if [ "yes" = "no" ]; then
 if [ ${os_for_conda} = "linux86" ]; then
     echo ${progress_delimiter}
     wget https://repo.anaconda.com/archive/Anaconda3-2020.11-Linux-x86_64.sh
@@ -149,6 +151,8 @@ fi
 echo ${progress_delimiter}
 echo "export PATH=./anaconda3/bin:$PATH" >> ~/.bashrc
 echo ${progress_delimiter}
+fi
+
 # Add conda-forge to channels
 echo ${progress_delimiter}
 conda config --append channels conda-forge
@@ -182,7 +186,11 @@ echo ${progress_delimiter}
 echo ${progress_delimiter}
 spack unload eigen
 # Edit eigen cflags for graphkernels install
+eigpath=$(pkg-config --path eigen3)
+sed -i 's/include\/eigen3/include/' ${eigpath}
+pip install graphkernels
 # Undo edit to eigen cflags
+sed -i 's/include/include\/eigen3/' ${eigpath}
 spack load eigen
 echo ${progress_delimiter}
 echo "Done Installing Pip Packages"
