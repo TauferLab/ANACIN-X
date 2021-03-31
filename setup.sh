@@ -154,9 +154,8 @@ echo ${progress_delimiter}
 echo
 
 # Set vars for job script infrastructure
-touch ./anacin-x/base_vars.sh
-echo "anacin_x_root=$(pwd)" >> ./anacin-x/base_vars.sh
-echo "ega_x_root=${anacin_x_root}/anacin-x/event_graph_analysis/" >> ./anacin-x/base_vars.sh
+anacin_x_root=$(pwd)
+sed -i 's/anacin_x_root= /anacin_x_root=${anacin_x_root}' ./apps/comm_pattern_generator/comm_pattern_config.config
 
 ## Set up conda environment
 #conda env create -f ./install/anacin-x-environment.yml
