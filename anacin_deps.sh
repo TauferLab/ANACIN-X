@@ -60,15 +60,16 @@ fi
 echo
 echo "Set up and Activate Spack Environment"
 echo ${progress_delimiter}
+#. /home/mushi11/spack/share/spack/setup-env.sh
 spack install zlib
 echo ${progress_delimiter}
 # Create and activate spack environment
 echo ${progress_delimiter}
 spack env create ${spack_env} ./anacin_env.yaml
 echo ${progress_delimiter}
-. /home/mushi11/spack/share/spack/setup-env.sh
+#. /home/mushi11/spack/share/spack/setup-env.sh
 spack env activate ${spack_env}
-echo "spack env activate ${spack_env}" >> ~/.bashrc
+#echo "spack env activate ${spack_env}" >> ~/.bashrc
 echo ${progress_delimiter}
 echo "Done Activating Spack Environment"
 echo
@@ -161,7 +162,7 @@ fi
 
 # Add conda-forge to channels
 echo ${progress_delimiter}
-export PATH=/home/mushi11/anaconda3/bin:$PATH
+#export PATH=/home/mushi11/anaconda3/bin:$PATH
 conda config --append channels conda-forge
 echo ${progress_delimiter}
 echo "Done Setting up Conda"
@@ -193,13 +194,18 @@ echo ${progress_delimiter}
 echo ${progress_delimiter}
 spack unload eigen
 # Edit eigen cflags for graphkernels install
-eigpath=$(pkg-config --path eigen3)
-echo ${eigpath}
+#eigpath=$(pkg-config --path eigen3)
+eigpath=$(pkg-config --variable=pcfiledir eigen3)
+eigpath="${eigpath}/eigen3.pc"
+#echo ${eigpath}
+#cat ${eigpath}
 sed -i 's/include\/eigen3/include/' ${eigpath}
+#cat ${eigpath}
 #export PKG_CONFIG_PATH=/home/mushi11/anaconda3/include/:$PKG_CONFIG_PATH
 pip install graphkernels
 # Undo edit to eigen cflags
 sed -i 's/include/include\/eigen3/' ${eigpath}
+#cat ${eigpath}
 spack load eigen
 echo ${progress_delimiter}
 echo "Done Installing Pip Packages"
