@@ -4,15 +4,16 @@
 # Take Input Variables
 user_mpi_name=$1
 user_os=$2
-user_conda=$3
-user_spack=$4
-user_mpi_name=$5
+#user_conda=$3
+#user_spack=$4
+user_spack_name=$3
+echo ${user_mpi_name}
 
-has_spack=${6:-"yes"}
-has_conda=${7:-"yes"}
-has_c_comp=${8:-"yes"}
-has_mpi=${9:-"yes"}
-has_ssh=${10:-"yes"}
+has_spack=${4:-"yes"}
+has_conda=${5:-"yes"}
+has_c_comp=${6:-"yes"}
+has_mpi=${7:-"yes"}
+has_ssh=${8:-"yes"}
 
 
 # Define Conditionals for Installs
@@ -21,7 +22,7 @@ spack_env="${user_spack_name:="anacin_spack_env"}"
 conda_path="${user_conda:=""}"
 spack_path="${user_spack:=".."}"
 os_for_conda="${user_os:="linux86"}"
-
+echo ${mpi_name}
 
 ### Create Delimiter and Workflow Variables
 n_columns=$(stty size | awk '{print $2}')
@@ -63,7 +64,9 @@ spack install zlib
 echo ${progress_delimiter}
 # Create and activate spack environment
 echo ${progress_delimiter}
-spack env create ${spack_env} ./Src_ANACIN-X/anacin_env.yaml
+spack env create ${spack_env} ./anacin_env.yaml
+echo ${progress_delimiter}
+. /home/mushi11/spack/share/spack/setup-env.sh
 spack env activate ${spack_env}
 echo "spack env activate ${spack_env}" >> ~/.bashrc
 echo ${progress_delimiter}
@@ -81,6 +84,7 @@ echo ${progress_delimiter}
 # Spack external mpi find?
 echo ${progress_delimiter}
 spack external find -t ${mpi_name}
+echo ${mpi_name}
 echo ${progress_delimiter}
 echo "Done Linking Spack"
 echo
@@ -101,14 +105,16 @@ echo
 echo "Loading Spack Packages"
 echo ${progress_delimiter}
 #source ./load_spack.sh
-spack load ${mpi_name}
-spack load libunwind
-spack load boost
-spack load cmake
-spack load nlohmann-json
-spack load spdlog
-spack load igraph
-spack load eigen
+echo ${mpi_name}
+echo
+spack load ${mpi_name};
+spack load libunwind;
+spack load boost;
+spack load cmake;
+spack load nlohmann-json;
+spack load spdlog;
+spack load igraph;
+spack load eigen;
 echo ${progress_delimiter}
 echo "Done Loading Spack Packages"
 echo
@@ -155,6 +161,7 @@ fi
 
 # Add conda-forge to channels
 echo ${progress_delimiter}
+export PATH=/home/mushi11/anaconda3/bin:$PATH
 conda config --append channels conda-forge
 echo ${progress_delimiter}
 echo "Done Setting up Conda"
@@ -164,11 +171,11 @@ echo
 echo
 echo "Installing Conda Packages"
 echo ${progress_delimiter}
-conda install -y ruptures
-conda install -y pyelftools
-conda install -y pkg-config
-conda install -y pkgconfig
-conda install -y eigen=3.3.7
+conda install -y ruptures pyelftools pkg-config pkgconfig eigen=3.3.7
+#conda install -y pyelftools
+#conda install -y pkg-config
+#conda install -y pkgconfig
+#conda install -y eigen=3.3.7
 echo ${progress_delimiter}
 echo "Done Installing Conda Packages"
 echo
@@ -187,7 +194,9 @@ echo ${progress_delimiter}
 spack unload eigen
 # Edit eigen cflags for graphkernels install
 eigpath=$(pkg-config --path eigen3)
+echo ${eigpath}
 sed -i 's/include\/eigen3/include/' ${eigpath}
+#export PKG_CONFIG_PATH=/home/mushi11/anaconda3/include/:$PKG_CONFIG_PATH
 pip install graphkernels
 # Undo edit to eigen cflags
 sed -i 's/include/include\/eigen3/' ${eigpath}

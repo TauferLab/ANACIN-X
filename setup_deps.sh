@@ -61,7 +61,7 @@ done
 while true; do
         read -p "Do you already have the Spack package manager installed? (yes/no) " user_has_spack
         case ${user_has_spack} in
-        	[yY] | [yY][eE][sS] ) has_spack="yes"; read -p "What is the path to the directory where your installation of Spack is? " user_spack; break ;;
+        	[yY] | [yY][eE][sS] ) has_spack="yes"; break ;;
 		[nN] | [nN][oO] ) echo "You will need to install Spack prior to installation."
 			echo "Please review instructions for spack installation at https://spack.readthedocs.io/en/latest/getting_started.html"
 			echo "Please see https://github.com/TauferLab/Src_ANACIN-X for a full list of necessary installs."
@@ -101,14 +101,14 @@ mpi_name="${user_mpi_name:="openmpi"}"
 os_for_conda="${user_os:="linux86"}"
 
 # Needs to be correct path if on machine
-conda_path="${user_conda:=""}"
-spack_path="${user_spack:=""}"
+#conda_path="${user_conda:=""}"
+#spack_path="${user_spack:=""}"
 
 # Can be anything
 spack_env_name="${user_spack_name:="anacin_spack_env"}"
 
 
-
-#bash anacin_deps.sh ${mpi_name} ${os_for_conda} ${conda_path} ${spack_path} ${spack_env_name} ${has_spack} ${has_conda} ${has_c_comp} ${has_mpi} ${has_ssh_key} 
+#echo ${mpi_name}
+bash anacin_deps.sh ${mpi_name} ${os_for_conda} ${spack_env_name} ${has_spack} ${has_conda} ${has_c_comp} ${has_mpi} ${has_ssh_key} 
 
 
