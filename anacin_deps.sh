@@ -7,7 +7,7 @@ user_os=$2
 #user_conda=$3
 #user_spack=$4
 user_spack_name=$3
-echo ${user_mpi_name}
+#echo ${user_mpi_name}
 
 has_spack=${4:-"yes"}
 has_conda=${5:-"yes"}
@@ -22,7 +22,7 @@ spack_env="${user_spack_name:="anacin_spack_env"}"
 conda_path="${user_conda:=""}"
 spack_path="${user_spack:=".."}"
 os_for_conda="${user_os:="linux86"}"
-echo ${mpi_name}
+#echo ${mpi_name}
 
 ### Create Delimiter and Workflow Variables
 n_columns=$(stty size | awk '{print $2}')
@@ -80,12 +80,13 @@ echo
 echo "Link Spack to External Compiler and MPI"
 echo ${progress_delimiter}
 echo "Link the external compiler to spack"
+#c_comp=$(which icc)
 spack compiler find
 echo ${progress_delimiter}
 # Spack external mpi find?
 echo ${progress_delimiter}
 spack external find -t ${mpi_name}
-echo ${mpi_name}
+#echo ${mpi_name}
 echo ${progress_delimiter}
 echo "Done Linking Spack"
 echo
