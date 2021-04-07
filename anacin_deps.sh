@@ -7,7 +7,7 @@ user_os=$2
 #user_conda=$3
 #user_spack=$4
 user_spack_name=$3
-echo ${user_mpi_name}
+#echo ${user_mpi_name}
 
 has_spack=${4:-"yes"}
 has_conda=${5:-"yes"}
@@ -22,7 +22,7 @@ spack_env="${user_spack_name:="anacin_spack_env"}"
 conda_path="${user_conda:=""}"
 spack_path="${user_spack:=".."}"
 os_for_conda="${user_os:="linux86"}"
-echo ${mpi_name}
+#echo ${mpi_name}
 
 ### Create Delimiter and Workflow Variables
 n_columns=$(stty size | awk '{print $2}')
@@ -60,15 +60,16 @@ fi
 echo
 echo "Set up and Activate Spack Environment"
 echo ${progress_delimiter}
+#. /home/mushi11/spack/share/spack/setup-env.sh
 spack install zlib
 echo ${progress_delimiter}
 # Create and activate spack environment
 echo ${progress_delimiter}
 spack env create ${spack_env} ./anacin_env.yaml
 echo ${progress_delimiter}
-. /home/mushi11/spack/share/spack/setup-env.sh
+#. /home/mushi11/spack/share/spack/setup-env.sh
 spack env activate ${spack_env}
-echo "spack env activate ${spack_env}" >> ~/.bashrc
+#echo "spack env activate ${spack_env}" >> ~/.bashrc
 echo ${progress_delimiter}
 echo "Done Activating Spack Environment"
 echo
@@ -79,12 +80,13 @@ echo
 echo "Link Spack to External Compiler and MPI"
 echo ${progress_delimiter}
 echo "Link the external compiler to spack"
+#c_comp=$(which icc)
 spack compiler find
 echo ${progress_delimiter}
 # Spack external mpi find?
 echo ${progress_delimiter}
 spack external find -t ${mpi_name}
-echo ${mpi_name}
+#echo ${mpi_name}
 echo ${progress_delimiter}
 echo "Done Linking Spack"
 echo
@@ -161,7 +163,7 @@ fi
 
 # Add conda-forge to channels
 echo ${progress_delimiter}
-export PATH=/home/mushi11/anaconda3/bin:$PATH
+#export PATH=/home/mushi11/anaconda3/bin:$PATH
 conda config --append channels conda-forge
 echo ${progress_delimiter}
 echo "Done Setting up Conda"
@@ -193,13 +195,18 @@ echo ${progress_delimiter}
 echo ${progress_delimiter}
 spack unload eigen
 # Edit eigen cflags for graphkernels install
-eigpath=$(pkg-config --path eigen3)
-echo ${eigpath}
+#eigpath=$(pkg-config --path eigen3)
+eigpath=$(pkg-config --variable=pcfiledir eigen3)
+eigpath="${eigpath}/eigen3.pc"
+#echo ${eigpath}
+#cat ${eigpath}
 sed -i 's/include\/eigen3/include/' ${eigpath}
+#cat ${eigpath}
 #export PKG_CONFIG_PATH=/home/mushi11/anaconda3/include/:$PKG_CONFIG_PATH
 pip install graphkernels
 # Undo edit to eigen cflags
 sed -i 's/include/include\/eigen3/' ${eigpath}
+#cat ${eigpath}
 spack load eigen
 echo ${progress_delimiter}
 echo "Done Installing Pip Packages"
