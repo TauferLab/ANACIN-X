@@ -1,7 +1,5 @@
 #!/usr/bin/env bash                                                                                                                                                                
 
-#BSUB -o build_graph-%j.out                                                                                                                                                                                   
-#BSUB -e build_graph-%j.err                                                                                                                                                                           
 
 n_procs=$1
 dumpi_to_graph_bin=$2
