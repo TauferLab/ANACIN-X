@@ -24,7 +24,7 @@ if sys.argv[1] == "amg2013":
                                        }
                                    ]})
         nd_frac += 0.1
-    with open("../config/amg2013_msg_size_{}_niters_{}.json".format(int(sys.argv[2]), int(sys.argv[3])), 'w+') as f:
+    with open("{}/config/amg2013_msg_size_{}_niters_{}.json".format(sys.argv[4], int(sys.argv[2]), int(sys.argv[3])), 'w+') as f:
         json.dump(out, f, indent=4)
 
 elif sys.argv[1] == "naive_reduce":
@@ -40,7 +40,7 @@ elif sys.argv[1] == "naive_reduce":
                                        }
                                    ]})
         nd_frac += 0.1
-    with open("../config/message_race_msg_size_{}_niters_{}.json".format(int(sys.argv[2]), int(sys.argv[3])), 'w+') as f:
+    with open("{}/config/message_race_msg_size_{}_niters_{}.json".format(sys.argv[4], int(sys.argv[2]), int(sys.argv[3])), 'w+') as f:
         json.dump(out, f, indent=4)
 
 
@@ -85,6 +85,6 @@ elif sys.argv[1] == "unstructured_mesh":
                                        }
                                    ]})
         nd_frac += 0.1
-    with open("../config/unstructured_mesh_{}x{}x{}_nd_neighbor_fraction_{}_msg_size_{}_niters_{}.json".format(int(sys.argv[3]), int(sys.argv[4]), int(sys.argv[5]), sys.argv[2], int(sys.argv[6]), int(sys.argv[7])), 'w+') as f:
+    with open("{}/config/unstructured_mesh_{}x{}x{}_nd_neighbor_fraction_{}_msg_size_{}_niters_{}.json".format(sys.argv[8], int(sys.argv[3]), int(sys.argv[4]), int(sys.argv[5]), sys.argv[2], int(sys.argv[6]), int(sys.argv[7])), 'w+') as f:
         json.dump(out, f, indent=4)
 
