@@ -48,19 +48,6 @@ echo "Done building Pluto."
 echo ${progress_delimiter}
 echo
 
-
-echo
-echo ${progress_delimiter}
-echo "Building NINJA Noise-Injection Agent..."
-echo ${progress_delimiter}
-echo
-./install/install_ninja.sh
-echo 
-echo ${progress_delimiter}
-echo "Done building NINJA Noise-Injection Agent."
-echo ${progress_delimiter}
-echo
-
 echo
 echo ${progress_delimiter}
 echo "Building CSMPI..."
@@ -93,7 +80,7 @@ echo ${progress_delimiter}
 echo 
 ./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/sst-dumpi/build/lib/libdumpi.so ./anacin-x/pnmpi/patched_libs/libdumpi.so
 ./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/csmpi/build/libcsmpi.so ./anacin-x/pnmpi/patched_libs/libcsmpi.so
-./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/ninja/build/libninja.so ./anacin-x/pnmpi/patched_libs/libninja.so
+#./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/ninja/build/libninja.so ./anacin-x/pnmpi/patched_libs/libninja.so
 ./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/Src_Pluto/build/libpluto.so ./anacin-x/pnmpi/patched_libs/libpluto.so
 
 echo
@@ -112,31 +99,6 @@ echo
 echo 
 echo ${progress_delimiter}
 echo "Done building graph constructor."
-echo ${progress_delimiter}
-echo
-
-# Install applications under study
-echo
-echo ${progress_delimiter}
-echo "Fetching non-deterministic MPI applications..."
-echo ${progress_delimiter}
-echo
-git clone git@github.com:TauferLab/miniAMR.git ./apps/miniAMR
-echo
-echo ${progress_delimiter}
-echo "Done fetching non-deterministic MPI applications."
-echo ${progress_delimiter}
-echo
-
-echo
-echo ${progress_delimiter}
-echo "Building miniAMR..."
-echo ${progress_delimiter}
-echo
-cd ./apps/miniAMR/ref && make -j && cd -
-echo
-echo ${progress_delimiter}
-echo "Done Building miniAMR."
 echo ${progress_delimiter}
 echo
 
