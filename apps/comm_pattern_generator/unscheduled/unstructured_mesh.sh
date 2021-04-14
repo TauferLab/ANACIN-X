@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
 
-run_idx_low=$1
-run_idx_high=$2
-n_nodes=$3
-n_iters=$4
-n_procs=$5
-msg_size=$6
+n_procs=$1
+n_iters=$2
+msg_size=$3
+n_nodes=$4
+run_idx_low=$5
+run_idx_high=$6
 results_root=$7
 
 echo "Starting Unstructured Mesh Run"
 source ./example_paths_lsf.config
+example_paths_dir=$(pwd)
 
 # Convenience function for making the dependency lists for the kernel distance
 # time series job
@@ -42,6 +43,8 @@ do
             # Set up results dir
             run_dir=${runs_root}/run_${run_idx}
             mkdir -p ${run_dir}
+	    debugging_path=${run_dir}/debug
+	    mkdir -p ${debugging_path}
             cd ${run_dir}
             
             # Determine proc grid
@@ -59,7 +62,7 @@ do
 	    if [ ! -f "config" ]; then
 		old_dir=$PWD
 		cd ${anacin_x_root}/apps/comm_pattern_generator/config
-		python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "unstructured_mesh" ${nd_neighbor_fraction} 4 3 2 ${msg_size} ${n_iters}
+		python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "unstructured_mesh" ${nd_neighbor_fraction} 4 3 2 ${msg_size} ${n_iters} "${example_paths_dir}/../"
 		cd ${old_dir}
 	    fi
 	    
@@ -73,22 +76,22 @@ do
             #    trace_stdout=$( bsub -nnodes ${n_nodes_trace} ${job_script_trace_spread_procs} ${n_procs} ${app} ${config} )
             #fi
             #trace_job_id=$( echo ${trace_stdout} | sed 's/[^0-9]*//g' )
-	    bash ${job_script_trace_pack_procs} ${n_procs} ${app} ${config}
+	    bash > ${debugging_path}/trace_exec_output.txt 2> ${debugging_path}/trace_exec_error.txt ${job_script_trace_pack_procs} ${n_procs} ${app} ${config}
 
 	    #echo "Starting Build Event Graph"
             # Build event graph
             #n_nodes_build_graph=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
             #build_graph_stdout=$( bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -w "done(${trace_job_id})" -o ${debugging_path}/build_graph_output.txt -e ${debugging_path}/build_graph_error.txt ${job_script_build_graph} ${n_procs} ${dumpi_to_graph_bin} ${dumpi_to_graph_config} ${run_dir} )
-	    bash ${job_script_build_graph} ${n_procs} ${dumpi_to_graph_bin} ${dumpi_to_graph_config} ${run_dir} 
+	    bash > ${debugging_path}/build_graph_output.txt 2> ${debugging_path}/build_graph_error.txt ${job_script_build_graph} ${n_procs} ${dumpi_to_graph_bin} ${dumpi_to_graph_config} ${run_dir} 
 	    #build_graph_job_id=$( echo ${build_graph_stdout} | sed 's/[^0-9]*//g' )
             event_graph=${run_dir}/event_graph.graphml
 
 	    #echo "Starting Extract Slices"
             # Extract slices
             #extract_slices_stdout=$( bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -w "done(${build_graph_job_id})" -o ${debugging_path}/extract_slices_output.txt -e ${debugging_path}/extract_slices_error.txt ${job_script_extract_slices} ${n_procs_extract_slices} ${extract_slices_script} ${event_graph} ${slicing_policy} )
-	    echo "preslice"
-	    bash ${job_script_extract_slices} ${n_procs_extract_slices} ${extract_slices_script} ${event_graph} ${slicing_policy} 
-	    echo "postslice"
+	    #echo "preslice"
+	    bash > ${debugging_path}/extract_slices_output.txt 2> ${debugging_path}/extract_slices_error.txt ${job_script_extract_slices} ${n_procs_extract_slices} ${extract_slices_script} ${event_graph} ${slicing_policy} 
+	    #echo "postslice"
 	    #extract_slices_job_id=$( echo ${extract_slices_stdout} | sed 's/[^0-9]*//g' ) 
             #kdts_job_deps+=("done(${extract_slices_job_id})")
         done # runs
@@ -97,14 +100,14 @@ do
         # Compute kernel distances for each slice
         #kdts_job_dep_str=$( join_by "&&" ${kdts_job_deps[@]} )
 	#echo ${kdts_job_dep_str}
-	echo "precd"
+	#echo "precd"
         cd ${runs_root}
-	echo "postcd"
+	#echo "postcd"
         #compute_kdts_stdout=$( bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -w ${kdts_job_dep_str} -o ${debugging_path}/compute_kdts_output.txt -e ${debugging_path}/compute_kdts_error.txt ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} ${slicing_policy} )
         #compute_kdts_stdout=$( sbatch -N${n_nodes_compute_kdts} ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} )
-	echo "prekdts"
-	bash ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} ${slicing_policy}
-	echo "postkdts"
+	#echo "prekdts"
+	bash > ${debugging_path}/../../compute_kdts_output.txt 2> ${debugging_path}/../../compute_kdts_error.txt ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} ${slicing_policy}
+	#echo "postkdts"
         #compute_kdts_job_id=$( echo ${compute_kdts_stdout} | sed 's/[^0-9]*//g' )
 
         # Generate plot
