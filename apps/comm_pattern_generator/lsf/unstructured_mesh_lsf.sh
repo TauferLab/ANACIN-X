@@ -1,20 +1,22 @@
 #!/usr/bin/env bash
 
-run_idx_low=$1
-run_idx_high=$2
-n_nodes=$3
-n_iters=$4
-n_procs=$5
-msg_size=$6
+n_procs=$1
+n_iters=$2
+msg_size=$3
+n_nodes=$4
+run_idx_low=$5
+run_idx_high=$6
 results_root=$7
 
 echo "Starting Unstructured Mesh Run"
 source ./example_paths_lsf.config
+example_paths_dir=$(pwd)
 
 # Convenience function for making the dependency lists for the kernel distance
 # time series job
 #function join_by { local IFS="$1"; shift; echo "$*"; }
 function join_by { local d=$1; shift; local f=$1; shift; printf %s "$f" "${@/#/$d}"; }
+n_procs_per_node=$((n_procs/n_nodes))
 
 #proc_placement=("pack" "spread")
 proc_placement=("pack")
@@ -42,6 +44,8 @@ do
             # Set up results dir
             run_dir=${runs_root}/run_${run_idx}
             mkdir -p ${run_dir}
+            debugging_path=${run_dir}/debug
+            mkdir -p ${debugging_path}
             cd ${run_dir}
             
             # Determine proc grid
@@ -59,12 +63,12 @@ do
 	    if [ ! -f "config" ]; then
 		old_dir=$PWD
 		cd ${anacin_x_root}/apps/comm_pattern_generator/config
-		python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "unstructured_mesh" ${nd_neighbor_fraction} 4 3 2 ${msg_size} ${n_iters}
+		python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "unstructured_mesh" ${nd_neighbor_fraction} 4 3 2 ${msg_size} ${n_iters} "${example_paths_dir}/../"
 		cd ${old_dir}
 	    fi
 	    
 	    # Trace execution
-	    n_procs_per_node=$((n_procs/n_nodes))
+	    #n_procs_per_node=$((n_procs/n_nodes))
             if [ ${proc_placement} == "pack" ]; then
                 #n_nodes_trace=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
                 trace_stdout=$( bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -o ${debugging_path}/trace_exec_output.txt -e ${debugging_path}/trace_exec_error.txt ${job_script_trace_pack_procs} ${n_procs} ${app} ${config} )
@@ -93,7 +97,7 @@ do
         kdts_job_dep_str=$( join_by "&&" ${kdts_job_deps[@]} )
 	echo ${kdts_job_dep_str}
         cd ${runs_root}
-        compute_kdts_stdout=$( bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -w ${kdts_job_dep_str} -o ${debugging_path}/compute_kdts_output.txt -e ${debugging_path}/compute_kdts_error.txt ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} ${slicing_policy} )
+        compute_kdts_stdout=$( bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -w ${kdts_job_dep_str} -o ${debugging_path}/../../compute_kdts_output.txt -e ${debugging_path}/../../compute_kdts_error.txt ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} ${slicing_policy} )
         #compute_kdts_stdout=$( sbatch -N${n_nodes_compute_kdts} ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} )
         compute_kdts_job_id=$( echo ${compute_kdts_stdout} | sed 's/[^0-9]*//g' )
 
