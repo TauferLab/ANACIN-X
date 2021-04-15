@@ -186,9 +186,10 @@ echo
 echo
 echo "Installing Pip Packages"
 echo ${progress_delimiter}
-pip install grakel==0.1b7
+pip install grakel
 pip install python-igraph
-pip install scikit-learn==0.22.1
+pip install scikit-learn
+pip install mpi4py
 echo ${progress_delimiter}
 
 # Set up to install graphkernels

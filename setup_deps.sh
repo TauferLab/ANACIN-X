@@ -110,6 +110,6 @@ spack_env_name="${user_spack_name:="anacin_spack_env"}"
 
 
 #echo ${mpi_name}
-. anacin_deps.sh ${mpi_name} ${os_for_conda} ${spack_env_name} ${has_spack} ${has_conda} ${has_c_comp} ${has_mpi} ${has_ssh_key} 
+. ./install/install_anacin_deps.sh ${mpi_name} ${os_for_conda} ${spack_env_name} ${has_spack} ${has_conda} ${has_c_comp} ${has_mpi} ${has_ssh_key} 
 
 
