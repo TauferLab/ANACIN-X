@@ -7,10 +7,11 @@ n_nodes=$4
 run_idx_low=$5
 run_idx_high=$6
 results_root=$7
+example_paths_dir=$8
 
 echo "Starting Unstructured Mesh Run"
-source ./example_paths_lsf.config
-example_paths_dir=$(pwd)
+source ${example_paths_dir}/example_paths_lsf.config
+#example_paths_dir=$(pwd)
 
 # Convenience function for making the dependency lists for the kernel distance
 # time series job

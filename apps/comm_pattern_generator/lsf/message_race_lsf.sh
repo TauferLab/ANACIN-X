@@ -7,9 +7,10 @@ n_nodes=$4
 run_idx_low=$5
 run_idx_high=$6
 results_root=$7
+example_paths_dir=$8
 
-source ./example_paths_lsf.config
-example_paths_dir=$(pwd)
+source ${example_paths_dir}/example_paths_lsf.config
+#example_paths_dir=$(pwd)
 
 function join_by { local d=$1; shift; local f=$1; shift; printf %s "$f" "${@/#/$d}"; }
 kdts_job_deps=()
