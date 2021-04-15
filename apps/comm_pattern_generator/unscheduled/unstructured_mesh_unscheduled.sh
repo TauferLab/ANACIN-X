@@ -7,10 +7,11 @@ n_nodes=$4
 run_idx_low=$5
 run_idx_high=$6
 results_root=$7
+example_paths_dir=$8
 
 echo "Starting Unstructured Mesh Run"
-source ./example_paths_lsf.config
-example_paths_dir=$(pwd)
+source ${example_paths_dir}/example_paths_unscheduled.config
+#example_paths_dir=$(pwd)
 
 # Convenience function for making the dependency lists for the kernel distance
 # time series job
@@ -76,7 +77,7 @@ do
             #    trace_stdout=$( bsub -nnodes ${n_nodes_trace} ${job_script_trace_spread_procs} ${n_procs} ${app} ${config} )
             #fi
             #trace_job_id=$( echo ${trace_stdout} | sed 's/[^0-9]*//g' )
-	    bash > ${debugging_path}/trace_exec_output.txt 2> ${debugging_path}/trace_exec_error.txt ${job_script_trace_pack_procs} ${n_procs} ${app} ${config}
+	    bash > ${debugging_path}/trace_exec_output.txt 2> ${debugging_path}/trace_exec_error.txt ${job_script_trace_pack_procs} ${n_procs} ${app} ${config} ${example_paths_dir}
 
 	    #echo "Starting Build Event Graph"
             # Build event graph

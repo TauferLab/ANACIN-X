@@ -8,20 +8,21 @@ results_path=$2
 
 
 # Comm Pattern definition
-comm_pattern="message_race"
-#comm_pattern="amg2013"
+#comm_pattern="message_race"
+comm_pattern="amg2013"
 #comm_pattern="unstructured_mesh"
 
 # Pick a scheduler
-scheduler=lsf
+#scheduler=lsf
 #scheduler=slurm
-#scheduler=unscheduled
+scheduler=unscheduled
 
 # Define Needed Paths
-source ./apps/comm_pattern_generator/${scheduler}/example_paths_${scheduler}.config
+#source ./apps/comm_pattern_generator/${scheduler}/example_paths_${scheduler}.config
 cd apps/comm_pattern_generator/${scheduler}
 example_paths_dir=$(pwd)
 cd -
+source ${example_paths_dir}/example_paths_${scheduler}.config
 #root_path=$HOME/Src_ANACIN-X
 #anacin_x_root=$HOME/Src_ANACIN-X
 config_path=${anacin_x_root}/apps/comm_pattern_generator/config
@@ -37,7 +38,7 @@ message_sizes=(512)
 num_iters=(1)
 
 # Decide number of processes
-num_procs=(16)
+num_procs=(4)
 
 #Other variables needed
 #nd_neighbor_fraction=0.2
