@@ -8,14 +8,14 @@ results_path=$2
 
 
 # Comm Pattern definition
-#comm_pattern="message_race"
-comm_pattern="amg2013"
+comm_pattern="message_race"
+#comm_pattern="amg2013"
 #comm_pattern="unstructured_mesh"
 
 # Pick a scheduler
 #scheduler=lsf
-#scheduler=slurm
-scheduler=unscheduled
+scheduler=slurm
+#scheduler=unscheduled
 
 # Define Needed Paths
 #source ./apps/comm_pattern_generator/${scheduler}/example_paths_${scheduler}.config
@@ -35,18 +35,18 @@ comm_pattern_path=${anacin_x_root}/apps/comm_pattern_generator/${scheduler}
 message_sizes=(512)
 
 # Decide number of iterations
-num_iters=(1)
+num_iters=(10)
 
 # Decide number of processes
-num_procs=(4)
+num_procs=(32)
 
 #Other variables needed
 #nd_neighbor_fraction=0.2
 n_nodes=1
 
 if [ ${scheduler} == "slurm" ]; then
-    slurm_queue="normal"
-    slurm_time_limit=5
+    slurm_queue="skx-normal"
+    slurm_time_limit=10
 fi
 
 # Run Comm Pattern Script

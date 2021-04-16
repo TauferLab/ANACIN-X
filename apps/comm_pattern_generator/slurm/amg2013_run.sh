@@ -21,7 +21,7 @@ fi
 
 # Trace execution
 LD_PRELOAD=${pnmpi} PNMPI_LIB_PATH=${pnmpi_lib_path} PNMPI_CONF=${pnmpi_conf} mpirun -np ${n_procs} > ${debug_dir}/trace_exec_output.txt 2> ${debug_dir}/trace_exec_error.txt ${app_bin} ${app_config}
-mv dumpi-* ${run_dir}
+#mv dumpi-* ${run_dir}
 
 # Build event graph
 mpirun -np ${n_procs} > ${debug_dir}/build_graph_output.txt 2> ${debug_dir}/build_graph_error.txt ${dumpi_to_graph_bin} ${dumpi_to_graph_config} ${run_dir}
