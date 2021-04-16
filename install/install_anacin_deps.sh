@@ -76,23 +76,25 @@ echo ${progress_delimiter}
 echo "Done Activating Spack Environment"
 echo
 
-if [ "yes" = "no" ]; then
+#if [ "yes" = "no" ]; then
 # Spack compiler link
 echo
 echo "Link Spack to External Compiler and MPI"
 echo ${progress_delimiter}
-echo "Link the external compiler to spack"
+#echo "Link the external compiler to spack"
 #c_comp=$(which icc)
-spack compiler find
+#spack compiler find
 echo ${progress_delimiter}
 # Spack external mpi find?
 echo ${progress_delimiter}
-spack external find -t ${mpi_name}
+if [ ${has_mpi} = "yes" ]; then
+    spack external find ${mpi_name}
+fi
 #echo ${mpi_name}
 echo ${progress_delimiter}
 echo "Done Linking Spack"
 echo
-fi
+#fi
 
 # Spack concretize (we need to update the cmake identification and the spdlog ^cmake install)
 echo
@@ -103,14 +105,19 @@ echo ${progress_delimiter}
 # Spack install
 echo ${progress_delimiter}
 spack install
+despacktivate
+spack install boost@1.70.0+atomic+chrono~clanglibcpp~context~coroutine cxxstd=98 +date_time~debug+exception~fiber+filesystem+graph~icu+iostreams+locale+log+math+mpi+multithreaded~numpy~pic+program_options~python+random+regex+serialization+shared+signals~singlethreaded+system~taggedlayout+test+thread+timer~versionedlayout visibility=hidden +wave ^${mpi_name}
+spack env activate ${spack_env}
 echo ${progress_delimiter}
+
+
 
 # Load packages
 echo
 echo "Loading Spack Packages"
 echo ${progress_delimiter}
 echo
-if [ ${has_mpi} = "no" ]; then
+if [ ${has_mpi} == "no" ]; then
     spack load ${mpi_name};
 fi
 spack load libunwind;
@@ -188,7 +195,7 @@ echo "Installing Pip Packages"
 echo ${progress_delimiter}
 pip install grakel
 pip install python-igraph
-pip install scikit-learn
+#pip install scikit-learn
 pip install mpi4py
 echo ${progress_delimiter}
 

@@ -117,7 +117,7 @@ echo
 
 # Set vars for job script infrastructure
 anacin_x_root=$(pwd)
-sed -i 's/anacin_x_root= /anacin_x_root=${anacin_x_root}' ./apps/comm_pattern_generator/comm_pattern_config.config
+sed -i 's/anacin_x_root= /anacin_x_root=${anacin_x_root}/' ./apps/comm_pattern_generator/comm_pattern_config.config
 
 ## Set up conda environment
 #conda env create -f ./install/anacin-x-environment.yml

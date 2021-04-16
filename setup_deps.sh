@@ -36,14 +36,14 @@ done
 while true; do
 	read -p "Do you already have a version of mpi installed? (yes/no) " user_has_mpi
 	case ${user_has_mpi} in
-#                [yY] | [yY][eE][sS] ) has_mpi="yes"; while true; do
-#		       read -p "Which mpi installation do you have? Input is case sensitive. (openmpi, mvapich2, mpich) " user_mpi_name
-#		       case ${user_mpi_name} in
-#			       "openmpi" | "mvapich2" | "mpich" ) break ;;
-#			       * ) echo "Please respond with one of the listed options. Input is case sensitive. (openmpi, mvapich2, mpich) " ;;
-#		       esac
-#	         done; break ;;
-		[yY] | [yY][eE][sS] ) has_mpi="yes"; break ;;
+                [yY] | [yY][eE][sS] ) has_mpi="yes"; while true; do
+		      read -p "Which mpi installation do you have? Input is case sensitive. (openmpi, mvapich2, mpich) " user_mpi_name
+		      case ${user_mpi_name} in
+                          "openmpi" | "mvapich2" | "mpich" ) break ;;
+			  * ) echo "Please respond with one of the listed options. Input is case sensitive. (openmpi, mvapich2, mpich) " ;;
+		      esac
+	        done; break ;;
+		#[yY] | [yY][eE][sS] ) has_mpi="yes"; break ;;
 		[nN] | [nN][oO] ) has_mpi="no"; break ;;
                 * ) echo "Please respond with either yes or no: " ;;
         esac
