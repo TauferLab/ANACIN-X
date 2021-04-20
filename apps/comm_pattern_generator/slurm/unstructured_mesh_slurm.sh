@@ -32,7 +32,7 @@ do
     do
     #echo "Launching jobs for: proc. placement = ${proc_placement}, # procs. = ${n_procs}, msg. size = ${msg_size}"
     
-    runs_root=${results_root}/n_procs_${n_procs}/proc_placement_${proc_placement}/nd_neighbor_fraction_${nd_neighbor_fraction}/msg_size_${msg_size}/
+    runs_root=${results_root}/msg_size_${msg_size}/n_procs_${n_procs}/n_iters_${n_iters}/proc_placement_${proc_placement}/nd_neighbor_fraction_${nd_neighbor_fraction}/
     
     # Launch intra-execution jobs
     kdts_job_deps=()
