@@ -25,7 +25,7 @@ source ${example_paths_dir}/example_paths_unscheduled.config
 for run_idx in `seq -f "%03g" ${run_idx_low} ${run_idx_high}`; 
 do
     # Create needed paths
-    run_dir=${results_root}/msg_size_${msg_size}/without_ninja/run_${run_idx}/
+    run_dir=${results_root}/msg_size_${msg_size}/n_procs_${n_procs}/n_iters_${n_iters}/run_${run_idx}/
     mkdir -p ${run_dir}
     debugging_path=${run_dir}/debug
     mkdir -p ${debugging_path}
