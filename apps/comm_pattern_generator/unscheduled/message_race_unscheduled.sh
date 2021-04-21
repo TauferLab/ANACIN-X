@@ -57,7 +57,7 @@ do
 done
 
 # Compute KDTS
-mpirun -np ${n_procs} > ${debugging_path}/../../compute_kdts_output.txt 2> ${debugging_path}/../../compute_kdts_error.txt ${compute_kdts_script} "${results_root}/msg_size_${msg_size}/without_ninja/" ${graph_kernel} --slice_dir_name "slices" -o "kdts.pkl"
+mpirun -np ${n_procs} > ${debugging_path}/../../compute_kdts_output.txt 2> ${debugging_path}/../../compute_kdts_error.txt ${compute_kdts_script} "${run_dir}/../" ${graph_kernel} --slice_dir_name "slices" -o "kdts.pkl"
 
 #	done
 #    done
