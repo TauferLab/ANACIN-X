@@ -14,16 +14,40 @@
 #results_path=$1
 
 
+Help() {
+    echo ""
+    echo "Below are the switches available to use when running this script"
+    echo ""
+    echo "The following command line switches can be used to define parameters for your job submission:"
+echo "* -p : Defines the size of the mpi communicator used when generating communication patterns. (Default 4 MPI processes)"
+echo "* -i : Defines the number of times a given communication pattern appears in a single execution of ANACIN-X. (Default 1 iteration)"
+echo "* -s : The size in bytes of the messages passed when generating communication patterns. (Default 512 bytes)"
+echo "* -n : The number of compute nodes requested for running the ANACIN-X workflow. (Default 1 node)"
+echo "* -r : The number of runs to make of the ANACIN-X workflow. (Default 2 executions)"
+echo "* -o : If used, allows the user to define their own path to store output from the project. (Defaults to the directory '$HOME/comm_pattern_output')"
+echo "* -v : If used, will display the execution settings prior to running the execution."
+echo "* -h : Used to display the list of switch options."
+echo ""
+echo "If you're running on a system that uses the Slurm scheduler, then the following switches can be used to define settings for job submission:"
+echo "* -sq : Defines the queue to submit Slurm jobs to. (Defaults to the "normal" queue)"
+echo "* -st : A maximum time limit in minutes on the time provided to jobs submitted. (Default 10 minutes)"
+echo ""
+}
+
+
 while [ -n "$1" ]; do
     case "$1" in
-	    -p) n_procs=$2;;
-	    -i) n_iters=$2;;
-	    -s) msg_sizes=$2;;
-	    -n) n_nodes=$2;; 
-	    -q) slurm_queue=$2;;
-	    -t) slurm_time_limit=$2;;
-	    -r) run_count=$2;;
-	    -o) results_path=$2 ;;
+	    -p) n_procs=$2; shift; shift ;;
+	    -i) n_iters=$2; shift; shift ;;
+	    -s) msg_sizes=$2; shift; shift ;;
+	    -n) n_nodes=$2; shift; shift ;; 
+	    -sq) slurm_queue=$2; shift; shift ;;
+	    -st) slurm_time_limit=$2; shift; shift ;;
+	    -lq) lsf_queue=$2; shift; shift ;;
+	    -r) run_count=$2; shift; shift ;;
+	    -o) results_path=$2; shift; shift ;;
+	    -v) verbose="true"; shift ;;
+	    -h) Help; exit ;;
 	    *) echo "$1 is not an option" ;;
     esac
     shift
@@ -55,22 +79,29 @@ msg_sizes="${msg_sizes:=512}"
 n_nodes="${n_nodes:=1}"
 run_count="${run_count:=2}"
 results_path="${results_path:=$HOME/comm_pattern_output/${comm_pattern}_$(date +%s.%N)/}"
-if [ ${scheduler} != "slurm" ]; then
+if [ ${scheduler} == "slurm" ]; then
+    slurm_queue="normal"
+    slurm_time_limit="10"
+else
     slurm_queue=""
     slurm_time_limit=""
 fi
 
-# Report Variable Values
-echo "Communication Pattern: ${comm_pattern}"
-echo "Scheduler Selected: ${scheduler}"
-echo "Number of Processes: ${n_procs}"
-echo "Number of Iterations: ${n_iters}"
-echo "Message Size: ${msg_sizes}"
-echo "Number of Nodes: ${n_nodes}"
-echo "Queue for Running through Slurm: ${slurm_queue}"
-echo "Time Limit for Running through Slurm: ${slurm_time_limit}"
-echo "Number of Execution Runs: ${run_count}"
-echo "Output will be stored in ${results_path}"
+# Report Variable Values if User Requests Verbose Execution
+if [ ${verbose} == "true" ]; then
+    echo "Communication Pattern: ${comm_pattern}"
+    echo "Scheduler Selected: ${scheduler}"
+    echo "Number of Processes: ${n_procs}"
+    echo "Number of Iterations: ${n_iters}"
+    echo "Message Size: ${msg_sizes}"
+    echo "Number of Nodes: ${n_nodes}"
+    if [ ${scheduler} == "slurm" ]; then
+        echo "Queue for Running through Slurm: ${slurm_queue}"
+        echo "Time Limit for Running through Slurm: ${slurm_time_limit}"
+    fi
+    echo "Number of Execution Runs: ${run_count}"
+    echo "Output will be stored in ${results_path}"
+fi
 
 
 
