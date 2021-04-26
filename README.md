@@ -157,8 +157,6 @@ Currently, the software supports the following types of scheduler systems for jo
 * Slurm scheduled systems (ex. Stampede2)
 * Unscheduled systems (ex. Jetstream, personal computers)
 
-Please run the project on a unix influenced operating system like linux or macOS.
-
 While our aim is to expand the project to support analysis of many types of MPI applications, the software currently works with the following communication patterns that are internally generated.  For more details about the communication patterns, please see []().
 * Message Race
 * AMG2013
