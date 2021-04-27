@@ -8,6 +8,9 @@ run_idx_low=$5
 run_idx_high=$6
 results_root=$7
 example_paths_dir=$8
+x_procs=$9
+y_procs=${10}
+z_procs=${11}
 
 echo "Starting Unstructured Mesh Run"
 source ${example_paths_dir}/example_paths_unscheduled.config
@@ -50,7 +53,7 @@ do
             
             # Determine proc grid
             #if [ ${n_procs} == 64 ]; then
-            proc_grid="4x3x2"
+            proc_grid="${x_procs}x${y_procs}x${z_procs}"
             #else
             #    echo "Invalid # procs: ${n_procs}"
             #    exit
@@ -63,7 +66,7 @@ do
 	    if [ ! -f "config" ]; then
 		old_dir=$PWD
 		cd ${anacin_x_root}/apps/comm_pattern_generator/config
-		python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "unstructured_mesh" ${nd_neighbor_fraction} 4 3 2 ${msg_size} ${n_iters} "${example_paths_dir}/../"
+		python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "unstructured_mesh" ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} ${msg_size} ${n_iters} "${example_paths_dir}/../"
 		cd ${old_dir}
 	    fi
 	    
