@@ -10,6 +10,9 @@ run_idx_low=$7
 run_idx_high=$8
 results_root=$9
 example_paths_dir=${10}
+x_procs=${11}
+y_procs=${12}
+z_procs=${13}
 
 source ${example_paths_dir}/example_paths_slurm.config
 #example_paths_dir=$(pwd)
@@ -45,7 +48,7 @@ do
         mkdir -p ${run_dir}
 	
         comm_pattern_run_name=unstructured_mesh_run_$(date +%s.%N)
-        comm_pattern_run_stdout=$( sbatch -N ${n_nodes} -p ${queue} -J ${comm_pattern_run_name} -t ${time_limit} -n ${n_procs} --ntasks-per-node=${n_procs_per_node} ${comm_pattern_run_script} ${n_procs} ${msg_size} ${n_iters} ${proc_placement} ${nd_neighbor_fraction} ${run_dir} ${example_paths_dir} ${debug_dir} )
+        comm_pattern_run_stdout=$( sbatch -N ${n_nodes} -p ${queue} -J ${comm_pattern_run_name} -t ${time_limit} -n ${n_procs} --ntasks-per-node=${n_procs_per_node} ${comm_pattern_run_script} ${n_procs} ${msg_size} ${n_iters} ${proc_placement} ${nd_neighbor_fraction} ${run_dir} ${example_paths_dir} ${debug_dir} ${x_procs} ${y_procs} ${z_procs} )
         while [ -z "$comm_pattern_run_id" ]; do
             #echo "Waiting for jobid"
             #comm_pattern_run_stdout=$( sbatch -N ${n_nodes} -p ${queue} -J ${comm_pattern_run_name} -t ${time_limit} -n ${n_procs} --ntasks-per-node=${n_procs_per_node} ${comm_pattern_run_script} ${n_procs} ${msg_size} ${n_iters} ${proc_placement} ${nd_neighbor_fraction} ${run_dir} ${example_paths_dir} ${debug_dir} )
