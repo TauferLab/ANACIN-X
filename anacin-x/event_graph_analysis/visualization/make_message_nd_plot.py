@@ -174,4 +174,4 @@ if __name__ == "__main__":
     parser.add_argument("--nd_neighbor_fraction", type=float,
                         help="Fraction of neighbors determined non-deterministically for these runs of the unstructured mesh comm. pattern")
     args = parser.parse_args()
-    main( args.data, args.pattern, args.output, args.nd_neighbor_fraction )
+    main( args.data, args.comm_pattern, args.output, args.nd_neighbor_fraction )
