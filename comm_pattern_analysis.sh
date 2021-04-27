@@ -19,7 +19,7 @@ Help() {
     echo "Below are the switches available to use when running this script"
     echo ""
     echo "The following command line switches can be used to define parameters for your job submission:"
-    echo "* -p : Defines the size of the mpi communicator used when generating communication patterns. (Default 4 MPI processes)"
+    echo "* -p : Defines the size of the mpi communicator used when generating communication patterns. (Default 10 MPI processes)"
     echo "* -i : Defines the number of times a given communication pattern appears in a single execution of ANACIN-X. (Default 1 iteration)"
     echo "* -s : The size in bytes of the messages passed when generating communication patterns. (Default 512 bytes)"
     echo "* -n : The number of compute nodes requested for running the ANACIN-X workflow. (Default 1 node)"
@@ -70,6 +70,7 @@ done
 # Ensure that input values will work
 while [ ${comm_pattern} == "unstructured_mesh" ] && [ $(( x_procs*y_procs*z_procs )) -lt 10 ]; do
     echo "The 3 coordinate values of unstructured mesh must multiply together to be greater than or equal to 10."
+    echo "Note that the product of these values will need to be equal to the number of processes."
     read -p "x coordinate: " x_procs
     read -p "y coordinate: " y_procs
     read -p "z coordinate: " z_procs
@@ -126,6 +127,7 @@ if [ "${verbose}" == "true" ]; then
         echo "Queue for Running through LSF: ${lsf_queue}"
     fi
     echo "Number of Execution Runs: ${run_count}"
+    echo "Unstructured Mesh Coordinates x*y*z = ${x_procs}*${y_procs}*${z_procs}"
     echo "Output will be stored in ${results_path}"
 fi
 
