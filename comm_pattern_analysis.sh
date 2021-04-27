@@ -26,7 +26,7 @@ Help() {
     echo "* -r : The number of runs to make of the ANACIN-X workflow. (Default 2 executions)"
     echo "       The number of runs must be at least 2"
     echo "* -o : If used, allows the user to define their own path to store output from the project. (Defaults to the directory '$HOME/comm_pattern_output')"
-    echo "* -c : When running the unstructured mesh communication pattern, use this with 3 arguments to define the grid coordinates. (Defaults to 2 2 1)"
+    echo "* -c : When running the unstructured mesh communication pattern, use this with 3 arguments to define the grid coordinates. (Ex. -c 2 3 4)"
     echo "       The 3 coordinate values must multiply together to equal the number of processes used."
     echo "       The 3 coordinate values must also multiply together to be greater than or equal 10."
     echo "* -v : If used, will display the execution settings prior to running the execution."
@@ -47,7 +47,7 @@ while [ -n "$1" ]; do
 	    -n)  n_nodes=$2; shift; shift ;; 
 	    -sq) slurm_queue=$2; shift; shift ;;
 	    -st) slurm_time_limit=$2; shift; shift ;;
-	    -lq) lsf_queue=$2; shift; shift ;;
+	    #-lq) lsf_queue=$2; shift; shift ;;
 	    -r)  run_count=$2; shift; shift ;;
 	    -o)  results_path=$2; shift; shift ;;
 	    -c)  x_procs=$2; y_procs=$3; z_procs=$4; shift; shift; shift; shift ;;
@@ -70,9 +70,9 @@ done
 # Ensure that input values will work
 while [ ${comm_pattern} == "unstructured_mesh" ] && [ $(( x_procs*y_procs*z_procs )) -lt 10 ]; do
     echo "The 3 coordinate values of unstructured mesh must multiply together to be greater than or equal to 10."
-    read "x coordinate: " x_procs
-    read "y coordinate: " y_procs
-    read "z coordinate: " z_procs
+    read -p "x coordinate: " x_procs
+    read -p "y coordinate: " y_procs
+    read -p "z coordinate: " z_procs
 done
 
 # Pick a scheduler
@@ -111,7 +111,7 @@ else
 fi
 
 # Report Variable Values if User Requests Verbose Execution
-if [ ${verbose} == "true" ]; then
+if [ "${verbose}" == "true" ]; then
     echo "Communication Pattern: ${comm_pattern}"
     echo "Scheduler Selected: ${scheduler}"
     echo "Number of Processes: ${n_procs}"
@@ -121,6 +121,9 @@ if [ ${verbose} == "true" ]; then
     if [ ${scheduler} == "slurm" ]; then
         echo "Queue for Running through Slurm: ${slurm_queue}"
         echo "Time Limit for Running through Slurm: ${slurm_time_limit}"
+    fi
+    if [ ${scheduler} == "lsf" ]; then
+        echo "Queue for Running through LSF: ${lsf_queue}"
     fi
     echo "Number of Execution Runs: ${run_count}"
     echo "Output will be stored in ${results_path}"
