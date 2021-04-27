@@ -1,4 +1,6 @@
-<img src="anacin-logo.png" width="400">
+<p align="center">
+    <img src="anacin-logo.png" width="350">
+</p>
 
 # ANACIN-X
 ## Project Overview
