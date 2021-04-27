@@ -128,19 +128,39 @@ The following packages will be installed as submodules to the installation of AN
 Use the 'comm_pattern_analysis.sh' script to generate traces of a selected communication pattern and perform analysis on the event graphs:
 
 The following command line switches can be used to define parameters for your job submission:
-* -p : Defines the size of the mpi communicator used when generating communication patterns. (Default 4 MPI processes)
-* -i  : Defines the number of times a given communication pattern appears in a single execution of ANACIN-X. (Default 1 iteration)
-* -s : The size in bytes of the messages passed when generating communication patterns. (Default 512 bytes)
-* -n : The number of compute nodes requested for running the ANACIN-X workflow. (Default 1 node)
-* -r  : The number of runs to make of the ANACIN-X workflow. (Default 2 executions)
-* -o : If used, allows the user to define their own path to store output from the project. (Defaults to the directory '$HOME/comm_pattern_output')
-* -c : When running the unstructured mesh communication pattern, use this with 3 arguments to define the grid coordinates. (Ex. -c 2 3 4)
-* -v : If used, will display the execution settings prior to running the execution.
-* -h : Used to display the list of switch options.
+* -p        : Defines the size of the mpi communicator 
+                used when generating communication patterns. 
+                (Default 4 MPI processes)
+* -i         : Defines the number of times a given communication 
+                pattern appears in a single execution of ANACIN-X. 
+                (Default 1 iteration)
+* -s        : The size in bytes of the messages passed when generating 
+                communication patterns. 
+                (Default 512 bytes)
+* -n        : The number of compute nodes requested for running 
+                the ANACIN-X workflow. 
+                (Default 1 node)
+* -r         : The number of runs to make of the ANACIN-X workflow. 
+                (Default 2 executions)
+* -o        : If used, allows the user to define their own path to 
+                store output from the project. 
+                (Defaults to the directory '$HOME/comm_pattern_output')
+* -c        : When running the unstructured mesh communication pattern, 
+                use this with 3 arguments to define the grid coordinates. 
+                (Ex. -c 2 3 4)
+* -v        : If used, will display the execution settings prior 
+                to running the execution.
+* -h        : Used to display the list of switch options.
 
 If you're running on a system that uses the Slurm scheduler, then the following switches can be used to define settings for job submission:
-* -sq : Defines the queue to submit Slurm jobs to. (Defaults to the "normal" queue)
-* -st  : A maximum time limit in minutes on the time provided to jobs submitted. (Default 10 minutes)
+* -sq       : Defines the queue to submit Slurm jobs to. 
+                (Defaults to the "normal" queue)
+* -st        : A maximum time limit in minutes on the time provided to jobs submitted. 
+                (Default 10 minutes)
+
+If you're running on a system that uses the LSF scheduler, then the following switch can be used to define settings for job submission:
+* -lq        : Defines the queue to submit LSF jobs to. 
+                (Defaults to the "normal" queue)
 
 Below is an example run of the script as one might submit it on the Stampede2 cluster computer:
 
