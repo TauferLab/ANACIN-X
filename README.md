@@ -134,6 +134,7 @@ The following command line switches can be used to define parameters for your jo
 * -n : The number of compute nodes requested for running the ANACIN-X workflow. (Default 1 node)
 * -r  : The number of runs to make of the ANACIN-X workflow. (Default 2 executions)
 * -o : If used, allows the user to define their own path to store output from the project. (Defaults to the directory '$HOME/comm_pattern_output')
+* -c : When running the unstructured mesh communication pattern, use this with 3 arguments to define the grid coordinates. (Ex. -c 2 3 4)
 * -v : If used, will display the execution settings prior to running the execution.
 * -h : Used to display the list of switch options.
 
@@ -144,13 +145,12 @@ If you're running on a system that uses the Slurm scheduler, then the following 
 Below is an example run of the script as one might submit it on the Stampede2 cluster computer:
 
 ```
-. ./comm_pattern_analysis.sh -p 10 -n 2 -v -r 50 -q "skx-normal" -o $WORK2/anacinx_output_1
+. ./comm_pattern_analysis.sh -p 10 -n 2 -v -r 50 -sq "skx-normal" -o $WORK2/anacinx_output_1
 ```
 
 Be aware that if you run the project on some machines and some job queues, there will be a limit to the number of jobs that can be submitted.  In such cases, you may lose some jobs if you try to run the program with settings that produce more jobs than are allowed in the queue being used.
 
 ### Result Visualization: 
-
 
 
 
@@ -168,16 +168,24 @@ While our aim is to expand the project to support analysis of many types of MPI 
 
 When determining the number of times to run a given execution, be sure that it is set to more than 1.  Otherwise, kernel analysis will not work properly.
 
+If you're implementing the Unstructured Mesh communication pattern, then set the 3 Unstructured Mesh coordinates such that their product is equal to the number of processes used.
+
 If you're running the project across more than 1 compute node, then please use a process count equal to a multiple of the number of nodes.
 
 
-## Developers:
+## Project Team:
+
+Active Developers
 * Nick Bell
 * Kae Suarez
 * Nigel Tan
 
 The following people have had significant contribution to the development of ANACIN-X but are not active developers:
 * Dylan Chapp
+
+Project Advisors
+* Dr. Michela Taufer (Project Lead)
+* Dr. Sanjukta Bhowmick
 
 ## Publications:
 
