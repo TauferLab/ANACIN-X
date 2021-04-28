@@ -36,6 +36,10 @@ Help() {
     echo "[-sq]   Defines the queue to submit Slurm jobs to. (Defaults to the "normal" queue)"
     echo "[-st]   A maximum time limit in minutes on the time provided to jobs submitted. (Default 10 minutes)"
     echo ""
+    echo "If you're running on a system that uses the LSF scheduler, then the following switches can be used to define settings for job submission:"
+    echo "[-lq]   Defines the queue to submit Slurm jobs to. (Defaults to the "normal" queue)"
+    echo "[-lt]   A maximum time limit in minutes on the time provided to jobs submitted. (Default 10 minutes)"
+    echo ""
 }
 
 
@@ -47,7 +51,8 @@ while [ -n "$1" ]; do
 	    -n)  n_nodes=$2; shift; shift ;; 
 	    -sq) slurm_queue=$2; shift; shift ;;
 	    -st) slurm_time_limit=$2; shift; shift ;;
-	    #-lq) lsf_queue=$2; shift; shift ;;
+	    -lq) lsf_queue=$2; shift; shift ;;
+            -lt) lsf_time_limit=$2; shift; shift ;;
 	    -r)  run_count=$2; shift; shift ;;
 	    -o)  results_path=$2; shift; shift ;;
 	    -c)  x_procs=$2; y_procs=$3; z_procs=$4; shift; shift; shift; shift ;;
@@ -107,8 +112,10 @@ else
 fi
 if [ ${scheduler} == "lsf" ]; then
     lsf_queue="${lsf_queue:="normal"}"
+    lsf_time_limit="${lsf_time_limit:=10}"
 else
     lsf_queue=""
+    lsf_time_limit=""
 fi
 
 # Report Variable Values if User Requests Verbose Execution
@@ -125,6 +132,7 @@ if [ "${verbose}" == "true" ]; then
     fi
     if [ ${scheduler} == "lsf" ]; then
         echo "Queue for Running through LSF: ${lsf_queue}"
+        echo "Time Limit for Running through LSF: ${lsf_time_limit}"
     fi
     echo "Number of Execution Runs: ${run_count}"
     echo "Unstructured Mesh Coordinates x*y*z = ${x_procs}*${y_procs}*${z_procs}"
@@ -145,11 +153,11 @@ comm_pattern_path=${anacin_x_root}/apps/comm_pattern_generator/${scheduler}
 
 # Run Comm Pattern Script
 if [ ${comm_pattern} == "message_race" ]; then
-    bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${slurm_queue} ${slurm_time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir}
+    bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${slurm_queue} ${slurm_time_limit} ${lsf_queue} ${lsf_time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir}
 elif [ ${comm_pattern} == "amg2013" ]; then
-    bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${slurm_queue} ${slurm_time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir}
+    bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${slurm_queue} ${slurm_time_limit} ${lsf_queue} ${lsf_time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir}
 elif [ ${comm_pattern} == "unstructured_mesh" ]; then
-    bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${slurm_queue} ${slurm_time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir} ${x_procs} ${y_procs} ${z_procs}
+    bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${slurm_queue} ${slurm_time_limit} ${lsf_queue} ${lsf_time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir} ${x_procs} ${y_procs} ${z_procs}
 fi
 
 
