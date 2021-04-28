@@ -161,6 +161,8 @@ If you're running on a system that uses the Slurm scheduler, then the following 
 If you're running on a system that uses the LSF scheduler, then the following switch can be used to define settings for job submission:
 * -lq        : Defines the queue to submit LSF jobs to. 
                 (Defaults to the "normal" queue)
+* -lt        : A maximum time limit in minutes on the time provided to jobs submitted.
+                (Default 10 minutes)
 
 Below is an example run of the script as one might submit it on the Stampede2 cluster computer:
 
