@@ -4,10 +4,12 @@ n_procs=$1
 n_iters=$2
 msg_size=$3
 n_nodes=$4
-run_idx_low=$5
-run_idx_high=$6
-results_root=$7
-example_paths_dir=$8
+queue=$5
+time_limit=$6
+run_idx_low=$7
+run_idx_high=$8
+results_root=$9
+example_paths_dir=${10}
 
 source ${example_paths_dir}/example_paths_lsf.config
 #example_paths_dir=$(pwd)
@@ -29,7 +31,7 @@ do
     cd ${run_dir}
 
     #bsub -n ${n_procs} ${message_race_script} ${n_procs} ${n_iters} ${msg_size} ${run_idx_low} ${run_idx_high} ${results_root}
-    comm_pattern_run_stdout=$( bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -o ${debugging_path}/lsf_output.txt -e ${debugging_path}/lsf_error.txt ${comm_pattern_job_script} ${n_procs} ${n_iters} ${msg_size} ${n_nodes} ${run_idx} ${example_paths_dir} ${run_dir} )
+    comm_pattern_run_stdout=$( bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -q ${queue} -W ${time_limit} -o ${debugging_path}/lsf_output.txt -e ${debugging_path}/lsf_error.txt ${comm_pattern_job_script} ${n_procs} ${n_iters} ${msg_size} ${n_nodes} ${run_idx} ${example_paths_dir} ${run_dir} )
     comm_pattern_job_id=$( echo ${comm_pattern_run_stdout} | sed 's/[^0-9]*//g' )
     kdts_job_deps+=("done(${comm_pattern_job_id})")
     echo ${kdts_job_deps} 
