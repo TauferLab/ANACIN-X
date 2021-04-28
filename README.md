@@ -197,17 +197,15 @@ If you're running the project across more than 1 compute node, then please use a
 
 ## Project Team:
 
-Active Developers
+Developers:
 * Nick Bell
+* Dylan Chapp
 * Kae Suarez
 * Nigel Tan
 
-The following people have had significant contribution to the development of ANACIN-X but are not active developers:
-* Dylan Chapp
-
-Project Advisors
-* Dr. Michela Taufer (Project Lead)
+Project Advisors:
 * Dr. Sanjukta Bhowmick
+* Dr. Michela Taufer (Project Lead)
 
 ## Publications:
 
