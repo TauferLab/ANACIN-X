@@ -19,40 +19,44 @@ Help() {
     echo "Below are the switches available to use when running this script"
     echo ""
     echo "The following command line switches can be used to define parameters for your job submission:"
-echo "* -p : Defines the size of the mpi communicator used when generating communication patterns. (Default 4 MPI processes)"
-echo "* -i : Defines the number of times a given communication pattern appears in a single execution of ANACIN-X. (Default 1 iteration)"
-echo "* -s : The size in bytes of the messages passed when generating communication patterns. (Default 512 bytes)"
-echo "* -n : The number of compute nodes requested for running the ANACIN-X workflow. (Default 1 node)"
-echo "* -r : The number of runs to make of the ANACIN-X workflow. (Default 2 executions)"
-echo "* -o : If used, allows the user to define their own path to store output from the project. (Defaults to the directory '$HOME/comm_pattern_output')"
-echo "* -v : If used, will display the execution settings prior to running the execution."
-echo "* -h : Used to display the list of switch options."
-echo ""
-echo "If you're running on a system that uses the Slurm scheduler, then the following switches can be used to define settings for job submission:"
-echo "* -sq : Defines the queue to submit Slurm jobs to. (Defaults to the "normal" queue)"
-echo "* -st : A maximum time limit in minutes on the time provided to jobs submitted. (Default 10 minutes)"
-echo ""
+    echo "[-p]    Defines the size of the mpi communicator used when generating communication patterns. (Default 10 MPI processes)"
+    echo "[-i]    Defines the number of times a given communication pattern appears in a single execution of ANACIN-X. (Default 1 iteration)"
+    echo "[-s]    The size in bytes of the messages passed when generating communication patterns. (Default 512 bytes)"
+    echo "[-n]    The number of compute nodes requested for running the ANACIN-X workflow. (Default 1 node)"
+    echo "[-r]    The number of runs to make of the ANACIN-X workflow. (Default 2 executions)"
+    echo "        The number of runs must be at least 2"
+    echo "[-o]    If used, allows the user to define their own path to store output from the project. (Defaults to the directory '$HOME/comm_pattern_output')"
+    echo "[-c]    When running the unstructured mesh communication pattern, use this with 3 arguments to define the grid coordinates. (Ex. -c 2 3 4)"
+    echo "        The 3 coordinate values must multiply together to equal the number of processes used."
+    echo "        The 3 coordinate values must also multiply together to be greater than or equal 10."
+    echo "[-v]    If used, will display the execution settings prior to running the execution."
+    echo "[-h]    Used to display the list of switch options."
+    echo ""
+    echo "If you're running on a system that uses the Slurm scheduler, then the following switches can be used to define settings for job submission:"
+    echo "[-sq]   Defines the queue to submit Slurm jobs to. (Defaults to the "normal" queue)"
+    echo "[-st]   A maximum time limit in minutes on the time provided to jobs submitted. (Default 10 minutes)"
+    echo ""
 }
 
 
 while [ -n "$1" ]; do
     case "$1" in
-	    -p) n_procs=$2; shift; shift ;;
-	    -i) n_iters=$2; shift; shift ;;
-	    -s) msg_sizes=$2; shift; shift ;;
-	    -n) n_nodes=$2; shift; shift ;; 
+	    -p)  n_procs=$2; shift; shift ;;
+	    -i)  n_iters=$2; shift; shift ;;
+	    -s)  msg_sizes=$2; shift; shift ;;
+	    -n)  n_nodes=$2; shift; shift ;; 
 	    -sq) slurm_queue=$2; shift; shift ;;
 	    -st) slurm_time_limit=$2; shift; shift ;;
-	    -lq) lsf_queue=$2; shift; shift ;;
-	    -r) run_count=$2; shift; shift ;;
-	    -o) results_path=$2; shift; shift ;;
-	    -v) verbose="true"; shift ;;
-	    -h) Help; exit ;;
-	    *) echo "$1 is not an option" ;;
+	    #-lq) lsf_queue=$2; shift; shift ;;
+	    -r)  run_count=$2; shift; shift ;;
+	    -o)  results_path=$2; shift; shift ;;
+	    -c)  x_procs=$2; y_procs=$3; z_procs=$4; shift; shift; shift; shift ;;
+	    -v)  verbose="true"; shift ;;
+	    -h)  Help; exit ;;
+	    *)   echo "$1 is not an option"; exit ;;
     esac
-    shift
-    shift
 done
+
 
 # Comm Pattern definition
 while true; do
@@ -61,6 +65,15 @@ while true; do
 	    "message_race" | "amg2013" | "unstructured_mesh" ) break ;;
 	    * ) echo "Please respond with one of the listed options. Input is case sensitive. (message_race, amg2013, unstructured_mesh) " ;;
     esac
+done
+
+# Ensure that input values will work
+while [ ${comm_pattern} == "unstructured_mesh" ] && [ $(( x_procs*y_procs*z_procs )) -lt 10 ]; do
+    echo "The 3 coordinate values of unstructured mesh must multiply together to be greater than or equal to 10."
+    echo "Note that the product of these values will need to be equal to the number of processes."
+    read -p "x coordinate: " x_procs
+    read -p "y coordinate: " y_procs
+    read -p "z coordinate: " z_procs
 done
 
 # Pick a scheduler
@@ -72,23 +85,34 @@ while true; do
     esac
 done
 
+
 # Assign Default Values
-n_procs="${n_procs:=4}"
+n_procs="${n_procs:=10}"
+if [ ${comm_pattern} == "unstructured_mesh" ] && [ $(( x_procs*y_procs*z_procs )) -ne ${n_procs} ]; then
+    echo "The number of processes must correspond to the product of the unstructured mesh coordinates ${x_procs}, ${y_procs}, and ${z_procs}"
+    echo "Updating the number of processes to $(( x_procs*y_procs*z_procs )) = ${x_procs}*${y_procs}*${z_procs}"
+    n_procs=$(( x_procs*y_procs*z_procs ))
+fi
 n_iters="${n_iters:=1}"
 msg_sizes="${msg_sizes:=512}"
 n_nodes="${n_nodes:=1}"
 run_count="${run_count:=2}"
 results_path="${results_path:=$HOME/comm_pattern_output/${comm_pattern}_$(date +%s.%N)/}"
 if [ ${scheduler} == "slurm" ]; then
-    slurm_queue="normal"
-    slurm_time_limit="10"
+    slurm_queue="${slurm_queue:="normal"}"
+    slurm_time_limit="${slurm_time_limit:=10}"
 else
     slurm_queue=""
     slurm_time_limit=""
 fi
+if [ ${scheduler} == "lsf" ]; then
+    lsf_queue="${lsf_queue:="normal"}"
+else
+    lsf_queue=""
+fi
 
 # Report Variable Values if User Requests Verbose Execution
-if [ ${verbose} == "true" ]; then
+if [ "${verbose}" == "true" ]; then
     echo "Communication Pattern: ${comm_pattern}"
     echo "Scheduler Selected: ${scheduler}"
     echo "Number of Processes: ${n_procs}"
@@ -99,7 +123,11 @@ if [ ${verbose} == "true" ]; then
         echo "Queue for Running through Slurm: ${slurm_queue}"
         echo "Time Limit for Running through Slurm: ${slurm_time_limit}"
     fi
+    if [ ${scheduler} == "lsf" ]; then
+        echo "Queue for Running through LSF: ${lsf_queue}"
+    fi
     echo "Number of Execution Runs: ${run_count}"
+    echo "Unstructured Mesh Coordinates x*y*z = ${x_procs}*${y_procs}*${z_procs}"
     echo "Output will be stored in ${results_path}"
 fi
 
@@ -116,19 +144,13 @@ comm_pattern_path=${anacin_x_root}/apps/comm_pattern_generator/${scheduler}
 
 
 # Run Comm Pattern Script
-#for n_iters in ${num_iters[@]};
-#do
-#    for n_procs in ${num_procs[@]};
-#    do
-#	for msg_sizes in ${message_sizes[@]};
-#	do
 if [ ${comm_pattern} == "message_race" ]; then
     bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${slurm_queue} ${slurm_time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir}
 elif [ ${comm_pattern} == "amg2013" ]; then
     bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${slurm_queue} ${slurm_time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir}
 elif [ ${comm_pattern} == "unstructured_mesh" ]; then
-    bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${slurm_queue} ${slurm_time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir}
+    bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${slurm_queue} ${slurm_time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir} ${x_procs} ${y_procs} ${z_procs}
 fi
-#	done
-#    done
-#done
+
+
+
