@@ -4,13 +4,15 @@ n_procs=$1
 n_iters=$2
 msg_size=$3
 n_nodes=$4
-run_idx_low=$5
-run_idx_high=$6
-results_root=$7
-example_paths_dir=$8
-x_procs=$9
-y_procs=${10}
-z_procs=${11}
+queue=$5
+time_limit=$6
+run_idx_low=$7
+run_idx_high=$8
+results_root=$9
+example_paths_dir=${10}
+x_procs=${11}
+y_procs=${12}
+z_procs=${13}
 
 
 echo "Starting Unstructured Mesh Run"
@@ -76,7 +78,7 @@ do
 	    #n_procs_per_node=$((n_procs/n_nodes))
             if [ ${proc_placement} == "pack" ]; then
                 #n_nodes_trace=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
-                trace_stdout=$( bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -o ${debugging_path}/trace_exec_output.txt -e ${debugging_path}/trace_exec_error.txt ${job_script_trace_pack_procs} ${n_procs} ${app} ${config} )
+                trace_stdout=$( bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -q ${queue} -W ${time_limit} -o ${debugging_path}/trace_exec_output.txt -e ${debugging_path}/trace_exec_error.txt ${job_script_trace_pack_procs} ${n_procs} ${app} ${config} )
             elif [ ${proc_placement} == "spread" ]; then
                 n_nodes_trace=${n_procs}
                 trace_stdout=$( bsub -nnodes ${n_nodes_trace} ${job_script_trace_spread_procs} ${n_procs} ${app} ${config} )
@@ -86,13 +88,13 @@ do
 	    #echo "Starting Build Event Graph"
             # Build event graph
             #n_nodes_build_graph=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
-            build_graph_stdout=$( bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -w "done(${trace_job_id})" -o ${debugging_path}/build_graph_output.txt -e ${debugging_path}/build_graph_error.txt ${job_script_build_graph} ${n_procs} ${dumpi_to_graph_bin} ${dumpi_to_graph_config} ${run_dir} )
+            build_graph_stdout=$( bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -w "done(${trace_job_id})" -q ${queue} -W ${time_limit} -o ${debugging_path}/build_graph_output.txt -e ${debugging_path}/build_graph_error.txt ${job_script_build_graph} ${n_procs} ${dumpi_to_graph_bin} ${dumpi_to_graph_config} ${run_dir} )
             build_graph_job_id=$( echo ${build_graph_stdout} | sed 's/[^0-9]*//g' )
             event_graph=${run_dir}/event_graph.graphml
 
 	    #echo "Starting Extract Slices"
             # Extract slices
-            extract_slices_stdout=$( bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -w "done(${build_graph_job_id})" -o ${debugging_path}/extract_slices_output.txt -e ${debugging_path}/extract_slices_error.txt ${job_script_extract_slices} ${n_procs_extract_slices} ${extract_slices_script} ${event_graph} ${slicing_policy} )
+            extract_slices_stdout=$( bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -w "done(${build_graph_job_id})" -q ${queue} -W ${time_limit} -o ${debugging_path}/extract_slices_output.txt -e ${debugging_path}/extract_slices_error.txt ${job_script_extract_slices} ${n_procs_extract_slices} ${extract_slices_script} ${event_graph} ${slicing_policy} )
             extract_slices_job_id=$( echo ${extract_slices_stdout} | sed 's/[^0-9]*//g' ) 
             kdts_job_deps+=("done(${extract_slices_job_id})")
         done # runs
@@ -102,7 +104,7 @@ do
         kdts_job_dep_str=$( join_by "&&" ${kdts_job_deps[@]} )
 	echo ${kdts_job_dep_str}
         cd ${runs_root}
-        compute_kdts_stdout=$( bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -w ${kdts_job_dep_str} -o ${debugging_path}/../../compute_kdts_output.txt -e ${debugging_path}/../../compute_kdts_error.txt ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} ${slicing_policy} )
+        compute_kdts_stdout=$( bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -w ${kdts_job_dep_str} -q ${queue} -W ${time_limit} -o ${debugging_path}/../../compute_kdts_output.txt -e ${debugging_path}/../../compute_kdts_error.txt ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} ${slicing_policy} )
         #compute_kdts_stdout=$( sbatch -N${n_nodes_compute_kdts} ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} )
         compute_kdts_job_id=$( echo ${compute_kdts_stdout} | sed 's/[^0-9]*//g' )
 
