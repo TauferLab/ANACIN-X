@@ -155,26 +155,27 @@ comm_pattern_path=${anacin_x_root}/apps/comm_pattern_generator/${scheduler}
 
 # Copy Run Configuration into Output Files
 mkdir -p ${results_path}
+user_config_file=${results_path}/comm_pattern_config.txt
 cp ${graph_kernel} ${results_path}
-echo "Communication Pattern: ${comm_pattern}" >> ${results_path}/run_config.txt
-echo "Scheduler Selected: ${scheduler}" >> ${results_path}/run_config.txt
-echo "Number of Processes: ${n_procs}" >> ${results_path}/run_config.txt
-echo "Number of Iterations: ${n_iters}" >> ${results_path}/run_config.txt
-echo "Message Size: ${msg_sizes}" >> ${results_path}/run_config.txt
-echo "Number of Nodes: ${n_nodes}" >> ${results_path}/run_config.txt
+echo "Communication Pattern: ${comm_pattern}" >> ${user_config_file}
+echo "Scheduler Selected: ${scheduler}" >> ${user_config_file}
+echo "Number of Processes: ${n_procs}" >> ${user_config_file}
+echo "Number of Iterations: ${n_iters}" >> ${user_config_file}
+echo "Message Size: ${msg_sizes}" >> ${user_config_file}
+echo "Number of Nodes: ${n_nodes}" >> ${user_config_file}
 if [ ${scheduler} == "slurm" ]; then
-    echo "Queue for Running through Slurm: ${slurm_queue}" >> ${results_path}/run_config.txt
-    echo "Time Limit for Running through Slurm: ${slurm_time_limit}" >> ${results_path}/run_config.txt
+    echo "Queue for Running through Slurm: ${slurm_queue}" >> ${user_config_file}
+    echo "Time Limit for Running through Slurm: ${slurm_time_limit}" >> ${user_config_file}
 fi
 if [ ${scheduler} == "lsf" ]; then
-    echo "Queue for Running through LSF: ${lsf_queue}" >> ${results_path}/run_config.txt
-    echo "Time Limit for Running through LSF: ${lsf_time_limit}" >> ${results_path}/run_config.txt
+    echo "Queue for Running through LSF: ${lsf_queue}" >> ${user_config_file}
+    echo "Time Limit for Running through LSF: ${lsf_time_limit}" >> ${user_config_file}
 fi
-echo "Number of Execution Runs: ${run_count}" >> ${results_path}/run_config.txt
+echo "Number of Execution Runs: ${run_count}" >> ${user_config_file}
 if [ ${comm_pattern} == "unstructured_mesh" ]; then
-    echo "Unstructured Mesh Coordinates x*y*z = ${x_procs}*${y_procs}*${z_procs}" >> ${results_path}/run_config.txt
+    echo "Unstructured Mesh Coordinates x*y*z = ${x_procs}*${y_procs}*${z_procs}" >> ${user_config_file}
 fi
-echo "Output will be stored in ${results_path}" >> ${results_path}/run_config.txt
+echo "Output will be stored in ${results_path}" >> ${user_config_file}
 
 
 # Run Comm Pattern Script
