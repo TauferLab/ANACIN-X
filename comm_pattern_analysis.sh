@@ -102,7 +102,7 @@ n_iters="${n_iters:=1}"
 msg_sizes="${msg_sizes:=512}"
 n_nodes="${n_nodes:=1}"
 run_count="${run_count:=2}"
-results_path="${results_path:=$HOME/comm_pattern_output/${comm_pattern}_$(date +%s.%N)/}"
+results_path="${results_path:=$HOME/comm_pattern_output/${comm_pattern}_$(date +%s)/}"
 if [ ${scheduler} == "slurm" ]; then
     slurm_queue="${slurm_queue:="normal"}"
     slurm_time_limit="${slurm_time_limit:=10}"
@@ -135,7 +135,9 @@ if [ "${verbose}" == "true" ]; then
         echo "Time Limit for Running through LSF: ${lsf_time_limit}"
     fi
     echo "Number of Execution Runs: ${run_count}"
-    echo "Unstructured Mesh Coordinates x*y*z = ${x_procs}*${y_procs}*${z_procs}"
+    if [ ${comm_pattern} == "unstructured_mesh" ]; then
+        echo "Unstructured Mesh Coordinates x*y*z = ${x_procs}*${y_procs}*${z_procs}"
+    fi
     echo "Output will be stored in ${results_path}"
 fi
 
@@ -149,6 +151,30 @@ cd -
 source ${example_paths_dir}/example_paths_${scheduler}.config
 config_path=${anacin_x_root}/apps/comm_pattern_generator/config
 comm_pattern_path=${anacin_x_root}/apps/comm_pattern_generator/${scheduler}
+
+
+# Copy Run Configuration into Output Files
+mkdir -p ${results_path}
+cp ${graph_kernel} ${results_path}
+echo "Communication Pattern: ${comm_pattern}" >> ${results_path}/run_config.txt
+echo "Scheduler Selected: ${scheduler}" >> ${results_path}/run_config.txt
+echo "Number of Processes: ${n_procs}" >> ${results_path}/run_config.txt
+echo "Number of Iterations: ${n_iters}" >> ${results_path}/run_config.txt
+echo "Message Size: ${msg_sizes}" >> ${results_path}/run_config.txt
+echo "Number of Nodes: ${n_nodes}" >> ${results_path}/run_config.txt
+if [ ${scheduler} == "slurm" ]; then
+    echo "Queue for Running through Slurm: ${slurm_queue}" >> ${results_path}/run_config.txt
+    echo "Time Limit for Running through Slurm: ${slurm_time_limit}" >> ${results_path}/run_config.txt
+fi
+if [ ${scheduler} == "lsf" ]; then
+    echo "Queue for Running through LSF: ${lsf_queue}" >> ${results_path}/run_config.txt
+    echo "Time Limit for Running through LSF: ${lsf_time_limit}" >> ${results_path}/run_config.txt
+fi
+echo "Number of Execution Runs: ${run_count}" >> ${results_path}/run_config.txt
+if [ ${comm_pattern} == "unstructured_mesh" ]; then
+    echo "Unstructured Mesh Coordinates x*y*z = ${x_procs}*${y_procs}*${z_procs}" >> ${results_path}/run_config.txt
+fi
+echo "Output will be stored in ${results_path}" >> ${results_path}/run_config.txt
 
 
 # Run Comm Pattern Script
