@@ -197,6 +197,7 @@ pip install grakel
 pip install python-igraph
 #pip install scikit-learn
 pip install mpi4py
+pip install ipyfilechooser
 echo ${progress_delimiter}
 
 # Set up to install graphkernels
