@@ -10,10 +10,11 @@ Runtime non-determinism in High Performance Computing (HPC) applications present
 * Event Graph Construction: We convert each execution's traces into a graph-structured model of the interprocess communication that took place during the execution.
   * Provide reference to dumpi_to_graph
 * Event Graph Analysis: We implement workflows for identifying root causes of non-deterministic behavior.
-* Communication Pattern Generator: We implement some respresentative sample MPI point-to-point, non-deterministic communication patterns for illustrating the value of Tracing, Event Graph Construction, and Event Graph Analysis in the process of debugging non-determinism.
-* Need to provide reference to explain communication patterns here.
+* Communication Pattern Generator: We implement some respresentative sample MPI point-to-point, non-deterministic communication patterns for illustrating the value of Tracing, Event Graph Construction, and Event Graph Analysis in the process of debugging non-determinism.  For more information about the communication patterns in question, please see the most recent publication in the publications section of this document.
 
 ## Installation
+
+If you're running your version of the project on an instance of the [Jetstream cloud computer](https://jetstream-cloud.org), use the image "Ubuntu20_04_Anacin-X" and skip ahead to the subsection below about installing ANACIN-X.  Otherwise, continue reading here to ensure all dependencies are installed.
 
 If you haven't already, you'll need to install the Spack and Conda package managers.
 
@@ -27,7 +28,7 @@ To install Spack, follow the instructions at: [Spack Install](https://spack.read
 In particular, make sure to follow the instructions under "Shell support". This step will allow software installed with Spack to be loaded and unloaded as [environment modules.](https://spack.readthedocs.io/en/latest/getting_started.html#installenvironmentmodules) 
 
 ### Conda:
-Conda is a cross-language package, dependency, and environment manager. We use Conda to manage the dependencies of ANACIN-X's Python code. 
+Conda is a cross-language package, dependency, and environment manager. We use Conda to manage the dependencies of ANACIN-X's Python code.  We strongly recommend using the Anaconda installation of the package manager rather than the Miniconda version so that you can have Jupyter installed on your machine for data visualization.
 
 To install Conda, follow the instructions at: [Conda Install](https://conda.io/projects/conda/en/latest/user-guide/install/index.html)
 
@@ -49,13 +50,19 @@ You will need to first download the project through git using
 git clone https://github.com/TauferLab/Src_ANACIN-X.git
 ```
 
-To begin, we stongly recommend using the following command to install dependencies for the project. 
+Note that Spack, Conda, and SSH will need to be installed and set up beforehand as described above, unless you're on Jetstream.  If there is a specific C compiler that you wish to have used on your machine, please see the 'Special Case' section below.
+
+Now that your environment is prepared and the project is on your local machine, be sure to enter the project root for setup with the command:
+
+```
+cd Src_ANACIN-X
+```
+
+If you're using the Jetstream cloud computer image for Anacin-X, you can skip this next command.  Otherwise, we strongly recommend installing the dependencies for the project with:
 
 ```
 . setup_deps.sh
 ``` 
-
-Note that Spack, Conda, and SSH will need to be installed and set up beforehand as described above.  If there is a specific C compiler that you wish to have used in the install procedure, please see the 'Special Cases' section below.
 
 The script will begin by verifying some information.  Follow the prompts at the beginning, and then the installation will run on its own.  The installation of all dependencies may take some time to complete.
 
@@ -114,6 +121,7 @@ The following packages will be installed via pip:
 * python-igraph
 * mpi4py
 * graphkernels
+* ipyfilechooser
 
 ### Submodule Packages
 The following packages will be installed as submodules to the installation of ANACIN-X:
@@ -170,11 +178,19 @@ Below is an example run of the script as one might submit it on the Stampede2 cl
 . ./comm_pattern_analysis.sh -p 10 -n 2 -v -r 50 -sq "skx-normal" -o $WORK2/anacinx_output_1
 ```
 
+Once the script has started running, follow the prompts at the beginning.  You will need to input a communication pattern to generate.  You can choose between any of the communication patterns listed in the supported settings section below with these corresponding formats: message_race, amg2013, unstructured_mesh.
+
+The script will also request which scheduler your computing system employs.  Please input one of the following: lsf, slurm, unscheduled.
+
 Be aware that if you run the project on some machines and some job queues, there will be a limit to the number of jobs that can be submitted.  In such cases, you may lose some jobs if you try to run the program with settings that produce more jobs than are allowed in the queue being used.
 
 ### Result Visualization: 
 
+We will be using a Jupyter Notebook for visualization of kernel distance data that will populate within the ouput of ANACIN-X.
 
+* Open Jupyter Notebook
+* Find kdts.pkl
+* Visualize
 
 ### Supported Systems and Settings:
 
@@ -183,7 +199,7 @@ Currently, the software supports the following types of scheduler systems for jo
 * Slurm scheduled systems (ex. Stampede2)
 * Unscheduled systems (ex. Jetstream, personal computers)
 
-While our aim is to expand the project to support analysis of many types of MPI applications, the software currently works with the following communication patterns that are internally generated.  For more details about the communication patterns, please see []().
+While our aim is to expand the project to support analysis of many types of MPI applications, the software currently works with the following communication patterns that are internally generated.  For more details about the communication patterns, please see the most recent publication in the publications section below.
 * Message Race
 * AMG2013
 * Unstructured Mesh
