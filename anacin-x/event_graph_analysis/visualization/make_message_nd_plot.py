@@ -13,17 +13,26 @@ from scipy.stats.stats import pearsonr, spearmanr
 
 import sys
 sys.path.append(sys.path[0]+"/..")
-sys.path.append(".")
-sys.path.append("..")
 #sys.path.append("/g/g12/chapp1/ANACIN-X/anacin-x/event_graph_analysis/")
 #sys.path.append("/g/g12/chapp1/ANACIN-X/anacin-x/event_graph_analysis/visualization/")
 #sys.path.append("/$HOME/Src_ANACIN-X/anacin-x/event_graph_analysis/")
 #sys.path.append("/$HOME/Src_ANACIN-X/anacin-x/event_graph_analysis/visualization/")
 
-print(sys.path[0])
-
 from graph_kernel_postprocessing import flatten_distance_matrix
 from kernel_distance_time_series_postprocessing import get_distances_seq
+
+def kernel_json_to_key( kernel_json ):
+    kernel_params = kernel_json["kernels"]
+    assert( len(kernel_params) == 1 )
+    kernel_params = kernel_params[0]
+    kernel_name = kernel_params["name"]
+    if kernel_name == "wlst":
+        label = kernel_params["params"]["label"]
+        n_iters = kernel_params["params"]["n_iters"]
+        key = ( kernel_name, label, n_iters )
+        return key
+    else:
+        raise NotImplementedError("Translation not implemented for kernel: {}".format(kernel_name))
 
 def get_scatter_plot_points( idx_to_distances ):
     x_vals = []
@@ -130,7 +139,6 @@ def main( kdts_path, pattern, output, nd_frac ):
     x_ticks = list(range(len(x_tick_labels)))
     ax.set_xticks( x_ticks )
     ax.set_xticklabels( x_tick_labels, rotation=0, fontdict=tick_label_fontdict )
-    print(scatter_y_vals)
     y_ticks = list(range(0,int(max(scatter_y_vals))+11,10))
     y_tick_labels = [ str(y) for y in y_ticks ]
     ax.set_yticks( y_ticks )
