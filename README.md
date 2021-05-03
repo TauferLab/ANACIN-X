@@ -186,11 +186,25 @@ Be aware that if you run the project on some machines and some job queues, there
 
 ### Result Visualization: 
 
-We will be using a Jupyter Notebook for visualization of kernel distance data that will populate within the ouput of ANACIN-X.
+There are a few methods to do visualization of the kernel distance data from ANACIN-X.  We strongly recommend using Jupyter Notebooks if you can pull it up from your machine.  The following methods will work to visualize the data.
 
-* Open Jupyter Notebook
-* Find kdts.pkl
-* Visualize
+#### Method 1 - Jupyter
+
+If you can use Jupyter to visualize the data for the project, open Jupyter from your machine.  Within Jupyter, find the file titled visualization.ipynb in the same directory as the script you used to produce your data (that is the root of your project).
+
+By opening this visualization script and following the instructions within, you can visualize the kernel distance data.
+
+#### Method 2 - Command Line Visualization
+
+If you can't use Jupyter to visualize the data, then we recommend using the command line python tool to generate the png images.  This will take a few key steps:
+
+* Navigate to the directory that your output was stored in from your run.  Follow the output directory structure down based on the inputs you gave to set the project with until you find a file titled 'kdts.pkl'.
+* Save the full path to your 'kdts.pkl' file so that it can be used when calling the visualization script.
+* Then return to the project directory where you submitted jobs from.  From there, input the following command:
+
+```
+python3 anacin-x/event_graph_analysis/visualization/make_message_nd_plot.py [Path to 'kdts.pkl' file with file name] [The type of communication pattern you used] [The name of a file to store the visualization in (excluding the file type)] [--nd_neighbor_fraction <value> (only used for unstructured mesh communication pattern)]
+```
 
 ### Supported Systems and Settings:
 
