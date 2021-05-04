@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-cd submodules/Src_Pluto
+cd submodules/Pluto
 $(pwd)/one_step_build.sh
