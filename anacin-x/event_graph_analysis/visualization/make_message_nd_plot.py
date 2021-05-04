@@ -3,6 +3,7 @@
 import os
 import pprint
 import pickle as pkl
+import json
 import argparse
 import numpy as np
 import matplotlib
@@ -37,8 +38,9 @@ def kernel_json_to_key( kernel_json ):
 def get_scatter_plot_points( idx_to_distances ):
     x_vals = []
     y_vals = []
-    for slice_idx,distances in idx_to_distances.items():
-        base_x_val = slice_idx
+    for i in range(len(idx_to_distances)):
+        base_x_val = i
+        distances = idx_to_distances[i]
         for d in distances:
             x_val = base_x_val + np.random.uniform(-0.25,0.25)
             y_val = d
@@ -46,13 +48,19 @@ def get_scatter_plot_points( idx_to_distances ):
             y_vals.append( y_val )
     return x_vals, y_vals
 
-def main( kdts_path, pattern, output, nd_frac ):
+def main( kdts_path, pattern, output, kernel_path, nd_frac ):
     # Read in kdts data
     with open( kdts_path, "rb" ) as infile:
         slice_idx_to_data = pkl.load( infile )
     
-    kernel = ('wlst','logical_time', 5)
-    idx_to_distances = { k:flatten_distance_matrix(v["kernel_distance"][kernel]) for k,v in slice_idx_to_data.items() }
+    with open(kernel_path, "r" ) as infile:
+        kernel = json.load(infile)
+    
+    # Unpack kernel distance time series data
+    slice_indices = sorted( slice_idx_to_data.keys() )
+    kernel_key = kernel_json_to_key( kernel )
+    kernel_matrices = [ slice_idx_to_data[i]["kernel_distance"][kernel_key] for i in slice_indices ]
+    idx_to_distances = [ flatten_distance_matrix(km) for km in kernel_matrices ]
 
     # Package data for scatter plot
     scatter_x_vals, scatter_y_vals = get_scatter_plot_points( idx_to_distances )
@@ -60,9 +68,9 @@ def main( kdts_path, pattern, output, nd_frac ):
     # Package data for box-plots
     bp_positions = []
     bp_data = []
-    for idx,distances in sorted( idx_to_distances.items() ):
-        bp_positions.append( idx )
-        bp_data.append( distances )
+    for i in range( len(idx_to_distances) ):
+        bp_positions.append( i )
+        bp_data.append( idx_to_distances[i] )
     
     # Specify appearance of boxes
     box_width = 0.5
@@ -177,9 +185,11 @@ if __name__ == "__main__":
                         help="Path to pickle file of kernel distance time series data")
     parser.add_argument("comm_pattern",
                         help = "Name of visualized communication pattern")
+    parser.add_argument("kernel",
+                        help = "Path to json file of kernel used for KDTS calculation")
     parser.add_argument("output",
                         help = "Name of output file")
     parser.add_argument("--nd_neighbor_fraction", type=float,
                         help="Fraction of neighbors determined non-deterministically for these runs of the unstructured mesh comm. pattern")
     args = parser.parse_args()
-    main( args.data, args.comm_pattern, args.output, args.nd_neighbor_fraction )
+    main( args.data, args.comm_pattern, args.output, args.kernel, args.nd_neighbor_fraction )
