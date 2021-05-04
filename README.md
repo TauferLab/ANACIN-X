@@ -203,7 +203,7 @@ If you can't use Jupyter to visualize the data, then we recommend using the comm
 * Then return to the project directory where you submitted jobs from.  From there, input the following command:
 
 ```
-python3 anacin-x/event_graph_analysis/visualization/make_message_nd_plot.py [Path to 'kdts.pkl' file with file name] [The type of communication pattern you used] [The name of a file to store the visualization in (excluding the file type)] [--nd_neighbor_fraction <value> (only used for unstructured mesh communication pattern)]
+python3 anacin-x/event_graph_analysis/visualization/make_message_nd_plot.py [Path to 'kdts.pkl' file with file name] [The type of communication pattern you used] [Path to kernel json used to generate kdts file] [The name of a file to store the visualization in (excluding the file type)] [--nd_neighbor_fraction <value> (only used for unstructured mesh communication pattern)]
 ```
 
 ### Supported Systems and Settings:
