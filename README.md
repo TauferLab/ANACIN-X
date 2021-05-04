@@ -206,6 +206,8 @@ If you can't use Jupyter to visualize the data, then we recommend using the comm
 python3 anacin-x/event_graph_analysis/visualization/make_message_nd_plot.py [Path to 'kdts.pkl' file with file name] [The type of communication pattern you used] [Path to kernel json used to generate kdts file] [The name of a file to store the visualization in (excluding the file type)] [--nd_neighbor_fraction <value> (only used for unstructured mesh communication pattern)]
 ```
 
+A png file will be produced and placed in the working directory.  If you're doing your work and producing visualizations on a remote machine, remember to copy your png image to your local machine using a tool like scp to view the image.
+
 ### Supported Systems and Settings:
 
 Currently, the software supports the following types of scheduler systems for job submission:
