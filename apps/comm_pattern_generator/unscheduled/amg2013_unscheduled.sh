@@ -27,7 +27,7 @@ source ${example_paths_dir}/example_paths_unscheduled.config
 for run_idx in `seq -f "%03g" ${run_idx_low} ${run_idx_high}`; 
 do
 
-    echo "Starting run ${run_idx} of Message Race communication pattern."
+    echo "Starting run ${run_idx} of AMG2013 communication pattern."
 
     # Create needed paths
     run_dir=${results_root}/msg_size_${msg_size}/n_procs_${n_procs}/n_iters_${n_iters}/run_${run_idx}/
@@ -62,7 +62,7 @@ do
 done
 
 # Compute KDTS
-echo "Computing KDTS data for Message Race communication pattern with $((run_idx_high+1)) runs."
+echo "Computing KDTS data for AMG2013 communication pattern with $((run_idx_high+1)) runs."
 mpirun -np ${n_procs} > ${debugging_path}/../../compute_kdts_output.txt 2> ${debugging_path}/../../compute_kdts_error.txt ${compute_kdts_script} "${run_dir}/../" ${graph_kernel} --slice_dir_name "slices" -o "kdts.pkl"
 
 #	done

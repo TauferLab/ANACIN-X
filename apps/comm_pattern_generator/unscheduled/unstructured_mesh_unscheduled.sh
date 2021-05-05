@@ -44,7 +44,7 @@ do
         for run_idx in `seq -f "%03g" ${run_idx_low} ${run_idx_high}`; 
         do
 
-            echo "Starting run ${run_idx} of Message Race communication pattern with nd neighbor fraction = ${nd_neighbor_fraction}."
+            echo "Starting run ${run_idx} of Unstructured Mesh communication pattern with nd neighbor fraction = ${nd_neighbor_fraction}."
 
 	    # Set up results dir
             run_dir=${runs_root}/run_${run_idx}
@@ -119,7 +119,7 @@ do
         #compute_kdts_stdout=$( bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -w ${kdts_job_dep_str} -o ${debugging_path}/compute_kdts_output.txt -e ${debugging_path}/compute_kdts_error.txt ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} ${slicing_policy} )
         #compute_kdts_stdout=$( sbatch -N${n_nodes_compute_kdts} ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} )
 	#echo "prekdts"
-	echo "Computing KDTS data for Message Race communication pattern with $((run_idx_high+1)) runs and nd neighbor fraction = ${nd_neighbor_fraction}"
+	echo "Computing KDTS data for Unstrucutured Mesh communication pattern with $((run_idx_high+1)) runs and nd neighbor fraction = ${nd_neighbor_fraction}"
 	bash > ${debugging_path}/../../compute_kdts_output.txt 2> ${debugging_path}/../../compute_kdts_error.txt ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} ${slicing_policy}
 	#echo "postkdts"
         #compute_kdts_job_id=$( echo ${compute_kdts_stdout} | sed 's/[^0-9]*//g' )
