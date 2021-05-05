@@ -16,6 +16,8 @@ source ${example_paths_dir}/example_paths_unscheduled.config
 #message_sizes=(1 512 1024 2048)
 #message_sizes=(512)
 
+#echo "Starting runs of Message Race communication pattern."
+
 # Non-NINJA Workflow
 #for iters in ${n_iters[@]};
 #do
@@ -25,6 +27,8 @@ source ${example_paths_dir}/example_paths_unscheduled.config
 #	do
 for run_idx in `seq -f "%03g" ${run_idx_low} ${run_idx_high}`; 
 do
+
+    echo "Starting run ${run_idx} of Message Race communication pattern."
 
     # Set up paths
     run_dir=${results_root}/msg_size_${msg_size}/n_procs_${n_procs}/n_iters_${n_iters}/run_${run_idx}
@@ -36,20 +40,24 @@ do
     
     # Create app config if doesn't exist
     if [ ! -f "$app_config" ]; then
+	#echo "Creating config file for message size ${msg_size} and iteration count ${n_iters}."
 	python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "naive_reduce" ${msg_size} ${n_iters} "${example_paths_dir}/../"
     fi
 
-    echo ${app_config}
+    #echo ${app_config}
     # Trace execution
+    #echo "Tracing communiction pattern on run ${run_idx}."
     LD_PRELOAD=${pnmpi} PNMPI_LIB_PATH=${pnmpi_lib_path} PNMPI_CONF=${pnmpi_conf} mpirun -np ${n_procs} > ${debugging_path}/trace_exec_output.txt 2> ${debugging_path}/trace_exec_error.txt ${app_bin} ${app_config}
     mv dumpi-* ${run_dir}
     mv pluto_out* ${run_dir}
 
     # Build event graph
+    #echo "Build the event graph on run ${run_idx}."
     mpirun -np ${n_procs} > ${debugging_path}/build_graph_output.txt 2> ${debugging_path}/build_graph_error.txt ${dumpi_to_graph_bin} ${dumpi_to_graph_config} ${run_dir}
     event_graph=${run_dir}/event_graph.graphml
 
     # Extract slices
+    #echo "Extract event graph slices on run ${run_idx}."
     mpirun -np ${n_procs} > ${debugging_path}/extract_slices_output.txt 2> ${debugging_path}/extract_slices_error.txt ${extract_slices_script} ${event_graph} ${slicing_policy} -o "slices"
 
     #cp ${event_graph} ${results_root}/../comm_pattern_graphs/graph_message_race_niters_${n_iters}_nprocs_${n_procs}_msg_size_${msg_size}_run_${run_idx}.graphml
@@ -57,6 +65,7 @@ do
 done
 
 # Compute KDTS
+echo "Computing KDTS data for Message Race communication pattern with $((run_idx_high+1)) runs."
 mpirun -np ${n_procs} > ${debugging_path}/../../compute_kdts_output.txt 2> ${debugging_path}/../../compute_kdts_error.txt ${compute_kdts_script} "${run_dir}/../" ${graph_kernel} --slice_dir_name "slices" -o "kdts.pkl"
 
 #	done

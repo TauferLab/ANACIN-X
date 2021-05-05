@@ -31,7 +31,7 @@ if [ ! -f "$app_config" ]; then
     python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "naive_reduce" ${msg_size} ${n_iters} "${example_paths_dir}/../"
 fi
 
-echo ${app_config}
+#echo ${app_config}
 # Trace execution
 LD_PRELOAD=${pnmpi} PNMPI_LIB_PATH=${pnmpi_lib_path} PNMPI_CONF=${pnmpi_conf} mpirun -np ${n_procs} > ${debugging_path}/trace_exec_output.txt 2> ${debugging_path}/trace_exec_error.txt ${app_bin} ${app_config}
 mv dumpi-* ${run_dir}

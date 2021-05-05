@@ -41,7 +41,8 @@ do
     kdts_job_deps=()
     for run_idx in `seq -f "%03g" ${run_idx_low} ${run_idx_high}`; 
     do
-        echo "Launching run ${run_idx} for: proc. placement = ${proc_placement}, # procs. = ${n_procs}, msg. size = ${msg_size}, nd. neighbor fraction = ${nd_neighbor_fraction}"
+        #echo "Launching run ${run_idx} for: proc. placement = ${proc_placement}, # procs. = ${n_procs}, msg. size = ${msg_size}, nd. neighbor fraction = ${nd_neighbor_fraction}"
+        echo "Submitting jobs for run ${run_idx} of the Unstructured Mesh communication pattern on scheduler=slurm with nd neighbor fraction = ${nd_neighbor_fraction}."
 
         # Set up results dir
         run_dir=${runs_root}/run_${run_idx}/
@@ -62,6 +63,7 @@ do
     # Compute kernel distances for each slice
     kdts_job_dep_str=$( join_by : ${kdts_job_deps[@]} )
     cd ${runs_root}
+    echo "Submitting job to compute KDTS data for Unstructured Mesh communication pattern with $((run_idx_high+1)) runs and nd neighbor fraction = ${nd_neighbor_fraction} on scheduler=slurm."
     compute_kdts_stdout=$( sbatch -N ${n_nodes} -p ${queue} -t ${time_limit} -n ${n_procs} --ntasks-per-node=${n_procs_per_node} -o compute_kdts_out.txt -e compute_kdts_err.txt --dependency=afterok:${kdts_job_dep_str} ${job_script_compute_kdts} ${n_procs} ${compute_kdts_script} ${runs_root} ${graph_kernel} )
     compute_kdts_job_id=$( echo ${compute_kdts_stdout} | sed 's/[^0-9]*//g' )
     

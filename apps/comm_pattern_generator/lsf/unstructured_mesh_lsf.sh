@@ -15,7 +15,7 @@ y_procs=${12}
 z_procs=${13}
 
 
-echo "Starting Unstructured Mesh Run"
+#echo "Starting Unstructured Mesh Run"
 source ${example_paths_dir}/example_paths_lsf.config
 #example_paths_dir=$(pwd)
 
@@ -32,7 +32,7 @@ proc_placement=("pack")
 nd_neighbor_fractions=("0" "0.25" "0.5" "0.75" "1")
 #nd_neighbor_fractions=("0")
 
-echo "Entering Loops"
+#echo "Entering Loops"
 for proc_placement in ${proc_placement[@]};
 do
     #    for n_procs in ${run_scales[@]};
@@ -41,14 +41,17 @@ do
     do
 	#            for msg_size in ${message_sizes[@]};
 	#            do
-        echo "Launching jobs for: proc. placement = ${proc_placement}, # procs. = ${n_procs}, neighbor non-determinism fraction = ${nd_neighbor_fraction}, msg. size = ${msg_size}"
+        #echo "Launching jobs for: proc. placement = ${proc_placement}, # procs. = ${n_procs}, neighbor non-determinism fraction = ${nd_neighbor_fraction}, msg. size = ${msg_size}"
         runs_root=${results_root}/msg_size_${msg_size}/n_procs_${n_procs}/n_iters_${n_iters}/proc_placement_${proc_placement}/neighbor_nd_fraction_${nd_neighbor_fraction}/
 
         # Launch intra-execution jobs
         kdts_job_deps=()
         for run_idx in `seq -f "%03g" ${run_idx_low} ${run_idx_high}`; 
         do
-            # Set up results dir
+
+            echo "Submitting jobs for run ${run_idx} of the Unstructured Mesh communication pattern on scheduler=lsf with nd neighbor fraction = ${nd_neighbor_fraction}."
+
+	    # Set up results dir
             run_dir=${runs_root}/run_${run_idx}
             mkdir -p ${run_dir}
             debugging_path=${run_dir}/debug
@@ -74,7 +77,7 @@ do
 		cd ${old_dir}
 	    fi
 	    
-	    # Trace execution
+# Trace execution
 	    #n_procs_per_node=$((n_procs/n_nodes))
             if [ ${proc_placement} == "pack" ]; then
                 #n_nodes_trace=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
@@ -102,8 +105,9 @@ do
 	#echo "Start Computing Kernel Distances"
         # Compute kernel distances for each slice
         kdts_job_dep_str=$( join_by "&&" ${kdts_job_deps[@]} )
-	echo ${kdts_job_dep_str}
+	#echo ${kdts_job_dep_str}
         cd ${runs_root}
+	echo "Submitting job to compute KDTS data for Unstructured Mesh communication pattern with $((run_idx_high+1)) runs and nd neighbor fraction = ${nd_neighbor_fraction} on scheduler=lsf."
         compute_kdts_stdout=$( bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -w ${kdts_job_dep_str} -q ${queue} -W ${time_limit} -o ${debugging_path}/../../compute_kdts_output.txt -e ${debugging_path}/../../compute_kdts_error.txt ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} ${slicing_policy} )
         #compute_kdts_stdout=$( sbatch -N${n_nodes_compute_kdts} ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} )
         compute_kdts_job_id=$( echo ${compute_kdts_stdout} | sed 's/[^0-9]*//g' )

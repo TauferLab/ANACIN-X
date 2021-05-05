@@ -31,14 +31,16 @@ do
     cd ${run_dir}
 
     #bsub -n ${n_procs} ${message_race_script} ${n_procs} ${n_iters} ${msg_size} ${run_idx_low} ${run_idx_high} ${results_root}
+    echo "Submitting job for run ${run_idx} of the Message Race communication pattern on scheduler=lsf."
     comm_pattern_run_stdout=$( bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -q ${queue} -W ${time_limit} -o ${debugging_path}/lsf_output.txt -e ${debugging_path}/lsf_error.txt ${comm_pattern_job_script} ${n_procs} ${n_iters} ${msg_size} ${n_nodes} ${run_idx} ${example_paths_dir} ${run_dir} )
     comm_pattern_job_id=$( echo ${comm_pattern_run_stdout} | sed 's/[^0-9]*//g' )
     kdts_job_deps+=("done(${comm_pattern_job_id})")
-    echo ${kdts_job_deps} 
+    #echo ${kdts_job_deps} 
 
 done
 
 kdts_job_dep_str=$( join_by "&&" ${kdts_job_deps[@]} )
-echo ${kdts_job_dep_str}
+#echo ${kdts_job_dep_str}
 cd ${run_dir}/../
+echo "Submitting job to compute KDTS data for Message Race communication pattern with $((run_idx_high+1)) runs on scheduler=lsf."
 bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -w ${kdts_job_dep_str} -o compute_kdts_output.txt -e compute_kdts_error.txt ${compute_kdts_script} "${run_dir}/../" ${graph_kernel} --slice_dir_name "slices" -o "kdts.pkl"

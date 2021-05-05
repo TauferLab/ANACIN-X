@@ -12,7 +12,7 @@ x_procs=$9
 y_procs=${10}
 z_procs=${11}
 
-echo "Starting Unstructured Mesh Run"
+#echo "Starting runs of Unstructured Mesh communication pattern."
 source ${example_paths_dir}/example_paths_unscheduled.config
 #example_paths_dir=$(pwd)
 
@@ -28,7 +28,6 @@ proc_placement=("pack")
 nd_neighbor_fractions=("0" "0.25" "0.5" "0.75" "1")
 #nd_neighbor_fractions=("0")
 
-echo "Entering Loops"
 for proc_placement in ${proc_placement[@]};
 do
     #    for n_procs in ${run_scales[@]};
@@ -37,14 +36,17 @@ do
     do
 	#            for msg_size in ${message_sizes[@]};
 	#            do
-        echo "Launching jobs for: proc. placement = ${proc_placement}, # procs. = ${n_procs}, neighbor non-determinism fraction = ${nd_neighbor_fraction}, msg. size = ${msg_size}"
+        #echo "Launching jobs for: proc. placement = ${proc_placement}, # procs. = ${n_procs}, neighbor non-determinism fraction = ${nd_neighbor_fraction}, msg. size = ${msg_size}"
         runs_root=${results_root}/msg_size_${msg_size}/n_procs_${n_procs}/n_iters_${n_iters}/proc_placement_${proc_placement}/neighbor_nd_fraction_${nd_neighbor_fraction}/
 
         # Launch intra-execution jobs
         kdts_job_deps=()
         for run_idx in `seq -f "%03g" ${run_idx_low} ${run_idx_high}`; 
         do
-            # Set up results dir
+
+            echo "Starting run ${run_idx} of Message Race communication pattern with nd neighbor fraction = ${nd_neighbor_fraction}."
+
+	    # Set up results dir
             run_dir=${runs_root}/run_${run_idx}
             mkdir -p ${run_dir}
 	    debugging_path=${run_dir}/debug
@@ -66,6 +68,10 @@ do
 	    if [ ! -f "config" ]; then
 		old_dir=$PWD
 		cd ${anacin_x_root}/apps/comm_pattern_generator/config
+                #echo "Creating config file for message size ${msg_size}"
+		#echo "                         iteration count ${n_iters}"
+		#echo "                         nd neighbor fraction ${nd_neighbor_fraction}"
+		#echo "                         coordinates ${x_procs}x${y_procs}x${z_procs}"
 		python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "unstructured_mesh" ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} ${msg_size} ${n_iters} "${example_paths_dir}/../"
 		cd ${old_dir}
 	    fi
@@ -80,12 +86,14 @@ do
             #    trace_stdout=$( bsub -nnodes ${n_nodes_trace} ${job_script_trace_spread_procs} ${n_procs} ${app} ${config} )
             #fi
             #trace_job_id=$( echo ${trace_stdout} | sed 's/[^0-9]*//g' )
+	    #echo "Tracing communiction pattern on run ${run_idx} and nd neighbor fraction ${nd_neighbor_fraction}"
 	    bash > ${debugging_path}/trace_exec_output.txt 2> ${debugging_path}/trace_exec_error.txt ${job_script_trace_pack_procs} ${n_procs} ${app} ${config} ${example_paths_dir}
 
 	    #echo "Starting Build Event Graph"
             # Build event graph
             #n_nodes_build_graph=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
             #build_graph_stdout=$( bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -w "done(${trace_job_id})" -o ${debugging_path}/build_graph_output.txt -e ${debugging_path}/build_graph_error.txt ${job_script_build_graph} ${n_procs} ${dumpi_to_graph_bin} ${dumpi_to_graph_config} ${run_dir} )
+            #echo "Build the event graph on run ${run_idx} and nd neighbor fraction ${nd_neighbor_fraction}"
 	    bash > ${debugging_path}/build_graph_output.txt 2> ${debugging_path}/build_graph_error.txt ${job_script_build_graph} ${n_procs} ${dumpi_to_graph_bin} ${dumpi_to_graph_config} ${run_dir} 
 	    #build_graph_job_id=$( echo ${build_graph_stdout} | sed 's/[^0-9]*//g' )
             event_graph=${run_dir}/event_graph.graphml
@@ -94,6 +102,7 @@ do
             # Extract slices
             #extract_slices_stdout=$( bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -w "done(${build_graph_job_id})" -o ${debugging_path}/extract_slices_output.txt -e ${debugging_path}/extract_slices_error.txt ${job_script_extract_slices} ${n_procs_extract_slices} ${extract_slices_script} ${event_graph} ${slicing_policy} )
 	    #echo "preslice"
+	    #echo "Extract event graph slices on run ${run_idx} and nd neighbor fraction ${nd_neighbor_fraction}" 
 	    bash > ${debugging_path}/extract_slices_output.txt 2> ${debugging_path}/extract_slices_error.txt ${job_script_extract_slices} ${n_procs_extract_slices} ${extract_slices_script} ${event_graph} ${slicing_policy} 
 	    #echo "postslice"
 	    #extract_slices_job_id=$( echo ${extract_slices_stdout} | sed 's/[^0-9]*//g' ) 
@@ -110,6 +119,7 @@ do
         #compute_kdts_stdout=$( bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -w ${kdts_job_dep_str} -o ${debugging_path}/compute_kdts_output.txt -e ${debugging_path}/compute_kdts_error.txt ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} ${slicing_policy} )
         #compute_kdts_stdout=$( sbatch -N${n_nodes_compute_kdts} ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} )
 	#echo "prekdts"
+	echo "Computing KDTS data for Message Race communication pattern with $((run_idx_high+1)) runs and nd neighbor fraction = ${nd_neighbor_fraction}"
 	bash > ${debugging_path}/../../compute_kdts_output.txt 2> ${debugging_path}/../../compute_kdts_error.txt ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} ${slicing_policy}
 	#echo "postkdts"
         #compute_kdts_job_id=$( echo ${compute_kdts_stdout} | sed 's/[^0-9]*//g' )

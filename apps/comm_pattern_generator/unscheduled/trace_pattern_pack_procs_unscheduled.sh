@@ -23,6 +23,6 @@ source ${example_paths_dir}/example_paths_unscheduled.config
 #pnmpi_lib_path=${anacin_x_root}/anacin-x//pnmpi/patched_libs/
 #pnmpi_conf=${anacin_x_root}/anacin-x/pnmpi/configs/dumpi.conf
 
-echo ${n_procs}
+#echo ${n_procs}
 
 LD_PRELOAD=${pnmpi} PNMPI_LIB_PATH=${pnmpi_lib_path} PNMPI_CONF=${pnmpi_conf} mpirun -np ${n_procs} ${app} ${config}

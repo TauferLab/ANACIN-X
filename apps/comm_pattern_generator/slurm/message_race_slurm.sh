@@ -28,15 +28,18 @@ time_limit=${slurm_time_limit}
 for proc_placement in ${proc_placement[@]};
 do
     #echo "Launching run ${run_idx} for: proc. placement = ${proc_placement}, # procs. = ${n_procs}, msg. size = ${msg_size}"
-    
+    #echo "Submitting job for run ${run_idx} of the Message Race communication pattern on scheduler=slurm."
+
     runs_root=${results_root}/msg_size_${msg_size}/n_procs_${n_procs}/n_iters_${n_iters}/proc_placement_${proc_placement}/
     
     # Launch intra-execution jobs
     kdts_job_deps=()
     for run_idx in `seq -f "%03g" ${run_idx_low} ${run_idx_high}`; 
     do
-        echo "Launching run ${run_idx} for: proc. placement = ${proc_placement}, # procs. = ${n_procs}, msg. size = ${msg_size}"
-        # Set up results dir
+    
+	#echo "Launching run ${run_idx} for: proc. placement = ${proc_placement}, # procs. = ${n_procs}, msg. size = ${msg_size}"
+        echo "Submitting job for run ${run_idx} of the Message Race communication pattern on scheduler=slurm."
+	# Set up results dir
         run_dir=${runs_root}/run_${run_idx}/
         mkdir -p ${run_dir}
 	
@@ -53,6 +56,7 @@ do
     # Compute kernel distances for each slice
     kdts_job_dep_str=$( join_by : ${kdts_job_deps[@]} )
     cd ${runs_root}
+    echo "Submitting job to compute KDTS data for Message Race communication pattern with $((run_idx_high+1)) runs on scheduler=slurm."
     compute_kdts_stdout=$( sbatch -N ${n_nodes} -p ${queue} -t ${time_limit} -n ${n_procs} --ntasks-per-node=${n_procs_per_node} -o compute_kdts_out.txt -e compute_kdts_err.txt --dependency=afterok:${kdts_job_dep_str} ${job_script_compute_kdts} ${n_procs} ${compute_kdts_script} ${runs_root} ${graph_kernel} )
     compute_kdts_job_id=$( echo ${compute_kdts_stdout} | sed 's/[^0-9]*//g' )
     
