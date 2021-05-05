@@ -115,8 +115,11 @@ echo
 
 # Set vars for job script infrastructure
 anacin_x_root=$(pwd)
-sed -i 's/anacin_x_root= /anacin_x_root=${anacin_x_root}/' ./apps/comm_pattern_generator/comm_pattern_config.config
+sed -i "s/anacin_x_root= /anacin_x_root=${anacin_x_root}/" ./apps/comm_pattern_generator/comm_pattern_config.config
 
+sed -i "s/anacin_x_root= /anacin_x_root=${anacin_x_root}/" ./apps/comm_pattern_generator/unscheduled/example_paths_unscheduled.config
+sed -i "s/anacin_x_root= /anacin_x_root=${anacin_x_root}/" ./apps/comm_pattern_generator/slurm/example_paths_slurm.config
+sed -i "s/anacin_x_root= /anacin_x_root=${anacin_x_root}/" ./apps/comm_pattern_generator/lsf/example_paths_lsf.config
 ## Set up conda environment
 #conda env create -f ./install/anacin-x-environment.yml
 #source ./install/activate_environment.sh
