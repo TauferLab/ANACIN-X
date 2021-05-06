@@ -1,9 +1,9 @@
 [submodule "submodules/sst-dumpi"]
 	path = submodules/sst-dumpi
-	url = git@github.com:TauferLab/sst-dumpi.git
+	url = https://github.com/TauferLab/sst-dumpi.git
 [submodule "submodules/PnMPI"]
 	path = submodules/PnMPI
-	url = git@github.com:LLNL/PnMPI.git
+	url = https://github.com/LLNL/PnMPI.git
 [submodule "submodules/Pluto"]
 	path = submodules/Pluto
 	url = https://github.com/TauferLab/Pluto
