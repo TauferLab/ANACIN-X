@@ -37,7 +37,7 @@ Help() {
     echo "[-st]   A maximum time limit in minutes on the time provided to jobs submitted. (Default 10 minutes)"
     echo ""
     echo "If you're running on a system that uses the LSF scheduler, then the following switches can be used to define settings for job submission:"
-    echo "[-lq]   Defines the queue to submit Slurm jobs to. (Defaults to the "normal" queue)"
+    echo "[-lq]   Defines the queue to submit LSF jobs to. (Defaults to the "normal" queue)"
     echo "[-lt]   A maximum time limit in minutes on the time provided to jobs submitted. (Default 10 minutes)"
     echo ""
 }
