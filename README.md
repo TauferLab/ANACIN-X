@@ -191,9 +191,17 @@ By opening this visualization script and following the instructions within, you 
 
 If you can't use Jupyter to visualize the data, then we recommend using the command line python tool to generate the png images.  This will take a few key steps:
 
-* Navigate to the directory that your output was stored in from your run.  Follow the output directory structure down based on the inputs you gave to set the project with until you find a file titled 'kdts.pkl'.
-* Save the full path to your 'kdts.pkl' file so that it can be used when calling the visualization script.
-* Then return to the project directory where you submitted jobs from.  From there, input the following command:
+You will first need to identify the inputs to the visualization script.  These can be found in 2 ways.
+* The first way to find the inputs is to look at the last 3 lines printed to standard out from your run.  There you can find:
+  * The path to your kernel distance (KDTS) data file.
+  * The communication pattern used.
+  * The path to your kernel config JSON file.
+* The second way to find the inputs is to navigate to your output directory in the following way.
+  * Navigate to the directory that your output was stored in from your run and save the full path including the file name of the json file stored there.
+  * Open the run_config.txt file stored in that directory and save the name of the communication pattern as listed in the first line item.  Then exit that file.
+  * Follow the output directory structure down based on the inputs you gave to set the project with until you find a file titled 'kdts.pkl' and save the full path to your 'kdts.pkl' file so that it can be used when calling the visualization script.
+
+Once you've gathered the needed inputs, return to the project directory where you submitted jobs from.  From there, input the following command:
 
 ```
 python3 anacin-x/event_graph_analysis/visualization/make_message_nd_plot.py [Path to 'kdts.pkl' file with file name] [The type of communication pattern you used] [Path to kernel json used to generate kdts file] [The name of a file to store the visualization in (excluding the file type)] [--nd_neighbor_fraction <value> (only used for unstructured mesh communication pattern)]

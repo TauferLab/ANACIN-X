@@ -181,11 +181,19 @@ echo "Output will be stored in ${results_path}" >> ${user_config_file}
 # Run Comm Pattern Script
 if [ ${comm_pattern} == "message_race" ]; then
     bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${slurm_queue} ${slurm_time_limit} ${lsf_queue} ${lsf_time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir}
+    echo "Stored kernel distance data in output file ${results_path}/msg_size_${msg_sizes}/n_procs_${n_procs}/n_iters_${n_iters}/kdts.pkl"
 elif [ ${comm_pattern} == "amg2013" ]; then
     bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${slurm_queue} ${slurm_time_limit} ${lsf_queue} ${lsf_time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir}
+    echo "Stored kernel distance data in output file ${results_path}/msg_size_${msg_sizes}/n_procs_${n_procs}/n_iters_${n_iters}/kdts.pkl"
 elif [ ${comm_pattern} == "unstructured_mesh" ]; then
     bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${slurm_queue} ${slurm_time_limit} ${lsf_queue} ${lsf_time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir} ${x_procs} ${y_procs} ${z_procs}
+    echo "Stored kernel distance data in output file ${results_path}/msg_size_${msg_sizes}/n_procs_${n_procs}/n_iters_${n_iters}/proc_placement_pack/nd_neighbor_fraction_{0, 0.25, 0.5, 0.75, 1}/kdts.pkl"
 fi
+
+
+# Communicate where to find visualization files
+echo "Used the communication pattern type: ${comm_pattern}"
+echo "Used graph kernel JSON file:         ${graph_kernel}"
 
 
 
