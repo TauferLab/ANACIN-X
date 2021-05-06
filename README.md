@@ -193,7 +193,7 @@ If you can't use Jupyter to visualize the data, then we recommend using the comm
 
 You will first need to identify the inputs to the visualization script.  These can be found in 2 ways.
 1. The first way to find the inputs is to look at the last 3 lines printed to standard out from your run.  There you can find:
-  * The path to your kernel distance (KDTS) data file.
+  * The path to your kernel distance (KDTS) data file. If you ran the unstructured mesh communication pattern, a separate KDTS file will be found in each 'nd_neighbor_fraction' directory.
   * The communication pattern used.
   * The path to your kernel config JSON file.
 2. The second way to find the inputs is to navigate to your output directory in the following way.
