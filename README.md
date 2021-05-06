@@ -14,7 +14,7 @@ Runtime non-determinism in High Performance Computing (HPC) applications present
 
 ## Installation
 
-If you're running your version of the project on an instance of the [Jetstream cloud computer](https://jetstream-cloud.org), use the image "Ubuntu20_04_Anacin-X" and skip ahead to the subsection below about installing ANACIN-X.  Otherwise, continue reading here to ensure all dependencies are installed.
+If you're running your version of the project on an instance of the [Jetstream cloud computer](https://jetstream-cloud.org), use the image "Ubuntu20.04_Anacin-X" and skip ahead to the subsection below about installing ANACIN-X.  Otherwise, continue reading here to ensure all dependencies are installed.
 
 If you haven't already, you'll need to install the Spack and Conda package managers.
 
