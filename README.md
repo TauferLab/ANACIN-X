@@ -18,8 +18,6 @@ If you're running your version of the project on an instance of the [Jetstream c
 
 If you haven't already, you'll need to install the Spack and Conda package managers.
 
-Also, make sure that you've set up an ssh key pair with github for your machine.
-
 ### Spack:
 Spack is a package manager with good support for scientific/HPC software. To use Spack you will need Python. We recommend you install Spack *and* enable Spack's shell integration. 
 
@@ -38,16 +36,11 @@ Before continuing, make sure to activate your version of conda:
 source ~/.bashrc
 ```
 
-### SSH:
-We use SSH to install github packages.
-
-To set up an SSH key pair, follow the instructions at: [SSH Setup](https://docs.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
-
 ### ANACIN-X:
 You will need to first download the project through git using
 
 ```
-git clone https://github.com/TauferLab/Src_ANACIN-X.git
+git clone https://github.com/TauferLab/ANACIN-X.git
 ```
 
 Note that Spack, Conda, and SSH will need to be installed and set up beforehand as described above, unless you're on Jetstream.  If there is a specific C compiler that you wish to have used on your machine, please see the 'Special Case' section below.
@@ -55,7 +48,7 @@ Note that Spack, Conda, and SSH will need to be installed and set up beforehand 
 Now that your environment is prepared and the project is on your local machine, be sure to enter the project root for setup with the command:
 
 ```
-cd Src_ANACIN-X
+cd ANACIN-X
 ```
 
 If you're using the Jetstream cloud computer image for Anacin-X, you can skip this next command.  Otherwise, we strongly recommend installing the dependencies for the project with:
