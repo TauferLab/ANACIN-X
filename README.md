@@ -43,7 +43,7 @@ You will need to first download the project through git using
 git clone https://github.com/TauferLab/ANACIN-X.git
 ```
 
-Note that Spack, Conda, and SSH will need to be installed and set up beforehand as described above, unless you're on Jetstream.  If there is a specific C compiler that you wish to have used on your machine, please see the 'Special Case' section below.
+Note that Spack and Conda will need to be installed and set up beforehand as described above, unless you're on Jetstream.  If there is a specific C compiler that you wish to have used on your machine, please see the 'Special Case' section below.
 
 Now that your environment is prepared and the project is on your local machine, be sure to enter the project root for setup with the command:
 
