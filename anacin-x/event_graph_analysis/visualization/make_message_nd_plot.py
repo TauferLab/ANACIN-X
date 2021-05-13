@@ -14,10 +14,6 @@ from scipy.stats.stats import pearsonr, spearmanr
 
 import sys
 sys.path.append(sys.path[0]+"/..")
-#sys.path.append("/g/g12/chapp1/ANACIN-X/anacin-x/event_graph_analysis/")
-#sys.path.append("/g/g12/chapp1/ANACIN-X/anacin-x/event_graph_analysis/visualization/")
-#sys.path.append("/$HOME/Src_ANACIN-X/anacin-x/event_graph_analysis/")
-#sys.path.append("/$HOME/Src_ANACIN-X/anacin-x/event_graph_analysis/visualization/")
 
 from graph_kernel_postprocessing import flatten_distance_matrix
 from kernel_distance_time_series_postprocessing import get_distances_seq
@@ -121,10 +117,15 @@ def main( kdts_path, pattern, output, kernel_path, nd_frac ):
     #pearson_correlation_txt = "Kernel distance vs. % ND → Pearson-R = {}, p = {}".format(np.round(pearson_r, 2), pearson_p)
     #spearman_correlation_txt = "Kernel distance vs. % ND → Spearman-R = {}, p = {}".format(np.round(spearman_r, 2), spearman_p)
 
-    pearson_correlation_txt = "Pearson's r = {}, p = {}\n".format(np.round(pearson_r, 2), pearson_p)
-    spearman_correlation_txt = "Spearman's ρ = {}, p = {}\n".format(np.round(spearman_r, 2), spearman_p)
+    pearson_correlation_txt = "Your Pearson's r value     = {}\n".format(np.round(pearson_r, 2))
+    pearson_p_txt = "It's corresponding p value = {}\n".format(pearson_p)
+    spearman_correlation_txt = "Your Spearman's ρ value    = {}\n".format(np.round(spearman_r, 2))
+    spearman_p_txt = "It's corresponding p value = {}\n".format(spearman_p)
     print( pearson_correlation_txt )
+    print( pearson_p_txt)
+    print( "\n" )
     print( spearman_correlation_txt )
+    print( spearman_p_txt)
 
     annotation_lines = [ "Kernel Distance vs. % Wildcard Receives: Correlation Coefficients\n",
                          #"=================================================================\n",
