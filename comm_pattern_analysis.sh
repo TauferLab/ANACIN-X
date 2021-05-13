@@ -29,8 +29,8 @@ Help() {
     echo "[-r]    The number of runs to make of the ANACIN-X workflow. (Default 2 executions)"
     echo "        The number of runs must be at least 2"
     echo "[-o]    If used, allows the user to define their own path to store output from the project. (Defaults to the directory '$HOME/comm_pattern_output')"
-    echo "        When using this flag, be sure to provide an absolute path that can exist on your machine.
-    echo "        If you run this script multiple times on the same settings, be sure to use different paths to avoid overlap and overwriting of files.
+    echo "        When using this flag, be sure to provide an absolute path that can exist on your machine."
+    echo "        If you run this script multiple times on the same settings, be sure to use different paths to avoid overlap and overwriting of files."
     echo "[-c]    When running the unstructured mesh communication pattern, use this with 3 arguments to define the grid coordinates. (Ex. -c 2 3 4)"
     echo "        The 3 coordinate values must multiply together to equal the number of processes used."
     echo "        The 3 coordinate values must also multiply together to be greater than or equal 10."
@@ -124,6 +124,26 @@ else
     lsf_time_limit=""
 fi
 
+# Ensure the output path is a valid path.
+project_path=$(pwd)
+cd
+while true; do
+    case "${results_path}" in
+        /*) mkdir -p ${results_path} 
+		if [[ -d "${results_path}" ]]; then
+		    break
+		else
+		    echo "Your output path is not a valid path.  Please make sure that the path you provided can exist on your machine."
+		    echo "As an example, you might input something of the form "$(pwd)"/example_path"
+		    read -p "Input your path here: " results_path
+		fi ;;
+	*)  echo "Your output path is not an absolute path.  Please make sure to input an absolute path for your output. It should start with a '/' character."
+		echo "As an example, you might input something of the form "$(pwd)"/example_path" 
+		read -p "Input your path here: " results_path ;;
+    esac
+done
+cd ${project_path}
+
 # Report Variable Values if User Requests Verbose Execution
 if [ "${verbose}" == "true" ]; then
     echo "Communication Pattern: ${comm_pattern}"
@@ -153,7 +173,7 @@ fi
 # Define Needed Paths
 cd apps/comm_pattern_generator/${scheduler}
 example_paths_dir=$(pwd)
-cd -
+cd ${project_path}
 source ${example_paths_dir}/example_paths_${scheduler}.config
 config_path=${anacin_x_root}/apps/comm_pattern_generator/config
 comm_pattern_path=${anacin_x_root}/apps/comm_pattern_generator/${scheduler}
