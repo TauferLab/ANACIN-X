@@ -51,7 +51,7 @@ Now that your environment is prepared and the project is on your local machine, 
 cd ANACIN-X
 ```
 
-If you're using the Jetstream cloud computer image for Anacin-X, you can skip this next command.  Otherwise, we strongly recommend installing the dependencies for the project with:
+If you're using the Jetstream cloud computer image for Anacin-X titled "Ubuntu20.04_Anacin-X", you can skip this next command.  Otherwise, we strongly recommend installing the dependencies for the project with:
 
 ```
 . setup_deps.sh
@@ -126,7 +126,7 @@ The following packages will be installed as submodules to the installation of AN
 
 ## Running ANACIN-X:
 
-Use the 'comm_pattern_analysis.sh' script to generate traces of a selected communication pattern and perform analysis on the event graphs:
+Use the 'comm_pattern_analysis.sh' script to generate traces of a selected communication pattern and perform analysis on the event graphs.  Make sure that the system you're running on supports the inputs you provide from the options below.:
 
 The following command line switches can be used to define parameters for your job submission:
 * -p        : Defines the size of the mpi communicator 
@@ -134,17 +134,23 @@ The following command line switches can be used to define parameters for your jo
                 (Default 4 MPI processes)
 * -i         : Defines the number of times a given communication 
                 pattern appears in a single execution of ANACIN-X. 
+                If running the message race communication patter,
+                it's recommended to set this to at least 10.
                 (Default 1 iteration)
 * -s        : The size in bytes of the messages passed when generating 
                 communication patterns. 
                 (Default 512 bytes)
 * -n        : The number of compute nodes requested for running 
                 the ANACIN-X workflow. 
+                If you're running on an unscheduled system,
+                this value should be set to 1.
                 (Default 1 node)
 * -r         : The number of runs to make of the ANACIN-X workflow. 
                 (Default 2 executions)
 * -o        : If used, allows the user to define their own path to 
                 store output from the project. 
+                Be sure to define an absolute path that can exist on your machine.
+                Use a different path when running on the same settings to avoid overwriting.
                 (Defaults to the directory '$HOME/comm_pattern_output')
 * -c        : When running the unstructured mesh communication pattern, 
                 use this with 3 arguments to define the grid coordinates. 
@@ -164,11 +170,24 @@ If you're running on a system that uses the LSF scheduler, then the following sw
                 (Defaults to the "normal" queue)
 * -lt        : A maximum time limit in minutes on the time provided to jobs submitted.
                 (Default 10 minutes)
+                
 
-Below is an example run of the script as one might submit it on the Stampede2 cluster computer:
+If the project is run with settings that are too small, then the communication pattern generation may end up not being non-deterministic.  A few things can be done to increase the odds of inducing non-determinism in a simulation:
+* It is good to run on a large number of processes (at least 10) and a large number of runs (at least 50) to increase the odds of non-determinism arising.
+* By running a communication pattern with multiple iterations (using the -i flag), the user can cause more non-determinism.  This is particularly important when running the message race communication pattern.
+* Running with a small message size (using the -s flag) can increase the likelihood of non-determinism.
+* Running the program across multiple compute nodes (using the -n flag) can help to cause more non-determinism.
+
+Below is an example run of the script as one might submit it to run message_race on an unscheduled system.
 
 ```
-. ./comm_pattern_analysis.sh -p 10 -n 2 -v -r 50 -sq "skx-normal" -o $WORK2/anacinx_output_1
+. ./comm_pattern_analysis.sh -p 20 -i 10 -v -r 100 -o $HOME/message_race_sim_1
+```
+
+Below is another example run of the script as one might submit it on the Stampede2 cluster computer:
+
+```
+. ./comm_pattern_analysis.sh -p 48 -n 2 -v -r 50 -sq "skx-normal" -o $WORK2/anacinx_output_1
 ```
 
 Once the script has started running, follow the prompts at the beginning.  You will need to input a communication pattern to generate.  You can choose between any of the communication patterns listed in the supported settings section below with these corresponding formats: message_race, amg2013, unstructured_mesh.
