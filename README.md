@@ -150,7 +150,7 @@ The following command line switches can be used to define parameters for your jo
 * -o        : If used, allows the user to define their own path to 
                 store output from the project. 
                 Be sure to define an absolute path that can exist on your machine.
-                Use a different path when running on the same settings to avoid overwriting.
+                Use a different path when running multiple times on the same settings to avoid overwriting.
                 (Defaults to the directory '$HOME/comm_pattern_output')
 * -c        : When running the unstructured mesh communication pattern, 
                 use this with 3 arguments to define the grid coordinates. 
