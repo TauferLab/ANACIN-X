@@ -49,7 +49,7 @@ do
         mkdir -p ${run_dir}
 	
         comm_pattern_run_name=unstructured_mesh_run_$(date +%s.%N)
-        comm_pattern_run_stdout=$( sbatch -N ${n_nodes} -p ${queue} -J ${comm_pattern_run_name} -t ${time_limit} -n ${n_procs} --ntasks-per-node=${n_procs_per_node} ${comm_pattern_run_script} ${n_procs} ${msg_size} ${n_iters} ${proc_placement} ${nd_neighbor_fraction} ${run_dir} ${example_paths_dir} ${debug_dir} ${x_procs} ${y_procs} ${z_procs} )
+	comm_pattern_run_stdout=$( sbatch -N ${n_nodes} -p ${queue} -J ${comm_pattern_run_name} -t ${time_limit} -n ${n_procs} --ntasks-per-node=$((n_procs_per_node+1)) ${comm_pattern_run_script} ${n_procs} ${msg_size} ${n_iters} ${proc_placement} ${nd_neighbor_fraction} ${run_dir} ${example_paths_dir} ${debug_dir} ${x_procs} ${y_procs} ${z_procs} )
         while [ -z "$comm_pattern_run_id" ]; do
             #echo "Waiting for jobid"
             #comm_pattern_run_stdout=$( sbatch -N ${n_nodes} -p ${queue} -J ${comm_pattern_run_name} -t ${time_limit} -n ${n_procs} --ntasks-per-node=${n_procs_per_node} ${comm_pattern_run_script} ${n_procs} ${msg_size} ${n_iters} ${proc_placement} ${nd_neighbor_fraction} ${run_dir} ${example_paths_dir} ${debug_dir} )
@@ -64,8 +64,11 @@ do
     kdts_job_dep_str=$( join_by : ${kdts_job_deps[@]} )
     cd ${runs_root}
     echo "Submitting job to compute KDTS data for Unstructured Mesh communication pattern with $((run_idx_high+1)) runs and nd neighbor fraction = ${nd_neighbor_fraction} on scheduler=slurm."
-    compute_kdts_stdout=$( sbatch -N ${n_nodes} -p ${queue} -t ${time_limit} -n ${n_procs} --ntasks-per-node=${n_procs_per_node} -o compute_kdts_out.txt -e compute_kdts_err.txt --dependency=afterok:${kdts_job_dep_str} ${job_script_compute_kdts} ${n_procs} ${compute_kdts_script} ${runs_root} ${graph_kernel} )
+    compute_kdts_stdout=$( sbatch -N ${n_nodes} -p ${queue} -t ${time_limit} -n ${n_procs} --ntasks-per-node=$((n_procs_per_node+1)) -o compute_kdts_out.txt -e compute_kdts_err.txt --dependency=afterok:${kdts_job_dep_str} ${job_script_compute_kdts} ${n_procs} ${compute_kdts_script} ${runs_root} ${graph_kernel} )
     compute_kdts_job_id=$( echo ${compute_kdts_stdout} | sed 's/[^0-9]*//g' )
     
     done
 done # proc placement
+
+
+
