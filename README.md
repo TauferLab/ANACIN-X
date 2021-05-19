@@ -5,7 +5,10 @@
 # ANACIN-X
 ## Software Overview
 Runtime non-determinism in High Performance Computing (HPC) applications presents steep challenges for computational reproducibility and correctness. These challenges are magnified in the context of complex scientific codes where the links between observable non-determinism and root causes are unclear. This repository contains a suite of tools for trace-based analysis of non-deterministic behavior in MPI applications. The core components of this tool suite are: 
-* A Workflow for Characterizing Root Sources of Non-Determinism as Graph Similarity: To meet the challenges of runtime non-determinism in HPC applications, we design a workflow for approximating the measure of non-determinism in a programs execution via graph kernel analysis.  This workflow is broken down into parts below this list.
+* A Workflow for Characterizing Root Sources of Non-Determinism as Graph Similarity: To meet the challenges of runtime non-determinism in HPC applications, we design a workflow for approximating the measure of non-determinism in a programs execution via graph kernel analysis.  This workflow is broken down into the following three stages that are described in more detail below this list:
+  1. Execution Tracing
+  2. Event Graph Construction
+  3. Event Graph Kernel Analysis
 * Use Case Communication Patterns: We implement some respresentative sample MPI point-to-point, non-deterministic communication patterns for illustrating the value of the ANACIN-X workflow in the process of debugging non-determinism.  We provide the user with the option to choose one of three communication patterns for a given executation of ANACIN-X: a message race, the Algebraic Multigrid 2013 (AMG 2013) pattern, or the Unstructured Mesh pattern.
   * In each case, we quantify and vary the amount of non-determinism ranging from 0% non-determinism up to 100% non-determinism.
   * For more information about the communication patterns in question, please see the most recent publication in the publications section of this README.md document.
