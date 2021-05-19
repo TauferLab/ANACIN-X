@@ -23,7 +23,7 @@ The workflow for characterizing root sources of non-determinism as graph similar
   * **Event Graph Construction**: We convert each execution's traces into a graph-structured model of the interprocess communication that took place during the execution using the [dumpi_to_graph](https://github.com/TauferLab/Src_dumpi_to_graph/tree/3966d25a916ddf0cd5e4e71ce71702798c0f39e1) tool.
     * dumpi_to_graph takes information about the addresses of MPI events from Pluto and about happens before MPI relationships from sst-dumpi to construct a unique directed acyclic graph of the [graphml](https://en.wikipedia.org/wiki/GraphML) format which models the underlying communication pattern.
   * **Event Graph Kernel Analysis**: We implement workflows for identifying root causes of non-deterministic behavior using the Weisfeiller-Lehmann Subtree (WLST) graph kernel.  This kernel analysis is implemented using the [GraphKernels](https://github.com/BorgwardtLab/GraphKernels) software package.
-    * The WLST graph kernel iteratively encodes graph structure into node labels by refining each node label based on its neighbors labels.  More information on WLST kernels can be found at **.
+    * The WLST graph kernel iteratively encodes graph structure into node labels by refining each node label based on its neighbors labels.  More information on WLST kernels can be found in the paper "Weisfeiller-lehmann graph kernels" by Shervashidze et al.
     * GraphKernels is a software package that implements a variety of kernels on graph structured data.  
 
 ## Installation
