@@ -3,14 +3,24 @@
 </p>
 
 # ANACIN-X
-## Project Overview
+## Software Overview
 Runtime non-determinism in High Performance Computing (HPC) applications presents steep challenges for computational reproducibility and correctness. These challenges are magnified in the context of complex scientific codes where the links between observable non-determinism and root causes are unclear. This repository contains a suite of tools for trace-based analysis of non-deterministic behavior in MPI applications. The core components of this tool suite are: 
-* Tracing Modules: We use a stack of PMPI modules composed with [PnMPI](https://github.com/LLNL/PnMPI) to trace executions of non-deterministic MPI applications.
-  * Provide reference to tracing modules
-* Event Graph Construction: We convert each execution's traces into a graph-structured model of the interprocess communication that took place during the execution.
-  * Provide reference to dumpi_to_graph
-* Event Graph Analysis: We implement workflows for identifying root causes of non-deterministic behavior.
-* Communication Pattern Generator: We implement some respresentative sample MPI point-to-point, non-deterministic communication patterns for illustrating the value of Tracing, Event Graph Construction, and Event Graph Analysis in the process of debugging non-determinism.  For more information about the communication patterns in question, please see the most recent publication in the publications section of this document.
+* A Workflow for Characterizing Root Sources of Non-Determinism as Graph Similarity: To meet the challenges of runtime non-determinism in HPC applications, we design a workflow for approximating the measure of non-determinism in a programs execution via graph kernel analysis.  This workflow is broken down into parts below this list.
+* Use Case Communication Patterns: We implement some respresentative sample MPI point-to-point, non-deterministic communication patterns for illustrating the value of the ANACIN-X workflow in the process of debugging non-determinism.  We provide the user with the option to choose one of three communication patterns for a given executation of ANACIN-X: a message race, the Algebraic Multigrid 2013 (AMG 2013) pattern, or the Unstructured Mesh pattern.
+  * In each case, we quantify and vary the amount of non-determinism ranging from 0% non-determinism up to 100% non-determinism.
+  * For more information about the communication patterns in question, please see the most recent publication in the publications section of this README.md document.
+* Kernel Distance Visualization: To help the user view the relationship between kernel distance and percent of non-determinism in a given communication pattern, we provide 2 ways to create a .png figure for data from a given set of runs: Use a Jupyter notebook to generate and view the figure or use a command line tool to generate the figure.
+  * Instructions for using these visualization options are provided in the 'Result Visualization' section below.
+  
+The workflow for characterizing root sources of non-determinism as graph similarity is broken up into 3 stages.  We describe each in more detail:
+  * Execution Tracing: We use a stack of PMPI modules composed with [PnMPI](https://github.com/LLNL/PnMPI) to trace executions of non-deterministic MPI applications.  In particular, we use the [sst-dumpi](https://github.com/TauferLab/sst-dumpi/tree/b47bb77ccbe3b87d585e3701e1a5c2f8d3626176) and the [Pluto](https://github.com/TauferLab/Src_Pluto/tree/main) tracing modules.
+    * sst-dumpi traces relationships between MPI events.  With this, we can determine the message order of these MPI events in time.
+    * Pluto traces memory addresses of MPI requests associated with non-blocking MPI events.  We use these memory addresses as unique identifiers of MPI requests to distinguish between different types of non-blocking MPI events
+  * Event Graph Construction: We convert each execution's traces into a graph-structured model of the interprocess communication that took place during the execution using the [dumpi_to_graph](https://github.com/TauferLab/Src_dumpi_to_graph/tree/3966d25a916ddf0cd5e4e71ce71702798c0f39e1) tool.
+    * dumpi_to_graph takes information about the addresses of MPI events from Pluto and about happens before MPI relationships from sst-dumpi to construct a unique directed acyclic graph of the [graphml](https://en.wikipedia.org/wiki/GraphML) format which models the underlying communication pattern.
+  * Event Graph Kernel Analysis: We implement workflows for identifying root causes of non-deterministic behavior using the Weisfeiller-Lehmann Subtree (WLST) graph kernel.  This kernel analysis is implemented using the [GraKeL](https://github.com/ysig/GraKeL) and the [GraphKernels](https://github.com/BorgwardtLab/GraphKernels) software packages.
+    * The WLST graph kernel iteratively encodes graph structure into node labels by refining each node label based on its neighbors labels.  More information on WLST kernels can be found at **.
+    * The GraKeL and GraphKernels are both software packages that implement a variety of kernels on graph structured data.  
 
 ## Installation
 
@@ -202,7 +212,7 @@ There are a few methods to do visualization of the kernel distance data from ANA
 
 #### Method 1 - Jupyter
 
-If you can use Jupyter to visualize the data for the project, open Jupyter from your machine.  Within Jupyter, find the file titled visualization.ipynb in the same directory as the script you used to produce your data (that is the root of your project).
+If you can use Jupyter to visualize the data for the project, open Jupyter from your machine.  Within Jupyter, find the file titled **visualization.ipynb** in the same directory as the script you used to produce your data (that is the root of your project).
 
 By opening this visualization script and following the instructions within, you can visualize the kernel distance data.
 
@@ -230,21 +240,14 @@ A png file will be produced and placed in the working directory.  If you're doin
 
 ### Supported Systems and Settings:
 
-Currently, the software supports the following types of scheduler systems for job submission:
+Currently, the software supports the following types of scheduler systems for job submission.  Make sure that you are running on one of these:
 * LSF scheduled systems (ex. Tellico)
 * Slurm scheduled systems (ex. Stampede2)
 * Unscheduled systems (ex. Jetstream, personal computers)
 
-While our aim is to expand the project to support analysis of many types of MPI applications, the software currently works with the following communication patterns that are internally generated.  For more details about the communication patterns, please see the most recent publication in the publications section below.
-* Message Race
-* AMG2013
-* Unstructured Mesh
-
 When determining the number of times to run a given execution, be sure that it is set to more than 1.  Otherwise, kernel analysis will not work properly.
 
 If you're implementing the Unstructured Mesh communication pattern, then set the 3 Unstructured Mesh coordinates such that their product is equal to the number of processes used.
-
-If you're running the project across more than 1 compute node, then please use a process count equal to a multiple of the number of nodes.
 
 
 ## Project Team:
