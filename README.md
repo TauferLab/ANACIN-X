@@ -5,25 +5,26 @@
 # ANACIN-X
 ## Software Overview
 Runtime non-determinism in High Performance Computing (HPC) applications presents steep challenges for computational reproducibility and correctness. These challenges are magnified in the context of complex scientific codes where the links between observable non-determinism and root causes are unclear. This repository contains a suite of tools for trace-based analysis of non-deterministic behavior in MPI applications. The core components of this tool suite are: 
-* A Workflow for Characterizing Root Sources of Non-Determinism as Graph Similarity: To meet the challenges of runtime non-determinism in HPC applications, we design a workflow for approximating the measure of non-determinism in a programs execution via graph kernel analysis.  This workflow is broken down into the following three stages that are described in more detail below this list:
+* **A Workflow for Characterizing Root Sources of Non-Determinism as Graph Similarity**: To meet the challenges of runtime non-determinism in HPC applications, we design a workflow for approximating the measure of non-determinism in a programs execution via graph kernel analysis.  This workflow is broken down into the following three stages that are described in more detail below this list:
   1. Execution Tracing
   2. Event Graph Construction
   3. Event Graph Kernel Analysis
-* Use Case Communication Patterns: We implement some respresentative sample MPI point-to-point, non-deterministic communication patterns for illustrating the value of the ANACIN-X workflow in the process of debugging non-determinism.  We provide the user with the option to choose one of three communication patterns for a given executation of ANACIN-X: a message race, the Algebraic Multigrid 2013 (AMG 2013) pattern, or the Unstructured Mesh pattern.
+* **Use Case Communication Patterns**: We implement some respresentative sample MPI point-to-point, non-deterministic communication patterns for illustrating the value of the ANACIN-X workflow in the process of debugging non-determinism.  We provide the user with the option to choose one of three communication patterns for a given executation of ANACIN-X: a message race, the Algebraic Multigrid 2013 (AMG 2013) pattern, or the Unstructured Mesh pattern.
   * In each case, we quantify and vary the amount of non-determinism ranging from 0% non-determinism up to 100% non-determinism.
   * For more information about the communication patterns in question, please see the most recent publication in the publications section of this README.md document.
-* Kernel Distance Visualization: To help the user view the relationship between kernel distance and percent of non-determinism in a given communication pattern, we provide 2 ways to create a .png figure for data from a given set of runs: Use a Jupyter notebook to generate and view the figure or use a command line tool to generate the figure.
+* **Kernel Distance Visualization**: To help the user view the relationship between kernel distance and percent of non-determinism in a given communication pattern, we provide 2 ways to create a .png figure for data from a given set of runs: Use a Jupyter notebook to generate and view the figure or use a command line tool to generate the figure.
   * Instructions for using these visualization options are provided in the 'Result Visualization' section below.
   
+### Outline of the Workflow
 The workflow for characterizing root sources of non-determinism as graph similarity is broken up into 3 stages.  We describe each in more detail:
-  * Execution Tracing: We use a stack of PMPI modules composed with [PnMPI](https://github.com/LLNL/PnMPI) to trace executions of non-deterministic MPI applications.  In particular, we use the [sst-dumpi](https://github.com/TauferLab/sst-dumpi/tree/b47bb77ccbe3b87d585e3701e1a5c2f8d3626176) and the [Pluto](https://github.com/TauferLab/Src_Pluto/tree/main) tracing modules.
+  * **Execution Tracing**: We use a stack of PMPI modules composed with [PnMPI](https://github.com/LLNL/PnMPI) to trace executions of non-deterministic MPI applications.  In particular, we use the [sst-dumpi](https://github.com/TauferLab/sst-dumpi/tree/b47bb77ccbe3b87d585e3701e1a5c2f8d3626176) and the [Pluto](https://github.com/TauferLab/Src_Pluto/tree/main) tracing modules.
     * sst-dumpi traces relationships between MPI events.  With this, we can determine the message order of these MPI events in time.
     * Pluto traces memory addresses of MPI requests associated with non-blocking MPI events.  We use these memory addresses as unique identifiers of MPI requests to distinguish between different types of non-blocking MPI events
-  * Event Graph Construction: We convert each execution's traces into a graph-structured model of the interprocess communication that took place during the execution using the [dumpi_to_graph](https://github.com/TauferLab/Src_dumpi_to_graph/tree/3966d25a916ddf0cd5e4e71ce71702798c0f39e1) tool.
+  * **Event Graph Construction**: We convert each execution's traces into a graph-structured model of the interprocess communication that took place during the execution using the [dumpi_to_graph](https://github.com/TauferLab/Src_dumpi_to_graph/tree/3966d25a916ddf0cd5e4e71ce71702798c0f39e1) tool.
     * dumpi_to_graph takes information about the addresses of MPI events from Pluto and about happens before MPI relationships from sst-dumpi to construct a unique directed acyclic graph of the [graphml](https://en.wikipedia.org/wiki/GraphML) format which models the underlying communication pattern.
-  * Event Graph Kernel Analysis: We implement workflows for identifying root causes of non-deterministic behavior using the Weisfeiller-Lehmann Subtree (WLST) graph kernel.  This kernel analysis is implemented using the [GraKeL](https://github.com/ysig/GraKeL) and the [GraphKernels](https://github.com/BorgwardtLab/GraphKernels) software packages.
+  * **Event Graph Kernel Analysis**: We implement workflows for identifying root causes of non-deterministic behavior using the Weisfeiller-Lehmann Subtree (WLST) graph kernel.  This kernel analysis is implemented using the [GraphKernels](https://github.com/BorgwardtLab/GraphKernels) software package.
     * The WLST graph kernel iteratively encodes graph structure into node labels by refining each node label based on its neighbors labels.  More information on WLST kernels can be found at **.
-    * The GraKeL and GraphKernels are both software packages that implement a variety of kernels on graph structured data.  
+    * GraphKernels is a software package that implements a variety of kernels on graph structured data.  
 
 ## Installation
 
