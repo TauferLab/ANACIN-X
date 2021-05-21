@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="anacin-logo.png" width="350">
+    <img src="anacin_pngs/anacin-logo.png" width="350">
 </p>
 
 # ANACIN-X
