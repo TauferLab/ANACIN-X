@@ -4,11 +4,13 @@
 
 # ANACIN-X
 
+## Introduction
+
 Non-deterministic results often arise unexpectedly in High Performance Computing (HPC) applications.  These make reproducible and correct results difficult to create.  As such, there is a need to improve the ability of software developers and scientists to comprehend non-determinism in their applications.  To this end, we present ANACIN-X.  This document is organized in the following order:
 
 * The first section describes the components of the software.  
 * The second section describes instructions for installation of the software.  **Please read this section carefully as there are a variety of different steps involved.**
-* The third section lists the dependencies that the installation procedure will install on its own.  **We do not recommend installing the dependencies on your own.  Instead, use instructions in the installation section to install the dependencies.**
+* The third section lists the dependencies that the installation procedure will install on its own.  **We do not recommend installing all of the dependencies on your own.  Instead, use instructions in the installation section to install the dependencies, starting with those on installing Spack and Conda.**
 * The fourth section describes how to run the software.  This is broken up into 3 main parts:
   1. How to run the software that produces kernel distance data.
   2. How to visualize data produced in the first part.
@@ -72,9 +74,9 @@ If effective inputs are set when running the ANACIN-X software, the user will be
 
 **Important**: Please read the instructions in this README in order.  Effective use of this software is dependent on correct installation of all dependencies.  Since there are a collection of dependencies, we provide tools for automating the process.  So read through the instructions carefully.
 
-If you're running your version of the project on an instance of the [Jetstream cloud computer](https://jetstream-cloud.org), use the image ["Ubuntu20.04_Anacin-X"](https://use.jetstream-cloud.org/application/images/1056) and skip ahead to the subsection below about installing ANACIN-X.  Otherwise, continue reading here to ensure all dependencies are installed.
+If you're running your version of the project on an instance of the [Jetstream cloud computer](https://jetstream-cloud.org), use the image ["Ubuntu20.04_Anacin-X"](https://use.jetstream-cloud.org/application/images/1056) and skip ahead to the subsection below about installing ANACIN-X.  If you're using a different Jetstream image or if you're not using Jetstream, continue reading here to ensure all dependencies get installed.
 
-**If you haven't already, you will need to install the Spack and Conda package managers.**  Be sure to do so using the following instructions.
+**If you haven't already, you will need to install the Spack and Conda package managers**, be sure to do so using the following instructions.  We will use these to help automate the installation of dependencies.
 
 ### Spack:
 Spack is a package manager with good support for scientific/HPC software. To use Spack you will need Python. We recommend you install Spack *and* enable Spack's shell integration. 
