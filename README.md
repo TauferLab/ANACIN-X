@@ -6,17 +6,17 @@
 
 Non-deterministic results often arise unexpectedly in High Performance Computing (HPC) applications.  These make reproducible and correct results difficult to create.  As such, there is a need to improve the ability of software developers and scientists to comprehend non-determinism in their applications.  To this end, we present ANACIN-X.  This document is organized in the following order:
 
-1. The first section describes the components of the software.  
-2. The second section describes instructions for installation of the software.  **Please read this section carefully as there are a variety of different steps involved.**
-3. The third section lists the dependencies that the installation procedure will install on its own.  **We do not recommend installing the dependencies on your own.  Instead, use instructions in the installation section to install the dependencies.**
-3. The fourth section describes how to run the software.  This is broken up into 3 main parts:
-  * How to run the software that produces kernel distance data.
-  * How to visualize data produced in the first part.
-  * Systems and settings that the project supports.
-4. At the end, we describe the following 3 things.
-  * The project team
-  * Publications associated with the software
-  * Copyright and license information
+* The first section describes the components of the software.  
+* The second section describes instructions for installation of the software.  **Please read this section carefully as there are a variety of different steps involved.**
+* The third section lists the dependencies that the installation procedure will install on its own.  **We do not recommend installing the dependencies on your own.  Instead, use instructions in the installation section to install the dependencies.**
+* The fourth section describes how to run the software.  This is broken up into 3 main parts:
+  1. How to run the software that produces kernel distance data.
+  2. How to visualize data produced in the first part.
+  3. Systems and settings that the project supports.
+* At the end, we describe the following 3 things:
+  1. The project team
+  2. Publications associated with the software
+  3. Copyright and license information
   
 ## Software Overview
 
