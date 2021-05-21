@@ -3,9 +3,24 @@
 </p>
 
 # ANACIN-X
-## Software Overview
 
-Non-deterministic results arise in High Performance Computing (HPC) applications.  These make reproducible and correct results difficult to create.  As such, there is a need to improve the ability of software developers and scientists to comprehend non-determinism in their applications.  To this end, we present ANACIN-X.
+Non-deterministic results often arise unexpectedly in High Performance Computing (HPC) applications.  These make reproducible and correct results difficult to create.  As such, there is a need to improve the ability of software developers and scientists to comprehend non-determinism in their applications.  To this end, we present ANACIN-X.  This document is organized in the following order:
+
+1. The first section describes the components of the software.  
+2. The second section describes instructions for installation of the software.  
+  * Please read this section carefully as there are a variety of different steps involved.
+3. The third section lists the dependencies that the installation procedure will install on its own.
+  * We do not recommend installing the dependencies on your own.  Instead, use instructions in the installation section to install the dependencies.
+3. The fourth section describes how to run the software.  This is broken up into 3 main parts:
+  1. How to run the software that produces kernel distance data.
+  2. How to visualize data produced in the first part.
+  3. Systems and settings that the project supports.
+4. At the end, we describe the following 3 things.
+  1. The project team
+  2. Publications associated with the software
+  3. Copyright and license information
+  
+## Software Overview
 
 This repository contains a suite of tools for trace-based analysis of non-deterministic behavior in MPI applications. The core components of this tool suite are as follows.  More detail for each can be found in sections below: 
 * **A Framework for Characterizing Root Sources of Non-Determinism as Graph Similarity**: To meet the challenges of non-determinism in HPC applications, we design a workflow for approximating the measure of non-determinism in a programs execution via graph kernel analysis.  This workflow is broken down into the following three stages that are described in more detail below this list:
@@ -57,7 +72,7 @@ If effective inputs are set when running the ANACIN-X software, the user will be
 
 ## **Installation**
 
-**Important** Please read the instructions in this README in order.  Effective use of this software is dependent on correct installation of all dependencies.  Since there are a collection of dependencies, we provide tools for automating the process.  So read through the instructions carefully.
+**Important**: Please read the instructions in this README in order.  Effective use of this software is dependent on correct installation of all dependencies.  Since there are a collection of dependencies, we provide tools for automating the process.  So read through the instructions carefully.
 
 If you're running your version of the project on an instance of the [Jetstream cloud computer](https://jetstream-cloud.org), use the image ["Ubuntu20.04_Anacin-X"](https://use.jetstream-cloud.org/application/images/1056) and skip ahead to the subsection below about installing ANACIN-X.  Otherwise, continue reading here to ensure all dependencies are installed.
 
@@ -88,7 +103,7 @@ You will need to first download the project through git using
 git clone https://github.com/TauferLab/ANACIN-X.git
 ```
 
-Note that Spack and Conda will need to be installed and set up beforehand as described above, unless you're on Jetstream.  If there is a specific C compiler that you wish to have used on your machine, please see the 'Special Case' section below.
+Note that Spack and Conda will need to be installed and set up beforehand as described above, unless you're using the Jetstream image listed above.  If there is a specific C compiler that you wish to have used on your machine, please see the 'Special Case' section below.
 
 Now that your environment is prepared and the project is on your local machine, be sure to enter the project root for setup with the command:
 
@@ -96,7 +111,7 @@ Now that your environment is prepared and the project is on your local machine, 
 cd ANACIN-X
 ```
 
-If you're using the Jetstream cloud computer image for Anacin-X titled "Ubuntu20.04_Anacin-X", you can skip this next command.  Otherwise, we strongly recommend installing the dependencies for the project with:
+If you're using the  [Jetstream cloud computer](https://jetstream-cloud.org) image for Anacin-X titled ["Ubuntu20.04_Anacin-X"](https://use.jetstream-cloud.org/application/images/1056), you can skip this next command.  Otherwise, we strongly recommend installing the dependencies for the project with:
 
 ```
 . setup_deps.sh
@@ -130,6 +145,9 @@ spack compiler find
 
 
 ## Dependencies:
+
+Below is a list of dependencies for ANACIN-X.  **Note** that if you follow the procedures above for installation, you do not need to install the dependencies one at a time.  We strongly recommend using the scripts provided to install the software, as described in the "Installation" section above.
+
 ### Installed by User
 The following packages need to be installed by the user:
 * spack
@@ -173,7 +191,7 @@ The following packages will be installed as submodules to the installation of AN
 
 Use the 'comm_pattern_analysis.sh' script to generate traces of a selected communication pattern and perform analysis on the event graphs.  
 
-**Important** Make sure that the system you're running on supports the inputs you provide from the options below.  If you request that the system use more processes or nodes than are available, or if you select a different scheduler from what is available, the program will fail.
+**Important**: Make sure that the system you're running on supports the inputs you provide from the options below.  If you request that the system use more processes or nodes than are available, or if you select a different scheduler from what is available, the program will fail.
 
 The following command line switches can be used to define parameters for your job submission:
 * -p        : Defines the size of the mpi communicator 
@@ -193,6 +211,7 @@ The following command line switches can be used to define parameters for your jo
                 this value should be set to 1.
                 (Default 1 node)
 * -r         : The number of runs to make of the ANACIN-X workflow. 
+                Be sure that this is set to more than 1.  Otherwise, analysis will not work.
                 (Default 2 executions)
 * -o        : If used, allows the user to define their own path to 
                 store output from the project. 
@@ -201,6 +220,7 @@ The following command line switches can be used to define parameters for your jo
                 (Defaults to the directory '$HOME/comm_pattern_output')
 * -c        : When running the unstructured mesh communication pattern, 
                 use this with 3 arguments to define the grid coordinates. 
+                The three values must be set so that their product equals the number of processes used.
                 (Ex. -c 2 3 4)
 * -v        : If used, will display the execution settings prior 
                 to running the execution.
@@ -281,16 +301,14 @@ python3 anacin-x/event_graph_analysis/visualization/make_message_nd_plot.py [Pat
 
 A png file will be produced and placed in the working directory.  If you're doing your work and producing visualizations on a remote machine, remember to copy your png image to your local machine using a tool like scp to view the image.
 
-### Supported Systems and Settings:
+### Supported Systems:
 
 Currently, the software supports the following types of scheduler systems for job submission.  Make sure that you are running on one of these:
 * LSF scheduled systems (ex. Tellico)
 * Slurm scheduled systems (ex. Stampede2)
 * Unscheduled systems (ex. Jetstream, personal computers)
 
-When determining the number of times to run a given execution, be sure that it is set to more than 1.  Otherwise, kernel analysis will not work properly.
-
-If you're implementing the Unstructured Mesh communication pattern, then set the 3 Unstructured Mesh coordinates such that their product is equal to the number of processes used.
+**Important**: Please refer to the list of command line switches above to determine what settings you can configure.  If your system cannot support the settings requested, then you will need to change them.  The program will not run correctly if you request more processes or nodes than are available in your computer.
 
 
 ## Project Team:
