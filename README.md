@@ -4,6 +4,8 @@
 
 # ANACIN-X
 
+[![DOI](https://zenodo.org/badge/364344863.svg)](https://zenodo.org/badge/latestdoi/364344863)
+
 ## Introduction
 
 Non-deterministic results often arise unexpectedly in High Performance Computing (HPC) applications.  These make reproducible and correct results difficult to create.  As such, there is a need to improve the ability of software developers and scientists to comprehend non-determinism in their applications.  To this end, we present ANACIN-X.  This document is organized in the following order:
