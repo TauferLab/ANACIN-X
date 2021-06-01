@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 
-#BSUB -o comm_pattern-%j.out
-#BSUB -e comm_pattern-%j.err
-
 n_procs=$1
 app=$2
 config=$3
+example_paths_dir=$4
 
-source /home/pnbell/Src_ANACIN-X/apps/comm_pattern_generator/lsf/example_paths_lsf.config
+source ${example_paths_dir}/example_paths_unscheduled.config
+#source /home/dsuarez1/Src_ANACIN-X/apps/comm_pattern_generator/unscheduled/example_paths_lsf.config
 
 # Determine number of nodes we need to run on
 #system=$(hostname | sed 's/[0-9]*//g')

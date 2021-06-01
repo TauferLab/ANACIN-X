@@ -36,14 +36,14 @@ done
 while true; do
 	read -p "Do you already have a version of mpi installed? (yes/no) " user_has_mpi
 	case ${user_has_mpi} in
-#                [yY] | [yY][eE][sS] ) has_mpi="yes"; while true; do
-#		       read -p "Which mpi installation do you have? Input is case sensitive. (openmpi, mvapich2, mpich) " user_mpi_name
-#		       case ${user_mpi_name} in
-#			       "openmpi" | "mvapich2" | "mpich" ) break ;;
-#			       * ) echo "Please respond with one of the listed options. Input is case sensitive. (openmpi, mvapich2, mpich) " ;;
-#		       esac
-#	         done; break ;;
-		[yY] | [yY][eE][sS] ) has_mpi="yes"; break ;;
+                [yY] | [yY][eE][sS] ) has_mpi="yes"; while true; do
+		      read -p "Which mpi installation do you have? Input is case sensitive. (openmpi, mvapich2, mpich) " user_mpi_name
+		      case ${user_mpi_name} in
+                          "openmpi" | "mvapich2" | "mpich" ) break ;;
+			  * ) echo "Please respond with one of the listed options. Input is case sensitive. (openmpi, mvapich2, mpich) " ;;
+		      esac
+	        done; break ;;
+		#[yY] | [yY][eE][sS] ) has_mpi="yes"; break ;;
 		[nN] | [nN][oO] ) has_mpi="no"; break ;;
                 * ) echo "Please respond with either yes or no: " ;;
         esac
@@ -110,6 +110,8 @@ spack_env_name="${user_spack_name:="anacin_spack_env"}"
 
 
 #echo ${mpi_name}
-. anacin_deps.sh ${mpi_name} ${os_for_conda} ${spack_env_name} ${has_spack} ${has_conda} ${has_c_comp} ${has_mpi} ${has_ssh_key} 
+cd install
+. ./install_anacin_deps.sh ${mpi_name} ${os_for_conda} ${spack_env_name} ${has_spack} ${has_conda} ${has_c_comp} ${has_mpi} ${has_ssh_key} 
+cd ..
 
 

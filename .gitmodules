@@ -1,21 +1,12 @@
-[submodule "submodules/csmpi"]
-	path = submodules/csmpi
-	url = git@github.com:TauferLab/Src_CSMPI.git
-[submodule "submodules/dumpi_to_graph"]
-	path = submodules/dumpi_to_graph
-	url = git@github.com:TauferLab/Src_dumpi_to_graph.git
 [submodule "submodules/sst-dumpi"]
 	path = submodules/sst-dumpi
-	url = git@github.com:TauferLab/sst-dumpi.git
+	url = https://github.com/TauferLab/sst-dumpi.git
 [submodule "submodules/PnMPI"]
 	path = submodules/PnMPI
-	url = git@github.com:LLNL/PnMPI.git
-[submodule "submodules/ninja"]
-	path = submodules/ninja
-	url = git@github.com:PRUNERS/NINJA.git
-[submodule "submodules/pmpi_timer"]
-	path = submodules/pmpi_timer
-	url = git@github.com:TauferLab/PMPI_timer.git
-[submodule "submodules/Src_Pluto"]
-	path = submodules/Src_Pluto
-	url = git@github.com:TauferLab/Src_Pluto.git
+	url = https://github.com/LLNL/PnMPI.git
+[submodule "submodules/Pluto"]
+	path = submodules/Pluto
+	url = https://github.com/TauferLab/Pluto
+[submodule "submodules/dumpi_to_graph"]
+	path = submodules/dumpi_to_graph
+	url = https://github.com/TauferLab/dumpi_to_graph
