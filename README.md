@@ -29,7 +29,7 @@ This repository contains a suite of tools for trace-based analysis of non-determ
   1. Execution Trace Collection
   2. Event Graph Construction
   3. Event Graph Kernel Analysis
-* **Use Case Communication Patterns for Testing**: So that the user can test the framework mentioned above, we implement some respresentative sample MPI point-to-point, non-deterministic communication patterns for illustrating the value of the ANACIN-X workflow in the process of debugging non-determinism.  We provide the user with the option to choose one of three communication patterns for a given executation of ANACIN-X: 
+* **Use Case Communication Patterns for Testing**: So that the user can test the framework mentioned above, we implement some representative sample MPI point-to-point, non-deterministic communication patterns for illustrating the value of the ANACIN-X workflow in the process of debugging non-determinism.  We provide the user with the option to choose one of three communication patterns for a given executation of ANACIN-X: 
   1. Message Race
   2. The Algebraic Multigrid 2013 (AMG 2013) pattern
   3. The Unstructured Mesh pattern
@@ -49,7 +49,7 @@ The framework for characterizing root sources of non-determinism as graph simila
   * GraphKernels is a software package that implements a variety of kernels on graph structured data.  
     
 ### Use Case Descriptions
-We provide 3 benchmark use case communication patterns for the purpose of testing the ability of the ANACIN-X workflow characterize non-determinism.  In each case, we quantify and vary the percentage of non-determinism present ranging from 0% non-determinism up to 100% non-determinism at intervals of 10%.  We provide a brief description below about each communication pattern.  For more information about the communication patterns in question, please see the most recent publication in the publications section of this README.md document.  The patterns are as follows:
+We provide 3 benchmark use case communication patterns for the purpose of testing the ability of the ANACIN-X workflow to characterize non-determinism.  In each case, we quantify and vary the percentage of non-determinism present ranging from 0% non-determinism up to 100% non-determinism at intervals of 10%.  We provide a brief description below about each communication pattern.  For more information about the communication patterns in question, please see the most recent publication in the publications section of this README.md document.  The patterns are as follows:
 * **Message Race**: 
   * When executed on N processes, this pattern consists of N-1 sender processes sending a single message to a root process that receives them in arbitrary order.  
   * It is the core pattern that models receiver-side non-determinism.
