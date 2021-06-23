@@ -15,7 +15,7 @@ while true; do
                 [yY] | [yY][eE][sS] ) has_ssh_key="yes"; break ;;
                 [nN] | [nN][oO] ) echo "You will need to set up an ssh key with github prior to installation."
 			echo "Please review instructions for how to do so at https://docs.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent"
-			echo "Please see https://github.com/TauferLab/Src_ANACIN-X for a full list of necessary installs."
+			echo "Please see https://github.com/TauferLab/ANACIN-X for a full list of necessary installs."
 			exit ;;
                 * ) echo "Please respond with either yes or no: " ;;
 	esac
@@ -28,7 +28,7 @@ while true; do
 		[yY] | [yY][eE][sS] ) has_c_comp="yes"; break ;;
 		[nN] | [nN][oO] ) has_c_comp="no"
 			echo "Please install a version of gcc before continuing"
-			echo "Please see https://github.com/TauferLab/Src_ANACIN-X for a full list of necessary installs."
+			echo "Please see https://github.com/TauferLab/ANACIN-X for a full list of necessary installs."
 			exit ;;
 		* ) echo "Please respond with either yes or no: " ;;
 	esac
@@ -65,7 +65,7 @@ while true; do
         	[yY] | [yY][eE][sS] ) has_spack="yes"; break ;;
 		[nN] | [nN][oO] ) echo "You will need to install Spack prior to installation."
 			echo "Please review instructions for spack installation at https://spack.readthedocs.io/en/latest/getting_started.html"
-			echo "Please see https://github.com/TauferLab/Src_ANACIN-X for a full list of necessary installs."
+			echo "Please see https://github.com/TauferLab/ANACIN-X for a full list of necessary installs."
 			exit ;;
                 * ) echo "Please respond with either yes or no: " ;;
         esac
@@ -77,7 +77,7 @@ while true; do
 		[yY] | [yY][eE][sS] ) has_conda="yes"; break ;;
 		[nN] | [nN][oO] ) echo "You will need to set up use of Anaconda prior to installation."
 			echo "Please review instructions for how to do so at https://conda.io/projects/conda/en/latest/user-guide/install/index.html"
-			echo "Please see https://github.com/TauferLab/Src_ANACIN-X for a full list of necessary installs."
+			echo "Please see https://github.com/TauferLab/ANACIN-X for a full list of necessary installs."
 			exit ;;
                 #[nN] | [nN][oO] ) has_conda="no";  read -p "Where would you like to install Conda? (Press enter for your home directory.) " user_conda; break ;;
                 * ) echo "Please respond with either yes or no: " ;;
