@@ -1,9 +1,9 @@
-One of the Following Operating Systems
+One of the Following Operating Systems:
 * Linux (Strongly Recommended)
 * Mac
 * Windows
 
-Necessary Software
+Necessary Software:
 * C/C++ Compiler
 * MPI
 
@@ -12,7 +12,7 @@ One of the Following Scheduler Systems:
 * Slurm
 * Unscheduled systems
 
-Package Dependencies (Install via Spack and Conda package managers is recommended)
+Package Dependencies (Install via Spack and Conda package managers is recommended):
 * boost
 * cmake
 * igraph
@@ -29,7 +29,7 @@ Package Dependencies (Install via Spack and Conda package managers is recommende
 * mpi4py
 * graphkernels
 
-Submodule Dependencies (Install via ANACIN-X setup.sh is recommended)
+Submodule Dependencies (Install via ANACIN-X setup.sh is recommended):
 * [PnMPI](https://github.com/LLNL/PnMPI/tree/f6fcc801ab9305352c510420c6439b7d48a248dc)
 * [sst-dumpi](https://github.com/TauferLab/sst-dumpi/tree/b47bb77ccbe3b87d585e3701e1a5c2f8d3626176)
 * [Pluto](https://github.com/TauferLab/Src_Pluto/tree/main)
