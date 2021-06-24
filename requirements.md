@@ -1,5 +1,5 @@
 One of the Following Operating Systems:
-* Linux (Strongly Recommended)
+* Linux (**Strongly Recommended** for easy installation)
 * Mac
 * Windows
 
