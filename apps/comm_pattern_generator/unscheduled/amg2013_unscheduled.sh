@@ -7,6 +7,9 @@ run_idx_low=$5
 run_idx_high=$6
 results_root=$7
 example_paths_dir=$8
+nd_start=$9
+nd_iter=${10}
+nd_end=${11}
 
 source ${example_paths_dir}/example_paths_unscheduled.config
 #example_paths_dir=$(pwd)
@@ -30,16 +33,16 @@ do
     echo "Starting run ${run_idx} of AMG2013 communication pattern."
 
     # Create needed paths
-    run_dir=${results_root}/msg_size_${msg_size}/n_procs_${n_procs}/n_iters_${n_iters}/run_${run_idx}/
+    run_dir=${results_root}/msg_size_${msg_size}/n_procs_${n_procs}/n_iters_${n_iters}/ndp_${nd_start}_${nd_iter}_${nd_end}/run_${run_idx}/
     mkdir -p ${run_dir}
     debugging_path=${run_dir}/debug
     mkdir -p ${debugging_path}
-    app_config=${anacin_x_root}/apps/comm_pattern_generator/config/amg2013_msg_size_${msg_size}_niters_${n_iters}.json
+    app_config=${anacin_x_root}/apps/comm_pattern_generator/config/amg2013_msg_size_${msg_size}_niters_${n_iters}_ndp_${nd_start}_${nd_iter}_${nd_end}.json
 
     # Create app config if doesn't exist
     if [ ! -f "$app_config" ]; then
 	#echo "Creating config file for message size ${msg_size} and iteration count ${n_iters}."
-	python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "amg2013" ${msg_size} ${n_iters} "${example_paths_dir}/../"
+	python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "amg2013" ${msg_size} ${n_iters} "${example_paths_dir}/../" ${nd_start} ${nd_iter} ${nd_end}
     fi
 
     # Trace execution

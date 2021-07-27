@@ -11,6 +11,9 @@ debug_dir=$8
 x_procs=$9
 y_procs=${10}
 z_procs=${11}
+nd_start=${12}
+nd_iter=${13}
+nd_end=${14}
 
 source ${example_paths_dir}/example_paths_slurm.config
 
@@ -20,9 +23,9 @@ mkdir -p ${debug_dir}
 
 # Create app config if doesn't exist
 proc_grid="${x_procs}x${y_procs}x${z_procs}"
-app_config=${anacin_x_root}/apps/comm_pattern_generator/config/unstructured_mesh_${proc_grid}_nd_neighbor_fraction_${nd_neighbor_fraction}_msg_size_${msg_size}_niters_${n_iters}.json
+app_config=${anacin_x_root}/apps/comm_pattern_generator/config/unstructured_mesh_${proc_grid}_nd_neighbor_fraction_${nd_neighbor_fraction}_msg_size_${msg_size}_niters_${n_iters}_ndp_${nd_start}_${nd_iter}_${nd_end}.json
 if [ ! -f "$app_config" ]; then
-    python3 > ${debug_dir}/create_json_output.txt 2> ${debug_dir}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "unstructured_mesh" ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} ${msg_size} ${n_iters} "${example_paths_dir}/../"
+    python3 > ${debug_dir}/create_json_output.txt 2> ${debug_dir}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "unstructured_mesh" ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} ${msg_size} ${n_iters} "${example_paths_dir}/../" ${nd_start} ${nd_iter} ${nd_end}
 fi
 
 #echo ${app_config}

@@ -7,6 +7,9 @@ n_nodes=$4
 run_idx=$5
 example_paths_dir=$6
 run_dir=$7
+nd_start=$8
+nd_iter=$9
+nd_end=${10}
 #debugging_path=$8
 
 source ${example_paths_dir}/example_paths_lsf.config
@@ -23,12 +26,12 @@ source ${example_paths_dir}/example_paths_lsf.config
 #mkdir -p ${run_dir}
 debugging_path=${run_dir}/debug
 mkdir -p ${debugging_path}
-app_config=${anacin_x_root}/apps/comm_pattern_generator/config/message_race_msg_size_${msg_size}_niters_${n_iters}.json
+app_config=${anacin_x_root}/apps/comm_pattern_generator/config/message_race_msg_size_${msg_size}_niters_${n_iters}_ndp_${nd_start}_${nd_iter}_${nd_end}.json
 #app_config=${anacin_x_root}/apps/comm_pattern_generator/config/message_race_msg_size_${msg_size}.json
 
 # Create app config if doesn't exist
 if [ ! -f "$app_config" ]; then
-    python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "naive_reduce" ${msg_size} ${n_iters} "${example_paths_dir}/../"
+    python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "naive_reduce" ${msg_size} ${n_iters} "${example_paths_dir}/../" ${nd_start} ${nd_iter} ${nd_end}
 fi
 
 #echo ${app_config}

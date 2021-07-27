@@ -13,6 +13,9 @@ example_paths_dir=${10}
 x_procs=${11}
 y_procs=${12}
 z_procs=${13}
+nd_start=${14}
+nd_iter=${15}
+nd_end=${16}
 
 
 #echo "Starting Unstructured Mesh Run"
@@ -42,7 +45,7 @@ do
 	#            for msg_size in ${message_sizes[@]};
 	#            do
         #echo "Launching jobs for: proc. placement = ${proc_placement}, # procs. = ${n_procs}, neighbor non-determinism fraction = ${nd_neighbor_fraction}, msg. size = ${msg_size}"
-        runs_root=${results_root}/msg_size_${msg_size}/n_procs_${n_procs}/n_iters_${n_iters}/proc_placement_${proc_placement}/neighbor_nd_fraction_${nd_neighbor_fraction}/
+        runs_root=${results_root}/msg_size_${msg_size}/n_procs_${n_procs}/n_iters_${n_iters}/ndp_${nd_start}_${nd_iter}_${nd_end}/proc_placement_${proc_placement}/neighbor_nd_fraction_${nd_neighbor_fraction}/
 
         # Launch intra-execution jobs
         kdts_job_deps=()
@@ -69,11 +72,11 @@ do
 	    #echo "Starting Trace Execution"
             # Create config if doesn't exist
 #            config=${anacin_x_root}/apps/comm_pattern_generator/config/unstructured_mesh_${proc_grid}_nd_neighbor_fraction_${nd_neighbor_fraction}_msg_size_${msg_size}.json
-	    config=${anacin_x_root}/apps/comm_pattern_generator/config/unstructured_mesh_${proc_grid}_nd_neighbor_fraction_${nd_neighbor_fraction}_msg_size_${msg_size}_niters_${n_iters}.json
+	    config=${anacin_x_root}/apps/comm_pattern_generator/config/unstructured_mesh_${proc_grid}_nd_neighbor_fraction_${nd_neighbor_fraction}_msg_size_${msg_size}_niters_${n_iters}_ndp_${nd_start}_${nd_iter}_${nd_end}.json
 	    if [ ! -f "config" ]; then
 		old_dir=$PWD
 		cd ${anacin_x_root}/apps/comm_pattern_generator/config
-		python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "unstructured_mesh" ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} ${msg_size} ${n_iters} "${example_paths_dir}/../"
+		python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "unstructured_mesh" ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} ${msg_size} ${n_iters} "${example_paths_dir}/../" ${nd_start} ${nd_iter} ${nd_end}
 		cd ${old_dir}
 	    fi
 	    

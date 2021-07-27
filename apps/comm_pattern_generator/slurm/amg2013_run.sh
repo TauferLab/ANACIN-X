@@ -6,6 +6,9 @@ n_iters=$3
 proc_placement=$4
 run_dir=$5
 example_paths_dir=$6
+nd_start=$7
+nd_iter=$8
+nd_end=$9
 
 source ${example_paths_dir}/example_paths_slurm.config
 
@@ -13,10 +16,10 @@ cd ${run_dir}
 debug_dir=${run_dir}/debug
 mkdir -p ${debug_dir}
 
-app_config=${anacin_x_root}/apps/comm_pattern_generator/config/amg2013_msg_size_${msg_size}_niters_${n_iters}.json
+app_config=${anacin_x_root}/apps/comm_pattern_generator/config/amg2013_msg_size_${msg_size}_niters_${n_iters}_ndp_${nd_start}_${nd_iter}_${nd_end}.json
 # Create app config if doesn't exist
 if [ ! -f "$app_config" ]; then
-    python3 > ${debug_dir}/create_json_output.txt 2> ${debug_dir}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "amg2013" ${msg_size} ${n_iters} "${example_paths_dir}/../"
+    python3 > ${debug_dir}/create_json_output.txt 2> ${debug_dir}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "amg2013" ${msg_size} ${n_iters} "${example_paths_dir}/../" ${nd_start} ${nd_iter} ${nd_end}
 fi
 
 # Trace execution

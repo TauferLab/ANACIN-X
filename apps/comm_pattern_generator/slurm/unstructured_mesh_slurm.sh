@@ -13,6 +13,9 @@ example_paths_dir=${10}
 x_procs=${11}
 y_procs=${12}
 z_procs=${13}
+nd_start=${14}
+nd_iter=${15}
+nd_end=${16}
 
 source ${example_paths_dir}/example_paths_slurm.config
 #example_paths_dir=$(pwd)
@@ -35,7 +38,7 @@ do
     do
     #echo "Launching jobs for: proc. placement = ${proc_placement}, # procs. = ${n_procs}, msg. size = ${msg_size}"
     
-    runs_root=${results_root}/msg_size_${msg_size}/n_procs_${n_procs}/n_iters_${n_iters}/proc_placement_${proc_placement}/nd_neighbor_fraction_${nd_neighbor_fraction}/
+    runs_root=${results_root}/msg_size_${msg_size}/n_procs_${n_procs}/n_iters_${n_iters}/ndp_${nd_start}_${nd_iter}_${nd_end}/proc_placement_${proc_placement}/nd_neighbor_fraction_${nd_neighbor_fraction}/
     
     # Launch intra-execution jobs
     kdts_job_deps=()
@@ -49,7 +52,7 @@ do
         mkdir -p ${run_dir}
 	
         comm_pattern_run_name=unstructured_mesh_run_$(date +%s.%N)
-	comm_pattern_run_stdout=$( sbatch -N ${n_nodes} -p ${queue} -J ${comm_pattern_run_name} -t ${time_limit} -n ${n_procs} --ntasks-per-node=$((n_procs_per_node+1)) ${comm_pattern_run_script} ${n_procs} ${msg_size} ${n_iters} ${proc_placement} ${nd_neighbor_fraction} ${run_dir} ${example_paths_dir} ${debug_dir} ${x_procs} ${y_procs} ${z_procs} )
+	comm_pattern_run_stdout=$( sbatch -N ${n_nodes} -p ${queue} -J ${comm_pattern_run_name} -t ${time_limit} -n ${n_procs} --ntasks-per-node=$((n_procs_per_node+1)) ${comm_pattern_run_script} ${n_procs} ${msg_size} ${n_iters} ${proc_placement} ${nd_neighbor_fraction} ${run_dir} ${example_paths_dir} ${debug_dir} ${x_procs} ${y_procs} ${z_procs} ${nd_start} ${nd_iter} ${nd_end} )
         while [ -z "$comm_pattern_run_id" ]; do
             #echo "Waiting for jobid"
             #comm_pattern_run_stdout=$( sbatch -N ${n_nodes} -p ${queue} -J ${comm_pattern_run_name} -t ${time_limit} -n ${n_procs} --ntasks-per-node=${n_procs_per_node} ${comm_pattern_run_script} ${n_procs} ${msg_size} ${n_iters} ${proc_placement} ${nd_neighbor_fraction} ${run_dir} ${example_paths_dir} ${debug_dir} )
