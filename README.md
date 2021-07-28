@@ -221,6 +221,15 @@ The following command line switches can be used to define parameters for your jo
                 Be sure to define an absolute path that can exist on your machine.
                 Use a different path when running multiple times on the same settings to avoid overwriting.
                 (Defaults to the directory '$HOME/comm_pattern_output')
+* -nd       : Takes 3 arguments in decinal format (start percent, step size, end percent) to define message non-determinism percentages present in the final data.
+                Start percent and end percent are the lowest and highest percentages used respectively.  The step size defines the percentages in between.
+                For example, default values correspond to '-nd 0.0 0.1 1.0'. The percentages used from this are 0, 10, 20, 30, ..., 100. This is the recommended setting.
+                All 3 values must fall between 0 and 1, inclusive, and must satisfy the relationship 'start percent + (step size * number of percentages used) = end percent'.
+                (Defaults to starting percent of 0%, step size of 10%, and ending percent of 100%)
+* -nt       : When running the unstructured mesh communication pattern, takes the percentage of topological non-determinism in decimal format.
+                For example, default values correspond to '-nt 0.5'.
+                Value must fall in the range of 0 to 1, inclusive.
+                (Defaults to 50% topological non-determinism percentage)
 * -c        : When running the unstructured mesh communication pattern, 
                 use this with 3 arguments to define the grid coordinates. 
                 The three values must be set so that their product equals the number of processes used.
@@ -287,22 +296,28 @@ By opening this visualization jupyter notebook and following the instructions wi
 If you can't use Jupyter to visualize the data, then we recommend using the command line python tool to generate the png images.  This will take a few key steps:
 
 You will first need to identify the inputs to the visualization script.  These can be found in 2 ways.
-1. The first way to find the inputs is to look at the last 3 lines printed to standard out from your run.  There you can find:
-  * The path to your kernel distance (KDTS) data file. If you ran the unstructured mesh communication pattern, a separate KDTS file will be found in each 'nd_neighbor_fraction' directory.
+1. The first way to find the inputs is to look at the last 7 lines printed to standard out from your run.  There you can find:
+  * The path to your kernel distance (KDTS) data file.
   * The communication pattern used.
   * The path to your kernel config JSON file.
+  * The three settings which define message non-determinism percentages: 'Starting Non-determinism Percentage', 'Non-determinism Percentage Step Size', and 'Ending Non-determinism Percentage'.
+  * The percentage of topological non-determinism. (For unstructured mesh visualizations.)
 2. The second way to find the inputs is to navigate to your output directory in the following way.
   * Navigate to the directory that your output was stored in from your run and save the full path including the file name of the json file stored there.
-  * Open the run_config.txt file stored in that directory and save the name of the communication pattern as listed in the first line item.  Then exit that file.
+  * Open the run_config.txt file stored in that directory and save the name of the communication pattern as listed in the first line item.
+  * Find your non-determinism percentage settings on the three lines titled 'Starting Non-determinism Percentage', 'Non-determinism Percentage Step Size', and 'Ending Non-determinism Percentage'. 
+  * If you ran unstructured mesh, your topological non-determinism percentage can also be found in the run_config.txt file under the line 'Topological Non-determinism Percentage'.  Then exit the run_config.txt file.
   * Follow the output directory structure down based on the inputs you gave to set the project with until you find a file titled 'kdts.pkl' and save the full path to your 'kdts.pkl' file so that it can be used when calling the visualization script.
 
 Once you've gathered the needed inputs, return to the project directory where you submitted jobs from.  From there, input the following command:
 
 ```
-python3 anacin-x/event_graph_analysis/visualization/make_message_nd_plot.py [Path to 'kdts.pkl' file with file name] [The type of communication pattern you used] [Path to kernel json used to generate kdts file] [The name of a file to store the visualization in (excluding the file type)] [--nd_neighbor_fraction <value> (only used for unstructured mesh communication pattern)]
+python3 anacin-x/event_graph_analysis/visualization/make_message_nd_plot.py [Path to 'kdts.pkl' file with file name] [The type of communication pattern you used] [Path to kernel json used to generate kdts file] [The name of a file to store the visualization in (excluding the file type)] [Lowest percentage of message non-determinism used in decimal format] [The message non-determinism percent step size in decimal format] [Highest percent of message non-determinism used in decimal format] [--nd_neighbor_fraction <topological non-determinism percent in decimal format> (only used for unstructured mesh communication pattern)]
 ```
 
-A png file will be produced and placed in the working directory.  If you're doing your work and producing visualizations on a remote machine, remember to copy your png image to your local machine using a tool like scp to view the image.
+A png file will be produced and placed in the working directory if no absolute path is given for output or in the absolute path provided as and output file.  Note that there's no need to include the file type (.png) at the end of your output file name, as it will be attached automatically.
+
+If you're doing your work and producing visualizations on a remote machine, remember to copy your png image to your local machine using a tool like scp to view the image.
 
 ### Supported Systems:
 
