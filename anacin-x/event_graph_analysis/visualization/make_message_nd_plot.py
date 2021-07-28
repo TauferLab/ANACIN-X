@@ -44,7 +44,7 @@ def get_scatter_plot_points( idx_to_distances ):
             y_vals.append( y_val )
     return x_vals, y_vals
 
-def main( kdts_path, pattern, output, kernel_path, nd_frac ):
+def main( kdts_path, pattern, output, kernel_path, nd_start, nd_iter, nd_end, nd_frac ):
     # Read in kdts data
     with open( kdts_path, "rb" ) as infile:
         slice_idx_to_data = pkl.load( infile )
@@ -73,11 +73,16 @@ def main( kdts_path, pattern, output, kernel_path, nd_frac ):
     flierprops = { "marker" : "+",
                    "markersize" : 4
                  }
-    boxprops = { "alpha" : 0.25
+    boxprops = { "alpha" : 0.5,
+            "facecolor" : "tab:brown"
                } 
+    whiskerprops = { "linewidth" : 3
+            }
     
     # Specify appearance of scatter plot markers
     marker_size = 6
+    marker_color = "b"
+    alpha_value = 0.5
     
     aspect_ratio = "widescreen"
     figure_scale = 1.5
@@ -97,15 +102,20 @@ def main( kdts_path, pattern, output, kernel_path, nd_frac ):
                      patch_artist=True,
                      showfliers=False,
                      boxprops=boxprops,
+                     whiskerprops=whiskerprops,
                      flierprops=flierprops )
 
     # Overlay actual data points on same axis
     ax.scatter( scatter_x_vals, 
                 scatter_y_vals,
-                s=marker_size)
+                s=marker_size,
+                c=marker_color,
+                alpha=alpha_value)
    
     # Plot annotation ( correlation coefficients )
-    nd_fractions = [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
+    step_count = int((nd_end - nd_start)/nd_iter);
+    nd_fractions = [round(nd_start + (nd_iter * step_num), 3) for step_num in range(step_count + 1)]
+    #nd_fractions = [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
     nd_fraction_seq = []
     dist_seq = []
     for i in range( len( nd_fractions ) ):
@@ -143,8 +153,9 @@ def main( kdts_path, pattern, output, kernel_path, nd_frac ):
     #           )
 
     # Tick labels
-    tick_label_fontdict = {"fontsize" : 12}
-    x_tick_labels = [ "0", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100" ]
+    tick_label_fontdict = {"fontsize" : 16}
+    x_tick_labels = [ str(100 * nd_fractions[index]) for index in range(step_count + 1)]
+    #x_tick_labels = [ "0", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100" ]
     x_ticks = list(range(len(x_tick_labels)))
     ax.set_xticks( x_ticks )
     ax.set_xticklabels( x_tick_labels, rotation=0, fontdict=tick_label_fontdict )
@@ -190,7 +201,13 @@ if __name__ == "__main__":
                         help = "Path to json file of kernel used for KDTS calculation")
     parser.add_argument("output",
                         help = "Name of output file")
+    parser.add_argument("nd_start", type=float,
+                        help = "The lowest percentage of non-determinism used during the ANACIN-X run.")
+    parser.add_argument("nd_iter", type=float,
+                        help = "The step size for the percentages of non-determinism used during the ANACIN-X run.")
+    parser.add_argument("nd_end", type=float,
+                        help = "The highest percentage of non-determinism used during the ANACIN-X run.")
     parser.add_argument("--nd_neighbor_fraction", type=float,
                         help="Fraction of neighbors determined non-deterministically for these runs of the unstructured mesh comm. pattern")
     args = parser.parse_args()
-    main( args.data, args.comm_pattern, args.output, args.kernel, args.nd_neighbor_fraction )
+    main( args.data, args.comm_pattern, args.output, args.kernel, args.nd_start, args.nd_iter, args.nd_end, args.nd_neighbor_fraction )

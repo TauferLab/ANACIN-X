@@ -177,6 +177,9 @@ if [ "${verbose}" == "true" ]; then
     echo "Number of Iterations: ${n_iters}"
     echo "Message Size: ${msg_sizes}"
     echo "Number of Nodes: ${n_nodes}"
+    echo "Starting Non-determinism Percentage: ${nd_start}"
+    echo "Non-determinism Percentage Step Size: ${nd_iter}"
+    echo "Ending Non-determinism Percentage: ${nd_end}"
     if [ ${scheduler} == "slurm" ]; then
         echo "Queue for Running through Slurm: ${slurm_queue}"
         echo "Time Limit for Running through Slurm: ${slurm_time_limit}"
@@ -214,6 +217,9 @@ echo "Number of Processes: ${n_procs}" >> ${user_config_file}
 echo "Number of Iterations: ${n_iters}" >> ${user_config_file}
 echo "Message Size: ${msg_sizes}" >> ${user_config_file}
 echo "Number of Nodes: ${n_nodes}" >> ${user_config_file}
+echo "Starting Non-determinism Percentage: ${nd_start}" >> ${user_config_file}
+echo "Non-determinism Percentage Step Size: ${nd_iter}" >> ${user_config_file}
+echo "Ending Non-determinism Percentage: ${nd_end}" >> ${user_config_file}
 if [ ${scheduler} == "slurm" ]; then
     echo "Queue for Running through Slurm: ${slurm_queue}" >> ${user_config_file}
     echo "Time Limit for Running through Slurm: ${slurm_time_limit}" >> ${user_config_file}
@@ -232,19 +238,21 @@ echo "Output will be stored in ${results_path}" >> ${user_config_file}
 # Run Comm Pattern Script
 if [ ${comm_pattern} == "message_race" ]; then
     bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${slurm_queue} ${slurm_time_limit} ${lsf_queue} ${lsf_time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir} ${nd_start} ${nd_iter} ${nd_end}
-    echo "Stored kernel distance data in output file: ${results_path}/msg_size_${msg_sizes}/n_procs_${n_procs}/n_iters_${n_iters}/kdts.pkl"
+    echo "Stored kernel distance data in output file: ${results_path}/msg_size_${msg_sizes}/n_procs_${n_procs}/n_iters_${n_iters}/ndp_${nd_start}_${nd_iter}_${nd_end}/kdts.pkl"
 elif [ ${comm_pattern} == "amg2013" ]; then
     bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${slurm_queue} ${slurm_time_limit} ${lsf_queue} ${lsf_time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir} ${nd_start} ${nd_iter} ${nd_end}
-    echo "Stored kernel distance data in output file: ${results_path}/msg_size_${msg_sizes}/n_procs_${n_procs}/n_iters_${n_iters}/kdts.pkl"
+    echo "Stored kernel distance data in output file: ${results_path}/msg_size_${msg_sizes}/n_procs_${n_procs}/n_iters_${n_iters}/ndp_${nd_start}_${nd_iter}_${nd_end}/kdts.pkl"
 elif [ ${comm_pattern} == "unstructured_mesh" ]; then
     bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${slurm_queue} ${slurm_time_limit} ${lsf_queue} ${lsf_time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir} ${x_procs} ${y_procs} ${z_procs} ${nd_start} ${nd_iter} ${nd_end}
-    echo "Stored kernel distance data in output file: ${results_path}/msg_size_${msg_sizes}/n_procs_${n_procs}/n_iters_${n_iters}/proc_placement_pack/nd_neighbor_fraction_{0, 0.25, 0.5, 0.75, 1}/kdts.pkl"
+    echo "Stored kernel distance data in output file: ${results_path}/msg_size_${msg_sizes}/n_procs_${n_procs}/n_iters_${n_iters}/ndp_${nd_start}_${nd_iter}_${nd_end}/proc_placement_pack/nd_neighbor_fraction_{0, 0.25, 0.5, 0.75, 1}/kdts.pkl"
 fi
 
 
 # Communicate where to find visualization files
 echo "Used the communication pattern type:        ${comm_pattern}"
 echo "Used graph kernel JSON file:                ${graph_kernel}"
-
+echo "Starting non-determinism percentage:        ${nd_start}"
+echo "Non-determinism percentage step size:       ${nd_iter}"
+echo "Ending non-determinism percentage:          ${nd_end}"
 
 
