@@ -14,6 +14,7 @@ z_procs=${11}
 nd_start=${12}
 nd_iter=${13}
 nd_end=${14}
+nd_neighbor_fraction=${15}
 
 #echo "Starting runs of Unstructured Mesh communication pattern."
 source ${example_paths_dir}/example_paths_unscheduled.config
@@ -28,15 +29,15 @@ source ${example_paths_dir}/example_paths_unscheduled.config
 proc_placement=("pack")
 #run_scales=(64)
 #message_sizes=(512)
-nd_neighbor_fractions=("0" "0.25" "0.5" "0.75" "1")
+#nd_neighbor_fractions=("0" "0.25" "0.5" "0.75" "1")
 #nd_neighbor_fractions=("0")
 
 for proc_placement in ${proc_placement[@]};
 do
     #    for n_procs in ${run_scales[@]};
     #    do
-    for nd_neighbor_fraction in ${nd_neighbor_fractions[@]};
-    do
+#    for nd_neighbor_fraction in ${nd_neighbor_fractions[@]};
+#    do
 	#            for msg_size in ${message_sizes[@]};
 	#            do
         #echo "Launching jobs for: proc. placement = ${proc_placement}, # procs. = ${n_procs}, neighbor non-determinism fraction = ${nd_neighbor_fraction}, msg. size = ${msg_size}"
@@ -132,6 +133,6 @@ do
         #make_plot_stdout=$( sbatch -N1 ${job_script_make_plot} ${make_plot_script_unstructured_mesh} "${runs_root}/kdts.pkl" )
 
 	#    done # msg sizes
-    done # nd neighbor fraction
+#    done # nd neighbor fraction
     #done # num procs
 done # proc placement

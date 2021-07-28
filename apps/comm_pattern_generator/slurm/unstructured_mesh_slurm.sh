@@ -16,6 +16,7 @@ z_procs=${13}
 nd_start=${14}
 nd_iter=${15}
 nd_end=${16}
+nd_neighbor_fraction=${17}
 
 source ${example_paths_dir}/example_paths_slurm.config
 #example_paths_dir=$(pwd)
@@ -25,7 +26,7 @@ source ${example_paths_dir}/example_paths_slurm.config
 function join_by { local IFS="$1"; shift; echo "$*"; }
 
 proc_placement=("pack")
-nd_neighbor_fractions=("0" "0.25" "0.5" "0.75" "1")
+#nd_neighbor_fractions=("0" "0.25" "0.5" "0.75" "1")
 comm_pattern_run_script=${anacin_x_root}/apps/comm_pattern_generator/slurm/unstructured_mesh_run.sh
 n_procs_per_node=$((n_procs/n_nodes))
 
@@ -34,8 +35,8 @@ time_limit=${slurm_time_limit}
 
 for proc_placement in ${proc_placement[@]};
 do
-    for nd_neighbor_fraction in ${nd_neighbor_fractions[@]};
-    do
+#    for nd_neighbor_fraction in ${nd_neighbor_fractions[@]};
+#    do
     #echo "Launching jobs for: proc. placement = ${proc_placement}, # procs. = ${n_procs}, msg. size = ${msg_size}"
     
     runs_root=${results_root}/msg_size_${msg_size}/n_procs_${n_procs}/n_iters_${n_iters}/ndp_${nd_start}_${nd_iter}_${nd_end}/proc_placement_${proc_placement}/nd_neighbor_fraction_${nd_neighbor_fraction}/
@@ -70,7 +71,7 @@ do
     compute_kdts_stdout=$( sbatch -N ${n_nodes} -p ${queue} -t ${time_limit} -n ${n_procs} --ntasks-per-node=$((n_procs_per_node+1)) -o compute_kdts_out.txt -e compute_kdts_err.txt --dependency=afterok:${kdts_job_dep_str} ${job_script_compute_kdts} ${n_procs} ${compute_kdts_script} ${runs_root} ${graph_kernel} )
     compute_kdts_job_id=$( echo ${compute_kdts_stdout} | sed 's/[^0-9]*//g' )
     
-    done
+#    done
 done # proc placement
 
 

@@ -36,10 +36,13 @@ Help() {
     echo "        The 3 coordinate values must also multiply together to be greater than or equal 10."
     echo "[-v]    If used, will display the execution settings prior to running the execution."
     echo "[-h]    Used to display the list of switch options."
-    echo "[-nd]   Takes 3 arguments in decinal format (start percent, step size, end percent) to define non-determinism percentages present in the final data."
+    echo "[-nd]   Takes 3 arguments in decinal format (start percent, step size, end percent) to define message non-determinism percentages present in the final data."
     echo "        Start percent and end percent are the lowest and highest percentages used respectively.  The step size defines the percentages in between."
     echo "        For example, default values correspond to '-nd 0.0 0.1 1.0'. The percentages used from this are 0, 10, 20, 30, ..., 100"
-    echo "        All 3 values must fall between 0 and 1 and must satisfy the relationship 'start percent + step size * step count = end percent'."
+    echo "        All 3 values must fall between 0 and 1, inclusive, and must satisfy the relationship 'start percent + step size * step count = end percent'."
+    echo "[-nt]   When running the unstructured mesh communication pattern, takes the percentage of topological non-determinism in decimal format."
+    echo "        For example, default values corresopnd to '-nt 0.5'."
+    echo "        Value must fall in the range of 0 to 1, inclusive."
     echo ""
     echo "If you're running on a system that uses the Slurm scheduler, then the following switches can be used to define settings for job submission:"
     echo "[-sq]   Defines the queue to submit Slurm jobs to. (Defaults to the "normal" queue)"
@@ -67,6 +70,7 @@ while [ -n "$1" ]; do
 	    -o)  results_path=$2; shift; shift ;;
 	    -c)  x_procs=$2; y_procs=$3; z_procs=$4; shift; shift; shift; shift ;;
 	    -nd) nd_start=$2; nd_iter=$3; nd_end=$4; shift; shift; shift; shift ;;
+	    -nt) nd_topo=$2; shift; shift ;;
 	    -v)  verbose="true"; shift ;;
 	    -h)  Help; exit ;;
 	    *)   echo "$1 is not an option"; exit ;;
@@ -116,6 +120,7 @@ run_count="${run_count:=2}"
 nd_start="${nd_start:=0.0}"
 nd_iter="${nd_iter:=0.1}"
 nd_end="${nd_end:=1.0}"
+nd_topo="${nd_topo:=0.5}"
 results_path="${results_path:=$HOME/comm_pattern_output/${comm_pattern}_$(date +%s)/}"
 if [ ${scheduler} == "slurm" ]; then
     slurm_queue="${slurm_queue:="normal"}"
@@ -135,7 +140,7 @@ fi
 # Ensure ND% values are valid, between 0 and 1, satisfy iteration condition
 while (( $(echo "$nd_start < 0" |bc -l) || $(echo "$nd_start > 1" |bc -l) || $(echo "$nd_iter < 0" |bc -l) || $(echo "$nd_iter > 1" |bc -l) || $(echo "$nd_end < 0" |bc -l) || $(echo "$nd_end < 0" |bc -l) || $(echo "$nd_end > 1" |bc -l) )); do
 	echo "The 3 values defining non-determinism percentage are not all between 0 and 1."
-	echo "Please set these values between 0 and 1."
+	echo "Please set these values between 0 and 1, inclusive."
 	read -p "Starting Non-determinism Percentage: " nd_start
 	read -p "Non-determinism Percentage Step Size: " nd_iter
 	read -p "Ending Non-determinism Percentage: " nd_end
@@ -147,6 +152,11 @@ while ! [[ "$ndp_step_count" =~ ^[0-9]+[.][0]$ ]]; do
 	read -p "start percent: " nd_start
 	read -p "step size: " nd_iter
 	read -p "end percent: " nd_end
+done
+while [ ${comm_pattern} == "unstructured_mesh" ] && (( $(echo "$nd_topo < 0" |bc -l) || $(echo "$nd_topo > 1" |bc -l) )); do
+	echo "The topological non-determinism percentage is not between 0 and 1."
+	echo "Please set this value between 0 and 1, inclusive."
+	read -p "Topological Non-determinism Percentage: " nd_topo
 done
 
 # Ensure the output path is a valid path.
@@ -180,6 +190,7 @@ if [ "${verbose}" == "true" ]; then
     echo "Starting Non-determinism Percentage: ${nd_start}"
     echo "Non-determinism Percentage Step Size: ${nd_iter}"
     echo "Ending Non-determinism Percentage: ${nd_end}"
+    echo "Topological Non-determinism Percentage ${nd_topo}"
     if [ ${scheduler} == "slurm" ]; then
         echo "Queue for Running through Slurm: ${slurm_queue}"
         echo "Time Limit for Running through Slurm: ${slurm_time_limit}"
@@ -220,6 +231,7 @@ echo "Number of Nodes: ${n_nodes}" >> ${user_config_file}
 echo "Starting Non-determinism Percentage: ${nd_start}" >> ${user_config_file}
 echo "Non-determinism Percentage Step Size: ${nd_iter}" >> ${user_config_file}
 echo "Ending Non-determinism Percentage: ${nd_end}" >> ${user_config_file}
+echo "Topological Non-determinism Percentage: ${nd_topo}" >> ${user_config_file}
 if [ ${scheduler} == "slurm" ]; then
     echo "Queue for Running through Slurm: ${slurm_queue}" >> ${user_config_file}
     echo "Time Limit for Running through Slurm: ${slurm_time_limit}" >> ${user_config_file}
@@ -243,8 +255,8 @@ elif [ ${comm_pattern} == "amg2013" ]; then
     bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${slurm_queue} ${slurm_time_limit} ${lsf_queue} ${lsf_time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir} ${nd_start} ${nd_iter} ${nd_end}
     echo "Stored kernel distance data in output file: ${results_path}/msg_size_${msg_sizes}/n_procs_${n_procs}/n_iters_${n_iters}/ndp_${nd_start}_${nd_iter}_${nd_end}/kdts.pkl"
 elif [ ${comm_pattern} == "unstructured_mesh" ]; then
-    bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${slurm_queue} ${slurm_time_limit} ${lsf_queue} ${lsf_time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir} ${x_procs} ${y_procs} ${z_procs} ${nd_start} ${nd_iter} ${nd_end}
-    echo "Stored kernel distance data in output file: ${results_path}/msg_size_${msg_sizes}/n_procs_${n_procs}/n_iters_${n_iters}/ndp_${nd_start}_${nd_iter}_${nd_end}/proc_placement_pack/nd_neighbor_fraction_{0, 0.25, 0.5, 0.75, 1}/kdts.pkl"
+    bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${slurm_queue} ${slurm_time_limit} ${lsf_queue} ${lsf_time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir} ${x_procs} ${y_procs} ${z_procs} ${nd_start} ${nd_iter} ${nd_end} ${nd_topo}
+    echo "Stored kernel distance data in output file: ${results_path}/msg_size_${msg_sizes}/n_procs_${n_procs}/n_iters_${n_iters}/ndp_${nd_start}_${nd_iter}_${nd_end}/proc_placement_pack/neighbor_nd_fraction_${nd_topo}/kdts.pkl"
 fi
 
 
@@ -254,5 +266,6 @@ echo "Used graph kernel JSON file:                ${graph_kernel}"
 echo "Starting non-determinism percentage:        ${nd_start}"
 echo "Non-determinism percentage step size:       ${nd_iter}"
 echo "Ending non-determinism percentage:          ${nd_end}"
+echo "Topological non-determinism percentage:     ${nd_topo}"
 
 
