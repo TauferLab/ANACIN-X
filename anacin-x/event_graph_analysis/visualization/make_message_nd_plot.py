@@ -137,7 +137,7 @@ def main( kdts_path, pattern, output, kernel_path, nd_start, nd_iter, nd_end, nd
     print( spearman_correlation_txt )
     print( spearman_p_txt)
 
-    annotation_lines = [ "Kernel Distance vs. % Wildcard Receives: Correlation Coefficients\n",
+    annotation_lines = [ "Kernel Distance vs. % Non-Deterministic Receives: Correlation Coefficients\n",
                          #"=================================================================\n",
                          pearson_correlation_txt,
                          spearman_correlation_txt
@@ -165,7 +165,7 @@ def main( kdts_path, pattern, output, kernel_path, nd_start, nd_iter, nd_end, nd
     ax.set_yticklabels( y_tick_labels, rotation=0, fontdict=tick_label_fontdict )
 
     # Axis labels
-    x_axis_label = "Percentage of Wildcard Receives (i.e., using MPI_ANY_SOURCE)"
+    x_axis_label = "Percentage of Non-Deterministic Receives (i.e., using MPI_ANY_SOURCE)"
     y_axis_label = "Kernel Distance (Higher == Runs Less Similar)"
     axis_label_fontdict = {"fontsize" : 18}
     ax.set_xlabel( x_axis_label, fontdict=axis_label_fontdict )
@@ -178,9 +178,9 @@ def main( kdts_path, pattern, output, kernel_path, nd_start, nd_iter, nd_end, nd
             "unstructured_mesh" : "Unstructured Mesh"
             }
     if pattern == "unstructured_mesh":
-        plot_title = "Percentage of Wildcard Receives vs. Kernel Distance - Communication Pattern: {} ({}% neighbors non-deterministically chosen )".format(name_dict[pattern], nd_frac)
+        plot_title = "Percentage of Non-Deterministic Receives vs. Kernel Distance - Communication Pattern: {} ({}% neighbors non-deterministically chosen )".format(name_dict[pattern], nd_frac)
     else:
-        plot_title = "Percentage of Wildcard Receives vs. Kernel Distance - Communication Pattern: {}".format(name_dict[pattern])
+        plot_title = "Percentage of Non-Deterministic Receives vs. Kernel Distance - Communication Pattern: {}".format(name_dict[pattern])
     title_fontdict = {"fontsize" : 20}
     plt.title( plot_title, fontdict=title_fontdict )
 
