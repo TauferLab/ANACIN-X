@@ -105,6 +105,14 @@ while true; do
     esac
 done
 
+# Notify user of unused values
+if [ ${comm_pattern} != "unstructured_mesh" ] && ( [ ! -z ${x_procs} ] || [ ! -z ${y_procs} ] || [ ! -z ${z_procs} ] ) ; then
+	echo "Warning: the Unstructured Mesh grid size has been set. These values will not be used for the selected communication pattern - ${comm_pattern}"
+fi
+if [ ${comm_pattern} != "unstructured_mesh" ] && [ ! -z ${nd_topo} ] ; then
+	echo "Warning: the Unstructured Mesh topological non-determinism percentage has been set.  This value will not be used for the selected commnication pattern - ${comm_pattern}"
+fi
+
 
 # Assign Default Values
 n_procs="${n_procs:=10}"
@@ -157,6 +165,33 @@ while [ ${comm_pattern} == "unstructured_mesh" ] && (( $(echo "$nd_topo < 0" |bc
 	echo "The topological non-determinism percentage is not between 0 and 1."
 	echo "Please set this value between 0 and 1, inclusive."
 	read -p "Topological Non-determinism Percentage: " nd_topo
+done
+
+# Ensure the input values are valid to program requirements
+while (( $(echo "$n_procs < 1" |bc -l) )) || ! [[ "$n_procs" =~ ^[0-9]+$ ]] ; do
+	echo "Number of MPI processes was set too low or is not an integer."
+	echo "Please set number of processes to an integer greater than 0. We recommend using at least 10 if available."
+	read -p "Number of MPI processes requested: " n_procs
+done
+while (( $(echo "$n_iters < 1" |bc -l) )) || ! [[ "$n_iters" =~ ^[0-9]+$ ]] ; do
+        echo "Number of communication pattern iterations was set too low or is not an integer."
+        echo "Please set number of iterations to an integer greater than 0. We recommend using at least 5."
+        read -p "Number of iterations requested: " n_iters
+done
+while (( $(echo "$n_nodes < 1" |bc -l) )) || ! [[ "$n_nodes" =~ ^[0-9]+$ ]] ; do
+        echo "Number of compute nodes was set too low or is not an integer."
+        echo "Please set number of compute nodes to an integer greater than 0. We recommend using at least 2 if available."
+        read -p "Number of compute nodes requested: " n_nodes
+done
+while (( $(echo "$msg_sizes < 1" |bc -l) )) || ! [[ "$msg_sizes" =~ ^[0-9]+$ ]] ; do
+        echo "The size of messages to use was set too low or is not an integer."
+        echo "Please set the message size to an integer greater than 0."
+        read -p "Message size requested: " msg_sizes
+done
+while (( $(echo "$run_count < 2" |bc -l) )) || ! [[ "$run_count" =~ ^[0-9]+$ ]] ; do
+        echo "Number of simulation executions was set too low or is not an integer."
+        echo "Please set number of executions to an integer greater than 1. We recommend using at least 20."
+        read -p "Number of simulation executions requested: " run_count
 done
 
 # Ensure the output path is a valid path.
