@@ -20,7 +20,7 @@ Help() {
     echo "Below are the switches available to use when running this script"
     echo ""
     echo "The following command line switches can be used to define parameters for your job submission:"
-    echo "[-p]    Defines the size of the mpi communicator used when generating communication patterns. (Default 10 MPI processes)"
+    echo "[-p]    Defines the number of mpi processes used when generating communication patterns. (Default 10 MPI processes)"
     echo "[-i]    Defines the number of times a given communication pattern appears in a single execution of ANACIN-X. (Default 1 iteration)"
     echo "        If you're running the message race communication pattern, it's recommended to set this to at least 10."
     echo "[-s]    The size in bytes of the messages passed when generating communication patterns. (Default 512 bytes)"
@@ -225,7 +225,9 @@ if [ "${verbose}" == "true" ]; then
     echo "Starting Non-determinism Percentage: ${nd_start}"
     echo "Non-determinism Percentage Step Size: ${nd_iter}"
     echo "Ending Non-determinism Percentage: ${nd_end}"
-    echo "Topological Non-determinism Percentage ${nd_topo}"
+    if [ ${comm_pattern} == "unstructured_mesh" ]; then
+	    echo "Topological Non-determinism Percentage ${nd_topo}"
+    fi
     if [ ${scheduler} == "slurm" ]; then
         echo "Queue for Running through Slurm: ${slurm_queue}"
         echo "Time Limit for Running through Slurm: ${slurm_time_limit}"
@@ -266,7 +268,9 @@ echo "Number of Nodes: ${n_nodes}" >> ${user_config_file}
 echo "Starting Non-determinism Percentage: ${nd_start}" >> ${user_config_file}
 echo "Non-determinism Percentage Step Size: ${nd_iter}" >> ${user_config_file}
 echo "Ending Non-determinism Percentage: ${nd_end}" >> ${user_config_file}
-echo "Topological Non-determinism Percentage: ${nd_topo}" >> ${user_config_file}
+if [ ${comm_pattern} == "unstructured_mesh" ]; then
+	echo "Topological Non-determinism Percentage: ${nd_topo}" >> ${user_config_file}
+fi
 if [ ${scheduler} == "slurm" ]; then
     echo "Queue for Running through Slurm: ${slurm_queue}" >> ${user_config_file}
     echo "Time Limit for Running through Slurm: ${slurm_time_limit}" >> ${user_config_file}
