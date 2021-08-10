@@ -221,7 +221,7 @@ The following command line switches can be used to define parameters for your jo
                 Be sure to define an absolute path that can exist on your machine.
                 Use a different path when running multiple times on the same settings to avoid overwriting.
                 (Defaults to the directory '$HOME/comm_pattern_output')
-* -nd       : Takes 3 arguments in decinal format (start percent, step size, end percent) to define message non-determinism percentages present in the final data.
+* -nd       : Takes 3 arguments in decimal format (start percent, step size, end percent) to define message non-determinism percentages present in the final data.
                 Start percent and end percent are the lowest and highest percentages used respectively.  The step size defines the percentages in between.
                 For example, default values correspond to '-nd 0.0 0.1 1.0'. The percentages used from this are 0, 10, 20, 30, ..., 100. This is the recommended setting.
                 All 3 values must fall between 0 and 1, inclusive, and must satisfy the relationship 'start percent + (step size * number of percentages used) = end percent'.
@@ -277,7 +277,9 @@ Be aware that if you run the project on some machines and some job queues, there
 
 ### **Result Visualization**: 
 
-There two methods to do visualization of the kernel distance data from ANACIN-X.  We recommend using Jupyter Notebooks if you can pull it up from your machine.  If you can't use Jupyter notebooks on your machine, we provide a command line python tool to create a .png file for data visualization.  We describe each visualization method in more detail below:
+There are two methods to do visualization of the kernel distance data from ANACIN-X.  We recommend using Jupyter Notebooks if you can pull it up from your machine.  If you can't use Jupyter notebooks on your machine, we provide a command line python tool to create a .png file for data visualization.  
+
+In either case, we provide the user with sample KDTS data within the ANACIN-X project under the sub-directory 'sample_kdts'.  The user has the option to visualzie the provided sample results or to visualize their own generated results.  We describe each visualization method in more detail below:
 
 #### Method 1 - Jupyter
 
@@ -295,7 +297,17 @@ By opening this visualization jupyter notebook and following the instructions wi
 
 If you can't use Jupyter to visualize the data, then we recommend using the command line python tool to generate the png images.  This will take a few key steps:
 
-You will first need to identify the inputs to the visualization script.  These can be found in 2 ways.
+If you are generating visualizations from provided sample kdts data, then do the following steps:
+1. Get the full path to the root of your ANACIN-X project. (It should be of the form '/home/<your_path>/ANACIN-X/')
+2. Get the full path to the provided sample kdts file you're using. (It should be of the form '/home/<your_path>/ANACIN-X/sample_kdts/<kdts_file_name>')
+3. Get the name of the communication pattern used from the name of the kdts file you're using. (The file name should be of the form samp_<communication pattern name>_kdts_<parameters used>.pkl)
+4. The use the following command from the root project directory to generate a .png visualization for the provided data:
+
+```
+python3 anacin-x/event_graph_analysis/visualization/make_message_nd_plot.py [Path to 'kdts.pkl' file with file name] [The type of communication pattern you used] anacin-x/event_graph_analysis/graph_kernel_policies/wlst_5iters_logical_timestamp_label.json [The name of a file to store the visualization in (excluding the file type)] 0.0 0.1 1.0
+```
+
+If you are generating visualization for your own data, you will first need to identify the inputs to the visualization script.  These can be found in 2 ways.
 1. The first way to find the inputs is to look at the last 7 lines printed to standard out from your run.  There you can find:
   * The path to your kernel distance (KDTS) data file.
   * The communication pattern used.
@@ -315,7 +327,7 @@ Once you've gathered the needed inputs, return to the project directory where yo
 python3 anacin-x/event_graph_analysis/visualization/make_message_nd_plot.py [Path to 'kdts.pkl' file with file name] [The type of communication pattern you used] [Path to kernel json used to generate kdts file] [The name of a file to store the visualization in (excluding the file type)] [Lowest percentage of message non-determinism used in decimal format] [The message non-determinism percent step size in decimal format] [Highest percent of message non-determinism used in decimal format] [--nd_neighbor_fraction <topological non-determinism percent in decimal format> (only used for unstructured mesh communication pattern)]
 ```
 
-A png file will be produced and placed in the working directory if no absolute path is given for output or in the absolute path provided as and output file.  Note that there's no need to include the file type (.png) at the end of your output file name, as it will be attached automatically.
+A png file will be produced and placed in the working directory if no absolute path is given for output or in the absolute path provided as an output file.  Note that there's no need to include the file type (.png) at the end of your output file name, as it will be attached automatically.
 
 If you're doing your work and producing visualizations on a remote machine, remember to copy your png image to your local machine using a tool like scp to view the image.
 
