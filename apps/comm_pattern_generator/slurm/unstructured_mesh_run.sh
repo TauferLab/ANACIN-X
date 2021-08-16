@@ -7,13 +7,13 @@ proc_placement=$4
 nd_neighbor_fraction=$5
 run_dir=$6
 example_paths_dir=$7
-debug_dir=$8
-x_procs=$9
-y_procs=${10}
-z_procs=${11}
-nd_start=${12}
-nd_iter=${13}
-nd_end=${14}
+#debug_dir=$8
+x_procs=$8
+y_procs=$9
+z_procs=${10}
+nd_start=${11}
+nd_iter=${12}
+nd_end=${13}
 
 source ${example_paths_dir}/example_paths_slurm.config
 

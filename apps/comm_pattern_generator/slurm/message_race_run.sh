@@ -6,10 +6,10 @@ n_iters=$3
 proc_placement=$4
 run_dir=$5
 example_paths_dir=$6
-debug_dir=$7
-nd_start=$8
-nd_iter=$9
-nd_end=${10}
+#debug_dir=$7
+nd_start=$7
+nd_iter=$8
+nd_end=$9
 
 source ${example_paths_dir}/example_paths_slurm.config
 
@@ -20,7 +20,7 @@ mkdir -p ${debug_dir}
 # Create app config if doesn't exist
 app_config=${anacin_x_root}/apps/comm_pattern_generator/config/message_race_msg_size_${msg_size}_niters_${n_iters}_ndp_${nd_start}_${nd_iter}_${nd_end}.json
 if [ ! -f "$app_config" ]; then
-    python3 > ${debug_dir}/create_json_output.txt 2> ${debug_dir}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "naive_reduce" ${msg_size} ${n_iters} ${example_paths_dir}/../ ${nd_start} ${nd_iter} ${nd_end}
+    python3 > ${debug_dir}/create_json_output.txt 2> ${debug_dir}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "naive_reduce" ${msg_size} ${n_iters} "${example_paths_dir}/../" ${nd_start} ${nd_iter} ${nd_end}
 fi
 
 #echo ${app_config}
