@@ -28,6 +28,10 @@ Help() {
     echo "        If you're running on an unscheduled system, this value should be set to 1."
     echo "[-r]    The number of runs to make of the ANACIN-X workflow. (Default 2 executions)"
     echo "        The number of runs must be at least 2"
+    echo "[-cp]   Used to define the communication pattern benchmark for testing. (Default message_race)"
+    echo "        Must be one of the 3 provided benchmarks in the following format: message_race, amg2013, or unstructured_mesh."
+    echo "[-sc]   Used to define which schedule system is currently in use. (Default unscheduled)"
+    echo "        Must be one of the following options: lsf, slurm, or unscheduled."
     echo "[-o]    If used, allows the user to define their own path to store output from the project. (Defaults to the directory '$HOME/comm_pattern_output')"
     echo "        When using this flag, be sure to provide an absolute path that can exist on your machine."
     echo "        If you run this script multiple times on the same settings, be sure to use different paths to avoid overlap and overwriting of files."
@@ -69,6 +73,8 @@ while [ -n "$1" ]; do
 	    -r)  run_count=$2; shift; shift ;;
 	    -o)  results_path=$2; shift; shift ;;
 	    -c)  x_procs=$2; y_procs=$3; z_procs=$4; shift; shift; shift; shift ;;
+	    -cp) comm_pattern=$2; shift; shift ;;
+	    -sc) scheduler=$2; shift; shift ;;
 	    -nd) nd_start=$2; nd_iter=$3; nd_end=$4; shift; shift; shift; shift ;;
 	    -nt) nd_topo=$2; shift; shift ;;
 	    -v)  verbose="true"; shift ;;
@@ -80,47 +86,53 @@ done
 
 # Comm Pattern definition
 while true; do
-    read -p "Which communication pattern would you like to analyze? Input is case sensitive. (message_race, amg2013, unstructured_mesh) " comm_pattern
+    #read -p "Which communication pattern would you like to analyze? Input is case sensitive. (message_race, amg2013, unstructured_mesh) " comm_pattern
     case ${comm_pattern} in
 	    "message_race" | "amg2013" | "unstructured_mesh" ) break ;;
-	    * ) echo "Please respond with one of the listed options. Input is case sensitive. (message_race, amg2013, unstructured_mesh) " ;;
+	    #* ) echo "Please respond with one of the listed options. Input is case sensitive. (message_race, amg2013, unstructured_mesh) " ;;
+	    * ) echo "The communication pattern must be selected from one of the provided benchmarks."
+		read -p "Please select one of the three provided options. Input is case sensitive. (message_race, amg2013, unstructured_mesh) " comm_pattern ;;
     esac
 done
 
 # Ensure that input values will work
-while [ ${comm_pattern} == "unstructured_mesh" ] && [ $(( x_procs*y_procs*z_procs )) -lt 10 ]; do
-    echo "The 3 coordinate values of unstructured mesh must multiply together to be greater than or equal to 10."
-    echo "Note that the product of these values will need to be equal to the number of processes."
-    read -p "x coordinate: " x_procs
-    read -p "y coordinate: " y_procs
-    read -p "z coordinate: " z_procs
-done
+#while [ ${comm_pattern} == "unstructured_mesh" ] && (( [ $(( x_procs*y_procs*z_procs )) -lt 10 ] || [ $(( x_procs*y_procs*z_procs )) -ne ${n_procs} ] )); do
+#	echo "The 3 coordinate values of unstructured mesh currently multiply together to equal x_procs*y_procs*z_procs=$(( x_procs*y_procs*z_procs ))"
+#	echo "The 3 value must multiply together to be greater than or equal to 10 and the product must be equal to the number of processes requested."
+#	echo "Please adjust each coordinate so that they satisfy the conditions."
+#	read -p "x coordinate: " x_procs
+#	read -p "y coordinate: " y_procs
+#	read -p "z coordinate: " z_procs
+#done
 
 # Pick a scheduler
 while true; do
-    read -p "Which job scheduler would you like to use? Input is case sensitive. (lsf, slurm, unscheduled) " scheduler
+    #read -p "Which job scheduler would you like to use? Input is case sensitive. (lsf, slurm, unscheduled) " scheduler
     case ${scheduler} in
             "lsf" | "slurm" | "unscheduled" ) break ;;
-            * ) echo "Please respond with one of the listed options. Input is case sensitive. (lsf, slurm, unscheduled) " ;;
+            * ) echo "The scheduler system needs to be selected from one of the three optional schedulers. (lsf, slurm, unscheduled) "
+		read -p "Please respond with one of the listed options. Input is case sensitive. " scheduler ;;
     esac
 done
 
 # Notify user of unused values
-if [ ${comm_pattern} != "unstructured_mesh" ] && ( [ ! -z ${x_procs} ] || [ ! -z ${y_procs} ] || [ ! -z ${z_procs} ] ) ; then
-	echo "Warning: the Unstructured Mesh grid size has been set. These values will not be used for the selected communication pattern - ${comm_pattern}"
-fi
-if [ ${comm_pattern} != "unstructured_mesh" ] && [ ! -z ${nd_topo} ] ; then
-	echo "Warning: the Unstructured Mesh topological non-determinism percentage has been set.  This value will not be used for the selected commnication pattern - ${comm_pattern}"
-fi
+#if [ ${comm_pattern} != "unstructured_mesh" ] && ( [ ! -z ${x_procs} ] || [ ! -z ${y_procs} ] || [ ! -z ${z_procs} ] ) ; then
+#	echo "Warning: the Unstructured Mesh grid size has been set. These values will not be used for the selected communication pattern - ${comm_pattern}"
+#fi
+#if [ ${comm_pattern} != "unstructured_mesh" ] && [ ! -z ${nd_topo} ] ; then
+#	echo "Warning: the Unstructured Mesh topological non-determinism percentage has been set.  This value will not be used for the selected commnication pattern - ${comm_pattern}"
+#fi
 
 
 # Assign Default Values
 n_procs="${n_procs:=10}"
-if [ ${comm_pattern} == "unstructured_mesh" ] && [ $(( x_procs*y_procs*z_procs )) -ne ${n_procs} ]; then
-    echo "The number of processes must correspond to the product of the unstructured mesh coordinates ${x_procs}, ${y_procs}, and ${z_procs}"
-    echo "Updating the number of processes to $(( x_procs*y_procs*z_procs )) = ${x_procs}*${y_procs}*${z_procs}"
-    n_procs=$(( x_procs*y_procs*z_procs ))
-fi
+#if [ ${comm_pattern} == "unstructured_mesh" ] && [ $(( x_procs*y_procs*z_procs )) -ne ${n_procs} ]; then
+#    echo "The number of processes must correspond to the product of the unstructured mesh coordinates ${x_procs}, ${y_procs}, and ${z_procs}"
+#    echo "Updating the number of processes to $(( x_procs*y_procs*z_procs )) = ${x_procs}*${y_procs}*${z_procs}"
+#    n_procs=$(( x_procs*y_procs*z_procs ))
+#fi
+comm_pattern="${comm_pattern:="message_race"}"
+scheduler="${scheduler:="unscheduled"}"
 n_iters="${n_iters:=1}"
 msg_sizes="${msg_sizes:=512}"
 n_nodes="${n_nodes:=1}"
@@ -146,49 +158,80 @@ else
 fi
 
 # Ensure ND% values are valid, between 0 and 1, satisfy iteration condition
-while (( $(echo "$nd_start < 0" |bc -l) || $(echo "$nd_start > 1" |bc -l) || $(echo "$nd_iter < 0" |bc -l) || $(echo "$nd_iter > 1" |bc -l) || $(echo "$nd_end < 0" |bc -l) || $(echo "$nd_end < 0" |bc -l) || $(echo "$nd_end > 1" |bc -l) )); do
-	echo "The 3 values defining non-determinism percentage are not all between 0 and 1."
-	echo "Please set these values between 0 and 1, inclusive."
-	read -p "Starting Non-determinism Percentage: " nd_start
-	read -p "Non-determinism Percentage Step Size: " nd_iter
-	read -p "Ending Non-determinism Percentage: " nd_end
+#ndp_step_count=$(echo "scale=1; ($nd_end - $nd_start)/$nd_iter" |bc -l)
+#while (( $(echo "$nd_start < 0" |bc -l) || $(echo "$nd_start > 1" |bc -l) || $(echo "$nd_iter < 0" |bc -l) || $(echo "$nd_iter > 1" |bc -l) || $(echo "$nd_end < 0" |bc -l) || $(echo "$nd_end < 0" |bc -l) || $(echo "$nd_end > 1" |bc -l) )); do
+while true; do
+	if (( $(echo "$nd_start < 0" |bc -l) || $(echo "$nd_start > 1" |bc -l) || $(echo "$nd_iter < 0" |bc -l) || $(echo "$nd_iter > 1" |bc -l) || $(echo "$nd_end <= 0" |bc -l) || $(echo "$nd_end > 1" |bc -l) )) || [ -z "$nd_start" ] || [ -z "$nd_iter" ] || [ -z "$nd_end" ]; then
+		echo "The 3 values defining non-determinism percentage are not all between 0 and 1 or are not all set."
+		echo "Please set these values between 0 and 1, inclusive."
+		read -p "Starting Non-determinism Percentage: " nd_start
+		read -p "Non-determinism Percentage Step Size: " nd_iter
+		read -p "Ending Non-determinism Percentage: " nd_end
+	fi
+	ndp_step_count=$(echo "scale=1; ($nd_end - $nd_start)/$nd_iter" |bc -l)
+	if ! [[ "$ndp_step_count" =~ ^[0-9]+[.][0]$ ]] || [ -z "$nd_start" ] || [ -z "$nd_iter" ] || [ -z "$nd_end" ]; then
+		echo "Your non-determinism percentage defining values do not satisfy the needed following constraint or are not all set."
+        	echo "Please ensure that they satisfy: start percent + step size * step count = end percent."
+        	read -p "Starting Non-determinism Percentage: " nd_start
+        	read -p "Non-determinism Percentage Step Size: " nd_iter
+        	read -p "Ending Non-determinism Percentage: " nd_end
+	fi
+	ndp_step_count=$(echo "scale=1; ($nd_end - $nd_start)/$nd_iter" |bc -l)
+	if ! (( $(echo "$nd_start < 0" |bc -l) || $(echo "$nd_start > 1" |bc -l) || $(echo "$nd_iter < 0" |bc -l) || $(echo "$nd_iter > 1" |bc -l) || $(echo "$nd_end <= 0" |bc -l) || $(echo "$nd_end > 1" |bc -l) )) && [[ "$ndp_step_count" =~ ^[0-9]+[.][0]$ ]] && ! [ -z "$nd_start" ] && ! [ -z "$nd_iter" ] && ! [ -z "$nd_end" ]; then
+		break;
+	fi
 done
-ndp_step_count=$(echo "scale=1; ($nd_end - $nd_start)/$nd_iter" |bc -l)
-while ! [[ "$ndp_step_count" =~ ^[0-9]+[.][0]$ ]]; do
-	echo "Your non-determinism percentage defining values do not satisfy the needed constraints."
-	echo "Please ensure that they satisfy: start percent + step size * step count = end percent."
-	read -p "start percent: " nd_start
-	read -p "step size: " nd_iter
-	read -p "end percent: " nd_end
-done
-while [ ${comm_pattern} == "unstructured_mesh" ] && (( $(echo "$nd_topo < 0" |bc -l) || $(echo "$nd_topo > 1" |bc -l) )); do
-	echo "The topological non-determinism percentage is not between 0 and 1."
+#ndp_step_count=$(echo "scale=1; ($nd_end - $nd_start)/$nd_iter" |bc -l)
+#while ! [[ "$ndp_step_count" =~ ^[0-9]+[.][0]$ ]]; do
+#	echo "Your non-determinism percentage defining values do not satisfy the needed constraints."
+#	echo "Please ensure that they satisfy: start percent + step size * step count = end percent."
+#	read -p "start percent: " nd_start
+#	read -p "step size: " nd_iter
+#	read -p "end percent: " nd_end
+#	ndp_step_count=$(echo "scale=1; ($nd_end - $nd_start)/$nd_iter" |bc -l)
+#done
+while [ ${comm_pattern} == "unstructured_mesh" ] && ( (( $(echo "$nd_topo < 0" |bc -l) || $(echo "$nd_topo > 1" |bc -l) )) || [ -z "$nd_topo" ] ); do
+	echo "The topological non-determinism percentage is not between 0 and 1 or is not set."
 	echo "Please set this value between 0 and 1, inclusive."
 	read -p "Topological Non-determinism Percentage: " nd_topo
 done
 
 # Ensure the input values are valid to program requirements
-while (( $(echo "$n_procs < 1" |bc -l) )) || ! [[ "$n_procs" =~ ^[0-9]+$ ]] ; do
+while (( $(echo "$n_procs < 1" |bc -l) )) || ! [[ "$n_procs" =~ ^[0-9]+$ ]] || [ -z "$n_procs" ] ; do
 	echo "Number of MPI processes was set too low or is not an integer."
 	echo "Please set number of processes to an integer greater than 0. We recommend using at least 10 if available."
 	read -p "Number of MPI processes requested: " n_procs
 done
-while (( $(echo "$n_iters < 1" |bc -l) )) || ! [[ "$n_iters" =~ ^[0-9]+$ ]] ; do
+while [ ${comm_pattern} == "unstructured_mesh" ] && ( [ $(( x_procs*y_procs*z_procs )) -lt 10 ] || [ -z "$x_procs" ] || [ -z "$y_procs" ] || [ -z "$z_procs" ] ) ; do
+        echo "The 3 coordinate values of unstructured mesh currently multiply together to equal x_procs*y_procs*z_procs=$(( x_procs*y_procs*z_procs ))"
+        echo "The 3 value must multiply together to be greater than or equal to 10."
+        echo "Please adjust each coordinate so that they satisfy the conditions."
+        read -p "x coordinate: " x_procs
+        read -p "y coordinate: " y_procs
+        read -p "z coordinate: " z_procs
+done
+if [ ${comm_pattern} == "unstructured_mesh" ] && [ $(( x_procs*y_procs*z_procs )) -ne ${n_procs} ]; then
+	echo "The 3 coordinate values of unstructured mesh must multiply together to equal the number of MPI processes requested."
+	echo "The 3 values currently multiply together to equal x_procs*y_procs*z_procs=$(( x_procs*y_procs*z_procs ))"
+	echo "Updating the number of processes to $(( x_procs*y_procs*z_procs )) = ${x_procs}*${y_procs}*${z_procs}"
+	n_procs=$(( x_procs*y_procs*z_procs ))
+fi
+while (( $(echo "$n_iters < 1" |bc -l) )) || ! [[ "$n_iters" =~ ^[0-9]+$ ]] || [ -z "$n_iters" ] ; do
         echo "Number of communication pattern iterations was set too low or is not an integer."
         echo "Please set number of iterations to an integer greater than 0. We recommend using at least 5."
         read -p "Number of iterations requested: " n_iters
 done
-while (( $(echo "$n_nodes < 1" |bc -l) )) || ! [[ "$n_nodes" =~ ^[0-9]+$ ]] ; do
+while (( $(echo "$n_nodes < 1" |bc -l) )) || ! [[ "$n_nodes" =~ ^[0-9]+$ ]] || [ -z "$n_nodes" ] ; do
         echo "Number of compute nodes was set too low or is not an integer."
         echo "Please set number of compute nodes to an integer greater than 0. We recommend using at least 2 if available."
         read -p "Number of compute nodes requested: " n_nodes
 done
-while (( $(echo "$msg_sizes < 1" |bc -l) )) || ! [[ "$msg_sizes" =~ ^[0-9]+$ ]] ; do
+while (( $(echo "$msg_sizes < 1" |bc -l) )) || ! [[ "$msg_sizes" =~ ^[0-9]+$ ]] || [ -z "$msg_sizes" ] ; do
         echo "The size of messages to use was set too low or is not an integer."
         echo "Please set the message size to an integer greater than 0."
         read -p "Message size requested: " msg_sizes
 done
-while (( $(echo "$run_count < 2" |bc -l) )) || ! [[ "$run_count" =~ ^[0-9]+$ ]] ; do
+while (( $(echo "$run_count < 2" |bc -l) )) || ! [[ "$run_count" =~ ^[0-9]+$ ]] || [ -z "$run_count" ] ; do
         echo "Number of simulation executions was set too low or is not an integer."
         echo "Please set number of executions to an integer greater than 1. We recommend using at least 20."
         read -p "Number of simulation executions requested: " run_count
@@ -213,6 +256,14 @@ while true; do
     esac
 done
 cd ${project_path}
+
+# Notify user of unused values
+if [ ${comm_pattern} != "unstructured_mesh" ] && ( [ ! -z ${x_procs} ] || [ ! -z ${y_procs} ] || [ ! -z ${z_procs} ] ) ; then
+        echo "Warning: the Unstructured Mesh grid size has been set. These values will not be used for the selected communication pattern - ${comm_pattern}"
+fi
+if [ ${comm_pattern} != "unstructured_mesh" ] && [ ! -z ${nd_topo} ] ; then
+        echo "Warning: the Unstructured Mesh topological non-determinism percentage has been set.  This value will not be used for the selected commnication pattern - ${comm_pattern}"
+fi
 
 # Report Variable Values if User Requests Verbose Execution
 if [ "${verbose}" == "true" ]; then
@@ -305,6 +356,8 @@ echo "Used graph kernel JSON file:                ${graph_kernel}"
 echo "Starting non-determinism percentage:        ${nd_start}"
 echo "Non-determinism percentage step size:       ${nd_iter}"
 echo "Ending non-determinism percentage:          ${nd_end}"
-echo "Topological non-determinism percentage:     ${nd_topo}"
+if [ ${comm_pattern} == "unstructured_mesh" ]; then
+	echo "Topological non-determinism percentage:     ${nd_topo}"
+fi
 
 
