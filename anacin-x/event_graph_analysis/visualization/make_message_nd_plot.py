@@ -44,6 +44,14 @@ def get_scatter_plot_points( idx_to_distances ):
             y_vals.append( y_val )
     return x_vals, y_vals
 
+def adjacent_values(vals, q1, q3):
+    upper_adjacent_value = q3 + (q3 - q1) * 1.5
+    upper_adjacent_value = np.clip(upper_adjacent_value, q3, vals[-1])
+
+    lower_adjacent_value = q1 - (q3 - q1) * 1.5
+    lower_adjacent_value = np.clip(lower_adjacent_value, vals[0], q1)
+    return lower_adjacent_value, upper_adjacent_value
+
 def main( kdts_path, pattern, output, kernel_path, nd_start, nd_iter, nd_end, nd_frac ):
     # Read in kdts data
     with open( kdts_path, "rb" ) as infile:
@@ -69,7 +77,7 @@ def main( kdts_path, pattern, output, kernel_path, nd_start, nd_iter, nd_end, nd
         bp_data.append( idx_to_distances[i] )
     
     # Specify appearance of boxes
-    box_width = 0.5
+    box_width = 0.8
     flierprops = { "marker" : "+",
                    "markersize" : 4
                  }
@@ -96,25 +104,59 @@ def main( kdts_path, pattern, output, kernel_path, nd_start, nd_iter, nd_end, nd
     fig,ax = plt.subplots( figsize=figure_size )
 
     # Create box plots 
-    bp = ax.boxplot( bp_data,
-                     widths=box_width,
-                     positions=bp_positions,
-                     patch_artist=True,
-                     showfliers=False,
-                     boxprops=boxprops,
-                     whiskerprops=whiskerprops,
-                     flierprops=flierprops )
+    #bp = ax.boxplot( bp_data,
+    #                 widths=box_width,
+    #                 positions=bp_positions,
+    #                 patch_artist=True,
+    #                 showfliers=False,
+    #                 boxprops=boxprops,
+    #                 whiskerprops=whiskerprops,
+    #                 flierprops=flierprops )
+
+    #bp_quantiles = [[0.25, 0.5, 0.75] for i in range(len(bp_positions))]
+
+    bp = ax.violinplot( bp_data, widths=box_width, positions=bp_positions, showmedians=True, showextrema=True )
+
+    for sprops in bp['bodies']:
+        #sprops.set_facecolor('#D43F3A')
+        sprops.set_facecolor('tab:olive')
+        sprops.set_edgecolor('black')
+        sprops.set_alpha(1)
+
+    #bp['cquantiles'].set_edgecolors('black')
+    #bp['cquantiles'].set_linewidths(2.5)
+    bp['cbars'].set_linewidths(2.5)
+    bp['cbars'].set_edgecolors('black')
+    bp['cmins'].set_linewidths(2.5)
+    bp['cmins'].set_edgecolors('black')
+    bp['cmaxes'].set_linewidths(2.5)
+    bp['cmaxes'].set_edgecolors('black')
+    bp['cmedians'].set_linewidths(3.5)
+    bp['cmedians'].set_edgecolors('black')
 
     # Overlay actual data points on same axis
-    ax.scatter( scatter_x_vals, 
-                scatter_y_vals,
-                s=marker_size,
-                c=marker_color,
-                alpha=alpha_value)
-   
+    #ax.scatter( scatter_x_vals, 
+    #            scatter_y_vals,
+    #            s=marker_size,
+    #            c=marker_color,
+    #            alpha=alpha_value)
+
+    quartile1, medians, quartile3 = np.percentile(bp_data, [25, 50, 75], axis=1)
+    #whiskers = np.array([
+    #    adjacent_values(sorted_array, q1, q3)
+    #    for sorted_array, q1, q3 in zip(bp_data, quartile1, quartile3)])
+    #whiskers_min, whiskers_max = whiskers[:, 0], whiskers[:, 1]
+
+    inds = np.arange(1, len(medians) + 1)
+    #ax.scatter(inds, medians, marker='o', color='white', s=30, zorder=3)
+    #ax.vlines(inds, quartile1, quartile3, color='k', linestyle='-', lw=5)
+    #ax.vlines(inds, whiskers_min, whiskers_max, color='k', linestyle='-', lw=1)
+
+    plt.ylim(ymin=0)
+
     # Plot annotation ( correlation coefficients )
     step_count = int((nd_end - nd_start)/nd_iter);
-    nd_fractions = [round(nd_start + (nd_iter * step_num), 3) for step_num in range(step_count + 1)]
+    nd_fractions = [round(nd_start + (nd_iter * step_num), 2) for step_num in range(step_count + 1)]
     #nd_fractions = [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
     nd_fraction_seq = []
     dist_seq = []
@@ -154,7 +196,7 @@ def main( kdts_path, pattern, output, kernel_path, nd_start, nd_iter, nd_end, nd
 
     # Tick labels
     tick_label_fontdict = {"fontsize" : 16}
-    x_tick_labels = [ str(100 * nd_fractions[index]) for index in range(step_count + 1)]
+    x_tick_labels = [ str(int(100 * nd_fractions[index])) for index in range(step_count + 1)]
     #x_tick_labels = [ "0", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100" ]
     x_ticks = list(range(len(x_tick_labels)))
     ax.set_xticks( x_ticks )
@@ -165,9 +207,9 @@ def main( kdts_path, pattern, output, kernel_path, nd_start, nd_iter, nd_end, nd
     ax.set_yticklabels( y_tick_labels, rotation=0, fontdict=tick_label_fontdict )
 
     # Axis labels
-    x_axis_label = "Percentage of Non-Deterministic Receives (i.e., using MPI_ANY_SOURCE)"
+    x_axis_label = "Percentage of Message Non-Determinism in Application"
     y_axis_label = "Kernel Distance (Higher == Runs Less Similar)"
-    axis_label_fontdict = {"fontsize" : 18}
+    axis_label_fontdict = {"fontsize" : 20}
     ax.set_xlabel( x_axis_label, fontdict=axis_label_fontdict )
     ax.set_ylabel( y_axis_label, fontdict=axis_label_fontdict )
 
@@ -177,12 +219,12 @@ def main( kdts_path, pattern, output, kernel_path, nd_start, nd_iter, nd_end, nd
             "amg2013" : "AMG2013",
             "unstructured_mesh" : "Unstructured Mesh"
             }
-    if pattern == "unstructured_mesh":
-        plot_title = "Percentage of Non-Deterministic Receives vs. Kernel Distance - Communication Pattern: {} ({}% neighbors non-deterministically chosen )".format(name_dict[pattern], nd_frac)
-    else:
-        plot_title = "Percentage of Non-Deterministic Receives vs. Kernel Distance - Communication Pattern: {}".format(name_dict[pattern])
-    title_fontdict = {"fontsize" : 20}
-    plt.title( plot_title, fontdict=title_fontdict )
+    #if pattern == "unstructured_mesh":
+        #plot_title = "Percentage of Message Non-Determinism vs. Kernel Distance - Communication Pattern: {} ({}% neighbors non-deterministically chosen )".format(name_dict[pattern], nd_frac)
+    #else:
+        #plot_title = "Percentage of Message Non-Determinism vs. Kernel Distance - Communication Pattern: {}".format(name_dict[pattern])
+    #title_fontdict = {"fontsize" : 22}
+    #plt.title( plot_title, fontdict=title_fontdict )
 
     #plt.show()
     plt.savefig( "{}.png".format(output),

@@ -301,7 +301,7 @@ If you are generating visualizations from provided sample kdts data, then do the
 1. Get the full path to the root of your ANACIN-X project. (It should be of the form '/home/<your_path>/ANACIN-X/')
 2. Get the full path to the provided sample kdts file you're using. (It should be of the form '/home/<your_path>/ANACIN-X/sample_kdts/<kdts_file_name>')
 3. Get the name of the communication pattern used from the name of the kdts file you're using. (The file name should be of the form samp_<communication pattern name>_kdts_<parameters used>.pkl)
-4. The use the following command from the root project directory to generate a .png visualization for the provided data:
+4. Then use the following command from the root project directory to generate a .png visualization for the provided data:
 
 ```
 python3 anacin-x/event_graph_analysis/visualization/make_message_nd_plot.py [Path to 'kdts.pkl' file with file name] [The type of communication pattern you used] anacin-x/event_graph_analysis/graph_kernel_policies/wlst_5iters_logical_timestamp_label.json [The name of a file to store the visualization in (excluding the file type)] 0.0 0.1 1.0
