@@ -28,9 +28,9 @@ Help() {
     echo "        If you're running on an unscheduled system, this value should be set to 1."
     echo "[-r]    The number of runs to make of the ANACIN-X workflow. (Default 2 executions)"
     echo "        The number of runs must be at least 2"
-    echo "[-cp]   Used to define the communication pattern benchmark for testing. (Default message_race)"
+    echo "[-cp]   Used to define the communication pattern benchmark for testing. (Code will request this if not set)"
     echo "        Must be one of the 3 provided benchmarks in the following format: message_race, amg2013, or unstructured_mesh."
-    echo "[-sc]   Used to define which schedule system is currently in use. (Default unscheduled)"
+    echo "[-sc]   Used to define which schedule system is currently in use. (Code will request this if not set)"
     echo "        Must be one of the following options: lsf, slurm, or unscheduled."
     echo "[-o]    If used, allows the user to define their own path to store output from the project. (Defaults to the directory '$HOME/comm_pattern_output')"
     echo "        When using this flag, be sure to provide an absolute path that can exist on your machine."
@@ -161,7 +161,7 @@ fi
 #ndp_step_count=$(echo "scale=1; ($nd_end - $nd_start)/$nd_iter" |bc -l)
 #while (( $(echo "$nd_start < 0" |bc -l) || $(echo "$nd_start > 1" |bc -l) || $(echo "$nd_iter < 0" |bc -l) || $(echo "$nd_iter > 1" |bc -l) || $(echo "$nd_end < 0" |bc -l) || $(echo "$nd_end < 0" |bc -l) || $(echo "$nd_end > 1" |bc -l) )); do
 while true; do
-	if (( $(echo "$nd_start < 0" |bc -l) || $(echo "$nd_start > 1" |bc -l) || $(echo "$nd_iter < 0" |bc -l) || $(echo "$nd_iter > 1" |bc -l) || $(echo "$nd_end <= 0" |bc -l) || $(echo "$nd_end > 1" |bc -l) )) || [ -z "$nd_start" ] || [ -z "$nd_iter" ] || [ -z "$nd_end" ]; then
+	if (( $(echo "$nd_start < 0" |bc -l) || $(echo "$nd_start > 1" |bc -l) || $(echo "$nd_iter < 0" |bc -l) || $(echo "$nd_iter > 1" |bc -l) || $(echo "$nd_end < 0" |bc -l) || $(echo "$nd_end > 1" |bc -l) )) || [ -z "$nd_start" ] || [ -z "$nd_iter" ] || [ -z "$nd_end" ]; then
 		echo "The 3 values defining non-determinism percentage are not all between 0 and 1 or are not all set."
 		echo "Please set these values between 0 and 1, inclusive."
 		read -p "Starting Non-determinism Percentage: " nd_start

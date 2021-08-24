@@ -216,6 +216,12 @@ The following command line switches can be used to define parameters for your jo
 * -r         : The number of runs to make of the ANACIN-X workflow. 
                 Be sure that this is set to more than 1.  Otherwise, analysis will not work.
                 (Default 2 executions)
+* -cp       : Used to define the communication pattern benchmark for testing.
+                Must be one of the 3 provided benchmarks in the following format: message_race, amg2013, or unstructured_mesh.
+                (Code will request this if not set)
+* -sc       : Used to define which schedule system is currently in use. 
+                Must be one of the following options: lsf, slurm, or unscheduled.
+                (Code will request this if not set)
 * -o        : If used, allows the user to define their own path to 
                 store output from the project. 
                 Be sure to define an absolute path that can exist on your machine.
