@@ -95,16 +95,6 @@ while true; do
     esac
 done
 
-# Ensure that input values will work
-#while [ ${comm_pattern} == "unstructured_mesh" ] && (( [ $(( x_procs*y_procs*z_procs )) -lt 10 ] || [ $(( x_procs*y_procs*z_procs )) -ne ${n_procs} ] )); do
-#	echo "The 3 coordinate values of unstructured mesh currently multiply together to equal x_procs*y_procs*z_procs=$(( x_procs*y_procs*z_procs ))"
-#	echo "The 3 value must multiply together to be greater than or equal to 10 and the product must be equal to the number of processes requested."
-#	echo "Please adjust each coordinate so that they satisfy the conditions."
-#	read -p "x coordinate: " x_procs
-#	read -p "y coordinate: " y_procs
-#	read -p "z coordinate: " z_procs
-#done
-
 # Pick a scheduler
 while true; do
     #read -p "Which job scheduler would you like to use? Input is case sensitive. (lsf, slurm, unscheduled) " scheduler
@@ -115,22 +105,9 @@ while true; do
     esac
 done
 
-# Notify user of unused values
-#if [ ${comm_pattern} != "unstructured_mesh" ] && ( [ ! -z ${x_procs} ] || [ ! -z ${y_procs} ] || [ ! -z ${z_procs} ] ) ; then
-#	echo "Warning: the Unstructured Mesh grid size has been set. These values will not be used for the selected communication pattern - ${comm_pattern}"
-#fi
-#if [ ${comm_pattern} != "unstructured_mesh" ] && [ ! -z ${nd_topo} ] ; then
-#	echo "Warning: the Unstructured Mesh topological non-determinism percentage has been set.  This value will not be used for the selected commnication pattern - ${comm_pattern}"
-#fi
-
 
 # Assign Default Values
 n_procs="${n_procs:=10}"
-#if [ ${comm_pattern} == "unstructured_mesh" ] && [ $(( x_procs*y_procs*z_procs )) -ne ${n_procs} ]; then
-#    echo "The number of processes must correspond to the product of the unstructured mesh coordinates ${x_procs}, ${y_procs}, and ${z_procs}"
-#    echo "Updating the number of processes to $(( x_procs*y_procs*z_procs )) = ${x_procs}*${y_procs}*${z_procs}"
-#    n_procs=$(( x_procs*y_procs*z_procs ))
-#fi
 comm_pattern="${comm_pattern:="message_race"}"
 scheduler="${scheduler:="unscheduled"}"
 n_iters="${n_iters:=1}"
@@ -181,15 +158,6 @@ while true; do
 		break;
 	fi
 done
-#ndp_step_count=$(echo "scale=1; ($nd_end - $nd_start)/$nd_iter" |bc -l)
-#while ! [[ "$ndp_step_count" =~ ^[0-9]+[.][0]$ ]]; do
-#	echo "Your non-determinism percentage defining values do not satisfy the needed constraints."
-#	echo "Please ensure that they satisfy: start percent + step size * step count = end percent."
-#	read -p "start percent: " nd_start
-#	read -p "step size: " nd_iter
-#	read -p "end percent: " nd_end
-#	ndp_step_count=$(echo "scale=1; ($nd_end - $nd_start)/$nd_iter" |bc -l)
-#done
 while [ ${comm_pattern} == "unstructured_mesh" ] && ( (( $(echo "$nd_topo < 0" |bc -l) || $(echo "$nd_topo > 1" |bc -l) )) || [ -z "$nd_topo" ] ); do
 	echo "The topological non-determinism percentage is not between 0 and 1 or is not set."
 	echo "Please set this value between 0 and 1, inclusive."
