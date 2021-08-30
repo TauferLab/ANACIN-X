@@ -21,6 +21,13 @@ cd ${run_dir}
 debug_dir=${run_dir}/debug
 mkdir -p ${debug_dir}
 
+#Set up csmpi configuration
+trace_dir=${run_dir}
+default_config="default_config_glibc.json"
+mkdir -p ${trace_dir}
+python3 ${csmpi_conf}/generate_config.py -o ${csmpi_conf}/${default_config} -d ${trace_dir}
+export CSMPI_CONFIG=${csmpi_conf}/${default_config}
+
 # Create app config if doesn't exist
 proc_grid="${x_procs}x${y_procs}x${z_procs}"
 app_config=${anacin_x_root}/apps/comm_pattern_generator/config/unstructured_mesh_${proc_grid}_nd_neighbor_fraction_${nd_neighbor_fraction}_msg_size_${msg_size}_niters_${n_iters}_ndp_${nd_start}_${nd_iter}_${nd_end}.json

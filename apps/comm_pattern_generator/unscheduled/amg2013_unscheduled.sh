@@ -39,6 +39,13 @@ do
     mkdir -p ${debugging_path}
     app_config=${anacin_x_root}/apps/comm_pattern_generator/config/amg2013_msg_size_${msg_size}_niters_${n_iters}_ndp_${nd_start}_${nd_iter}_${nd_end}.json
 
+    #Set up csmpi configuration
+    trace_dir=${run_dir}
+    default_config="default_config_glibc.json"
+    mkdir -p ${trace_dir}
+    python3 ${csmpi_conf}/generate_config.py -o ${csmpi_conf}/${default_config} -d ${trace_dir}
+    export CSMPI_CONFIG=${csmpi_conf}/${default_config}
+
     # Create app config if doesn't exist
     if [ ! -f "$app_config" ]; then
 	#echo "Creating config file for message size ${msg_size} and iteration count ${n_iters}."

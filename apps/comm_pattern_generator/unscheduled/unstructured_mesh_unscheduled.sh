@@ -56,7 +56,14 @@ do
 	    debugging_path=${run_dir}/debug
 	    mkdir -p ${debugging_path}
             cd ${run_dir}
-            
+
+            #Set up csmpi configuration
+            trace_dir=${run_dir}
+            default_config="default_config_glibc.json"
+            mkdir -p ${trace_dir}
+            python3 ${csmpi_conf}/generate_config.py -o ${csmpi_conf}/${default_config} -d ${trace_dir}
+            export CSMPI_CONFIG=${csmpi_conf}/${default_config}
+
             # Determine proc grid
             #if [ ${n_procs} == 64 ]; then
             proc_grid="${x_procs}x${y_procs}x${z_procs}"
