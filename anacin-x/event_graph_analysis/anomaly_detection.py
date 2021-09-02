@@ -249,7 +249,7 @@ def main( kernel_distance_data_path, policy_file_path, output_path ):
         anomaly_detection_policies = json.load( infile )
 
     # Choose a kernel
-    chosen_kernel = ( "wlst", "logical_time", 40 )
+    chosen_kernel = ( "wlst", "logical_time", 5 )
 
     # Filter down to a kernel distance time series w/r/t that kernel
     kernel_distances_seq = []
