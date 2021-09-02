@@ -13,3 +13,6 @@
 [submodule "submodules/Src_CSMPI"]
 	path = submodules/Src_CSMPI
 	url = https://github.com/TauferLab/Src_CSMPI.git
+[submodule "submodules/CSMPI"]
+	path = submodules/CSMPI
+	url = https://github.com/TauferLab/CSMPI.git

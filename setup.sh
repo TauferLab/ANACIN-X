@@ -80,7 +80,7 @@ echo ${progress_delimiter}
 echo 
 ./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/sst-dumpi/build/lib/libdumpi.so ./anacin-x/pnmpi/patched_libs/libdumpi.so
 ./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/Pluto/build/libpluto.so ./anacin-x/pnmpi/patched_libs/libpluto.so
-./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/Src_CSMPI/build/libcsmpi.so ./anacin-x/pnmpi/patched_libs/libcsmpi.so
+./submodules/PnMPI/build/bin/pnmpi-patch ./submodules/CSMPI/build/libcsmpi.so ./anacin-x/pnmpi/patched_libs/libcsmpi.so
 echo
 echo ${progress_delimiter}
 echo "Done patching tracing libraries for use with PnMPI..."
