@@ -17,4 +17,4 @@ graph_kernel=$4
 #n_procs_per_node=32
 #n_nodes=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
 
-mpirun -np ${n_procs} ${compute_kdts_script} ${traces_dir} ${graph_kernel} --slice_dir_name "slices" -o "kdts.pkl"
+mpirun -np ${n_procs} ${compute_kdts_script} ${traces_dir} ${graph_kernel} --slice_dir_name "slices" -o "kdts.pkl" -c

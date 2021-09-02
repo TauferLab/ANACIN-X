@@ -19,4 +19,4 @@ slicing_policy=$5
 #n_procs_per_node=32
 #n_nodes=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
 
-mpirun -np ${n_procs} ${compute_kdts_script} ${traces_dir} ${graph_kernel} --slicing_policy ${slicing_policy} -o "kdts.pkl"
+mpirun -np ${n_procs} ${compute_kdts_script} ${traces_dir} ${graph_kernel} --slicing_policy ${slicing_policy} -o "kdts.pkl" -c
