@@ -9,6 +9,7 @@ example_paths_dir=$6
 nd_start=$7
 nd_iter=$8
 nd_end=$9
+impl=${10}
 
 source ${example_paths_dir}/example_paths_slurm.config
 
@@ -18,9 +19,9 @@ mkdir -p ${debug_dir}
 
 #Set up csmpi configuration
 trace_dir=${run_dir}
-default_config="default_config_glibc.json"
+default_config="default_config_${impl}_run_${run_idx}.json"
 mkdir -p ${trace_dir}
-python3 ${csmpi_conf}/generate_config.py -o ${csmpi_conf}/${default_config} -d ${trace_dir}
+python3 ${csmpi_conf}/generate_config.py -o ${csmpi_conf}/${default_config} --backtrace_impl ${impl} -d ${trace_dir}
 export CSMPI_CONFIG=${csmpi_conf}/${default_config}
 
 app_config=${anacin_x_root}/apps/comm_pattern_generator/config/amg2013_msg_size_${msg_size}_niters_${n_iters}_ndp_${nd_start}_${nd_iter}_${nd_end}.json

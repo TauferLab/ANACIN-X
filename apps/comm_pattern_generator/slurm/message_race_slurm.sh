@@ -13,6 +13,7 @@ example_paths_dir=${10}
 nd_start=${11}
 nd_iter=${12}
 nd_end=${13}
+impl=${14}
 
 source ${example_paths_dir}/example_paths_slurm.config
 #example_paths_dir=$(pwd)
@@ -47,7 +48,7 @@ do
         mkdir -p ${run_dir}
 	
         comm_pattern_run_name=message_race_run_$(date +%s.%N)
-	comm_pattern_run_stdout=$( sbatch -N ${n_nodes} -p ${queue} -J ${comm_pattern_run_name} -t ${time_limit} -n ${n_procs} --ntasks-per-node=$((n_procs_per_node+1)) ${comm_pattern_run_script} ${n_procs} ${msg_size} ${n_iters} ${proc_placement} ${run_dir} ${example_paths_dir} ${nd_start} ${nd_iter} ${nd_end} )
+	comm_pattern_run_stdout=$( sbatch -N ${n_nodes} -p ${queue} -J ${comm_pattern_run_name} -t ${time_limit} -n ${n_procs} --ntasks-per-node=$((n_procs_per_node+1)) ${comm_pattern_run_script} ${n_procs} ${msg_size} ${n_iters} ${proc_placement} ${run_dir} ${example_paths_dir} ${nd_start} ${nd_iter} ${nd_end} ${impl} )
         while [ -z "$comm_pattern_run_id" ]; do
             comm_pattern_run_id=$( sacct -n -X --format jobid --name ${comm_pattern_run_name} )
         done

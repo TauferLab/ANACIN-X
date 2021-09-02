@@ -15,6 +15,7 @@ nd_start=${12}
 nd_iter=${13}
 nd_end=${14}
 nd_neighbor_fraction=${15}
+impl=${16}
 
 #echo "Starting runs of Unstructured Mesh communication pattern."
 source ${example_paths_dir}/example_paths_unscheduled.config
@@ -59,9 +60,9 @@ do
 
             #Set up csmpi configuration
             trace_dir=${run_dir}
-            default_config="default_config_glibc.json"
+            default_config="default_config_${impl}_run_${run_idx}.json"
             mkdir -p ${trace_dir}
-            python3 ${csmpi_conf}/generate_config.py -o ${csmpi_conf}/${default_config} -d ${trace_dir}
+            python3 ${csmpi_conf}/generate_config.py -o ${csmpi_conf}/${default_config} --backtrace_impl ${impl} -d ${trace_dir}
             export CSMPI_CONFIG=${csmpi_conf}/${default_config}
 
             # Determine proc grid
@@ -83,7 +84,7 @@ do
 		#echo "                         iteration count ${n_iters}"
 		#echo "                         nd neighbor fraction ${nd_neighbor_fraction}"
 		#echo "                         coordinates ${x_procs}x${y_procs}x${z_procs}"
-		python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "unstructured_mesh" ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} ${msg_size} ${n_iters} "${example_paths_dir}/../" ${nd_start} ${nd_iter} ${nd_end}
+		python3 >> ${debugging_path}/create_json_output.txt 2>> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "unstructured_mesh" ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} ${msg_size} ${n_iters} "${example_paths_dir}/../" ${nd_start} ${nd_iter} ${nd_end}
 		cd ${old_dir}
 	    fi
 	    
@@ -98,7 +99,7 @@ do
             #fi
             #trace_job_id=$( echo ${trace_stdout} | sed 's/[^0-9]*//g' )
 	    #echo "Tracing communiction pattern on run ${run_idx} and nd neighbor fraction ${nd_neighbor_fraction}"
-	    bash > ${debugging_path}/trace_exec_output.txt 2> ${debugging_path}/trace_exec_error.txt ${job_script_trace_pack_procs} ${n_procs} ${app} ${config} ${example_paths_dir}
+	    bash >> ${debugging_path}/trace_exec_output.txt 2>> ${debugging_path}/trace_exec_error.txt ${job_script_trace_pack_procs} ${n_procs} ${app} ${config} ${example_paths_dir}
 
 	    #echo "Starting Build Event Graph"
             # Build event graph
