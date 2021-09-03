@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-cd submodules/csmpi
+cd submodules/CSMPI
 $(pwd)/one_step_build.sh

@@ -13,5 +13,5 @@ rm -rf ${build_dir} && mkdir ${build_dir}
 cd ${build_dir}
 export CC=mpicc
 export CXX=mpicxx
-cmake .. && make -j
+cmake -D CMAKE_BUILD_TYPE=Debug .. && make -j
 

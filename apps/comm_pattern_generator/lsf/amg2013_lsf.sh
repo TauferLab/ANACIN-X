@@ -13,6 +13,7 @@ example_paths_dir=${10}
 nd_start=${11}
 nd_iter=${12}
 nd_end=${13}
+impl=${14}
 
 source ${example_paths_dir}/example_paths_lsf.config
 #example_paths_dir=$(pwd)
@@ -35,7 +36,7 @@ do
 
     #bsub -n ${n_procs} ${message_race_script} ${n_procs} ${n_iters} ${msg_size} ${run_idx_low} ${run_idx_high} ${results_root}
     echo "Submitting job for run ${run_idx} of the AMG2013 communication pattern on scheduler=lsf."
-    comm_pattern_run_stdout=$( bsub -n ${n_procs} -R "span[ptile=$((n_procs_per_node+1))]" -q ${queue} -W ${time_limit} -o ${debugging_path}/lsf_output.txt -e ${debugging_path}/lsf_error.txt ${comm_pattern_job_script} ${n_procs} ${n_iters} ${msg_size} ${n_nodes} ${run_idx} ${example_paths_dir} ${run_dir} ${nd_start} ${nd_iter} ${nd_end} )
+    comm_pattern_run_stdout=$( bsub -n ${n_procs} -R "span[ptile=$((n_procs_per_node+1))]" -q ${queue} -W ${time_limit} -o ${debugging_path}/lsf_output.txt -e ${debugging_path}/lsf_error.txt ${comm_pattern_job_script} ${n_procs} ${n_iters} ${msg_size} ${n_nodes} ${run_idx} ${example_paths_dir} ${run_dir} ${nd_start} ${nd_iter} ${nd_end} ${impl} )
     comm_pattern_job_id=$( echo ${comm_pattern_run_stdout} | sed 's/[^0-9]*//g' )
     kdts_job_deps+=("done(${comm_pattern_job_id})")
     #echo ${kdts_job_deps} 

@@ -11,6 +11,7 @@ example_paths_dir=$8
 nd_start=$9
 nd_iter=${10}
 nd_end=${11}
+impl=${12}
 
 source ${example_paths_dir}/example_paths_unscheduled.config
 #example_paths_dir=$(pwd)
@@ -40,7 +41,14 @@ do
     mkdir -p ${debugging_path}
     app_config=${anacin_x_root}/apps/comm_pattern_generator/config/message_race_msg_size_${msg_size}_niters_${n_iters}_ndp_${nd_start}_${nd_iter}_${nd_end}.json
     #app_config=${anacin_x_root}/apps/comm_pattern_generator/config/message_race_msg_size_${msg_size}.json
-    
+
+    #Set up csmpi configuration
+    trace_dir=${run_dir}
+    default_config="default_config_${impl}_run_${run_idx}.json"
+    mkdir -p ${trace_dir}
+    python3 ${csmpi_conf}/generate_config.py -o ${csmpi_conf}/${default_config} --backtrace_impl ${impl} -d ${trace_dir}
+    export CSMPI_CONFIG=${csmpi_conf}/${default_config}
+
     # Create app config if doesn't exist
     if [ ! -f "$app_config" ]; then
 	#echo "Creating config file for message size ${msg_size} and iteration count ${n_iters}."
@@ -69,7 +77,7 @@ done
 
 # Compute KDTS
 echo "Computing KDTS data for Message Race communication pattern with $((run_idx_high+1)) runs."
-mpirun -np ${n_procs} > ${debugging_path}/../../compute_kdts_output.txt 2> ${debugging_path}/../../compute_kdts_error.txt ${compute_kdts_script} "${run_dir}/../" ${graph_kernel} --slice_dir_name "slices" -o "kdts.pkl"
+mpirun -np ${n_procs} > ${debugging_path}/../../compute_kdts_output.txt 2> ${debugging_path}/../../compute_kdts_error.txt ${compute_kdts_script} "${run_dir}/../" ${graph_kernel} --slice_dir_name "slices" -o "kdts.pkl" -c
 
 #	done
 #    done

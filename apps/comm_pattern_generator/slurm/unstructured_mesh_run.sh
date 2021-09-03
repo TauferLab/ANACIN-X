@@ -14,12 +14,27 @@ z_procs=${10}
 nd_start=${11}
 nd_iter=${12}
 nd_end=${13}
+impl=${14}
 
 source ${example_paths_dir}/example_paths_slurm.config
 
 cd ${run_dir}
 debug_dir=${run_dir}/debug
 mkdir -p ${debug_dir}
+
+#Set up csmpi configuration
+trace_dir=${run_dir}
+default_config="default_config_${impl}_run_${run_idx}.json"
+mkdir -p ${trace_dir}
+python3 ${csmpi_conf}/generate_config.py -o ${csmpi_conf}/${default_config} --backtrace_impl ${impl} -d ${trace_dir}
+export CSMPI_CONFIG=${csmpi_conf}/${default_config}
+
+#Set up csmpi configuration
+trace_dir=${run_dir}
+default_config="default_config_${impl}_run_${run_idx}.json"
+mkdir -p ${trace_dir}
+python3 ${csmpi_conf}/generate_config.py -o ${csmpi_conf}/${default_config} --backtrace_impl ${impl} -d ${trace_dir}
+export CSMPI_CONFIG=${csmpi_conf}/${default_config}
 
 # Create app config if doesn't exist
 proc_grid="${x_procs}x${y_procs}x${z_procs}"

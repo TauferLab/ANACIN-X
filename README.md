@@ -9,7 +9,7 @@
 
 ## Introduction
 
-Non-deterministic results often arise unexpectedly in High Performance Computing (HPC) applications.  These make reproducible and correct results difficult to create.  As such, there is a need to improve the ability of software developers and scientists to comprehend non-determinism in their applications.  To this end, we present ANACIN-X.  This document is organized in the following order:
+Non-deterministic results often arise unexpectedly in High Performance Computing (HPC) applications.  These make reproducible and correct results difficult to create.  As such, there is a need to improve the ability of software developers and scientists to comprehend root sources of non-determinism in their applications.  To this end, we present ANACIN-X.  This document is organized in the following order:
 
 * The first section describes the components of the software.  
 * The second section describes instructions for installation of the software.  **Please read this section carefully as there are a variety of different steps involved.**
@@ -40,9 +40,10 @@ This repository contains a suite of tools for trace-based analysis of non-determ
   
 ### Outline of the Framework for Characterizing Root Sources of Non-Determinism
 The framework for characterizing root sources of non-determinism as graph similarity is broken up into 3 stages.  We describe each in more detail:
-* **Execution Trace Collection**: We use a stack of PMPI modules composed with [PnMPI](https://github.com/LLNL/PnMPI) to trace executions of non-deterministic MPI applications.  In particular, we use the [sst-dumpi](https://github.com/TauferLab/sst-dumpi/tree/b47bb77ccbe3b87d585e3701e1a5c2f8d3626176) and the [Pluto](https://github.com/TauferLab/Src_Pluto/tree/main) tracing modules.
+* **Execution Trace Collection**: We use a stack of PMPI modules composed with [PnMPI](https://github.com/LLNL/PnMPI) to trace executions of non-deterministic MPI applications.  In particular, we use the [sst-dumpi](https://github.com/TauferLab/sst-dumpi/tree/b47bb77ccbe3b87d585e3701e1a5c2f8d3626176), [Pluto](https://github.com/TauferLab/Src_Pluto/tree/main), and [CSMPI](https://github.com/TauferLab/CSMPI/tree/367a1c3bdba1511ad5d415daecf714ea01c536c6) tracing modules.
   * sst-dumpi traces relationships between MPI events.  With this, we can determine the message order of these MPI events in time.
   * Pluto traces memory addresses of MPI requests associated with non-blocking MPI events.  We use these memory addresses as unique identifiers of MPI requests to distinguish between different types of non-blocking MPI events
+  * CSMPI traces callstacks of MPI function calls. We use these to identify which function calls are associated with the highest amounts of non-determinism in the traced application.
 * **Event Graph Construction**: We convert each execution's traces into a graph-structured model of the interprocess communication that took place during the execution using the [dumpi_to_graph](https://github.com/TauferLab/Src_dumpi_to_graph/tree/3966d25a916ddf0cd5e4e71ce71702798c0f39e1) tool.
   * dumpi_to_graph takes information about the addresses of MPI events from Pluto and about happens before MPI relationships from sst-dumpi to construct a unique directed acyclic graph of the [graphml](https://en.wikipedia.org/wiki/GraphML) format which models the underlying communication pattern.
 * **Event Graph Kernel Analysis**: We implement workflows for identifying root causes of non-deterministic behavior using the Weisfeiler-Lehmann Subtree (WLST) graph kernel.  This kernel analysis is implemented using the [GraphKernels](https://github.com/BorgwardtLab/GraphKernels) software package.
@@ -62,11 +63,11 @@ We provide 3 benchmark use case communication patterns for the purpose of testin
   * It exhibits non-determinism due to a randomized process topology, resulting in run-to-run variation in terms of which processes communicate with which others.
   
 ### Kernel Distance Visualization
-Here we provide a brief description of each tool for visualizing ANACIN-X kernel distance data.  Instructions for using these visualization options are provided in the 'Result Visualization' section farther down in this README.
+Here we provide a brief description of each tool for visualizing ANACIN-X kernel distance and callstack data.  Instructions for using these visualization options are provided in the 'Result Visualization' section farther down in this README.
 * **Jupyter Notebook**:
   * As one method for visualizing kernel distance data, we created a Jupyter notebook which is able to display your .png visualization without needing to copy the .png file across machines.
   * For more information about Jupyter notebooks, see their website [here](https://jupyter.org).
-* **Command Line Python Tool**:
+* **Command Line Python Tools**:
   * You may not have easy access to Jupyter notebooks on the machine you run ANACIN-X from.  In that case, we provide instructions for generating the same visualization from the command line.
   * Those instructions can be found farther down this document in the section titled 'Result Visualization'.
   
@@ -188,6 +189,7 @@ The following packages will be installed as submodules to the installation of AN
 * [sst-dumpi](https://github.com/TauferLab/sst-dumpi/tree/b47bb77ccbe3b87d585e3701e1a5c2f8d3626176)
 * [Pluto](https://github.com/TauferLab/Src_Pluto/tree/main)
 * [dumpi_to_graph](https://github.com/TauferLab/Src_dumpi_to_graph/tree/3966d25a916ddf0cd5e4e71ce71702798c0f39e1)
+* [CSMPI](https://github.com/TauferLab/CSMPI/tree/367a1c3bdba1511ad5d415daecf714ea01c536c6)
 
 
 ## **Running ANACIN-X**:
@@ -197,7 +199,7 @@ Use the 'comm_pattern_analysis.sh' script to generate traces of a selected commu
 **Important**: Make sure that the system you're running on supports the inputs you provide from the options below.  If you request that the system use more processes or nodes than are available, or if you select a different scheduler from what is available, the program will fail.
 
 The following command line switches can be used to define parameters for your job submission:
-* -p        : Defines the size of the mpi communicator 
+* -p        : Defines the size of the mpi communicator (number of MPI processes)
                 used when generating communication patterns. 
                 (Default 4 MPI processes)
 * -i         : Defines the number of times a given communication 
@@ -216,12 +218,10 @@ The following command line switches can be used to define parameters for your jo
 * -r         : The number of runs to make of the ANACIN-X workflow. 
                 Be sure that this is set to more than 1.  Otherwise, analysis will not work.
                 (Default 2 executions)
-* -cp       : Used to define the communication pattern benchmark for testing.
+* -cp      : Used to define the communication pattern benchmark for testing. 
                 Must be one of the 3 provided benchmarks in the following format: message_race, amg2013, or unstructured_mesh.
-                (Code will request this if not set)
-* -sc       : Used to define which schedule system is currently in use. 
+* -sc      : Used to define which schedule system is currently in use.
                 Must be one of the following options: lsf, slurm, or unscheduled.
-                (Code will request this if not set)
 * -o        : If used, allows the user to define their own path to 
                 store output from the project. 
                 Be sure to define an absolute path that can exist on your machine.
@@ -275,17 +275,15 @@ Below is another example run of the script as one might submit it on the Stamped
 . ./comm_pattern_analysis.sh -p 48 -n 2 -v -r 50 -sq "skx-normal" -o $WORK2/anacinx_output_1
 ```
 
-Once the script has started running, follow the prompts at the beginning.  You will need to input a communication pattern to generate.  You can choose between any of the communication patterns listed in the supported settings section below with these corresponding formats: message_race, amg2013, unstructured_mesh.
-
-The script will also request which scheduler your computing system employs.  Please input one of the following: lsf, slurm, unscheduled.
+If a communication pattern or a scheduler type has not been provided to the script using one of command line switches above, follow the prompts at the beginning of the script to select them.  You will need to input a communication pattern to generate and which scheduler your computing system employs.  You can choose between any of the communication patterns listed in the supported settings section below with these corresponding formats: message_race, amg2013, unstructured_mesh.  And you can choose one of the following scheduler systems: lsf, slurm, unscheduled.
 
 Be aware that if you run the project on some machines and some job queues, there will be a limit to the number of jobs that can be submitted.  In such cases, you may lose some jobs if you try to run the program with settings that produce more jobs than are allowed in the queue being used.
 
 ### **Result Visualization**: 
 
-There are two methods to do visualization of the kernel distance data from ANACIN-X.  We recommend using Jupyter Notebooks if you can pull it up from your machine.  If you can't use Jupyter notebooks on your machine, we provide a command line python tool to create a .png file for data visualization.  
+There are two methods to visualize kernel distance data from ANACIN-X.  We recommend using Jupyter Notebooks if you can pull it up from your machine.  If you can't use Jupyter notebooks on your machine, we provide 2 command line python tools to: (1) create a .png file for visualization of the relationship between kernel distance and percentage of message non-determinism, or kdts visualizations and (2) create a bar chart of of which callstack functions presented the highest impact on kernel distance during an applications runtime, or callstack visualizations.  
 
-In either case, we provide the user with sample KDTS data within the ANACIN-X project under the sub-directory 'sample_kdts'.  The user has the option to visualzie the provided sample results or to visualize their own generated results.  We describe each visualization method in more detail below:
+In either case, we provide the user with sample KDTS data within the ANACIN-X project under the sub-directory 'sample_kdts'.  The user has the option to visualzie the provided sample results or to visualize their own generated results.  We describe each visualization method in more detail below.
 
 #### Method 1 - Jupyter
 
@@ -303,17 +301,7 @@ By opening this visualization jupyter notebook and following the instructions wi
 
 If you can't use Jupyter to visualize the data, then we recommend using the command line python tool to generate the png images.  This will take a few key steps:
 
-If you are generating visualizations from provided sample kdts data, then do the following steps:
-1. Get the full path to the root of your ANACIN-X project. (It should be of the form '/home/<your_path>/ANACIN-X/')
-2. Get the full path to the provided sample kdts file you're using. (It should be of the form '/home/<your_path>/ANACIN-X/sample_kdts/<kdts_file_name>')
-3. Get the name of the communication pattern used from the name of the kdts file you're using. (The file name should be of the form samp_<communication pattern name>_kdts_<parameters used>.pkl)
-4. Then use the following command from the root project directory to generate a .png visualization for the provided data:
-
-```
-python3 anacin-x/event_graph_analysis/visualization/make_message_nd_plot.py [Path to 'kdts.pkl' file with file name] [The type of communication pattern you used] anacin-x/event_graph_analysis/graph_kernel_policies/wlst_5iters_logical_timestamp_label.json [The name of a file to store the visualization in (excluding the file type)] 0.0 0.1 1.0
-```
-
-If you are generating visualization for your own data, you will first need to identify the inputs to the visualization script.  These can be found in 2 ways.
+If you are generating a kdts visualization for your own data, you will first need to identify the inputs to the visualization script.  These can be found in 2 ways.
 1. The first way to find the inputs is to look at the last 7 lines printed to standard out from your run.  There you can find:
   * The path to your kernel distance (KDTS) data file.
   * The communication pattern used.
@@ -333,9 +321,31 @@ Once you've gathered the needed inputs, return to the project directory where yo
 python3 anacin-x/event_graph_analysis/visualization/make_message_nd_plot.py [Path to 'kdts.pkl' file with file name] [The type of communication pattern you used] [Path to kernel json used to generate kdts file] [The name of a file to store the visualization in (excluding the file type)] [Lowest percentage of message non-determinism used in decimal format] [The message non-determinism percent step size in decimal format] [Highest percent of message non-determinism used in decimal format] [--nd_neighbor_fraction <topological non-determinism percent in decimal format> (only used for unstructured mesh communication pattern)]
 ```
 
-A png file will be produced and placed in the working directory if no absolute path is given for output or in the absolute path provided as an output file.  Note that there's no need to include the file type (.png) at the end of your output file name, as it will be attached automatically.
+If you are generating a kdts visualization from provided sample kdts data, then do the following steps:
+1. Get the full path to the root of your ANACIN-X project. (It should be of the form '/home/<your_path>/ANACIN-X/')
+2. Get the full path to the provided sample kdts file you're using. (It should be of the form '/home/<your_path>/ANACIN-X/sample_kdts/<kdts_file_name>')
+3. Get the name of the communication pattern used from the name of the kdts file you're using. (The file name should be of the form samp_<communication pattern name>_kdts_<parameters used>.pkl)
+4. The use the following command from the root project directory to generate a .png visualization for the provided data:
 
-If you're doing your work and producing visualizations on a remote machine, remember to copy your png image to your local machine using a tool like scp to view the image.
+```
+python3 anacin-x/event_graph_analysis/visualization/make_message_nd_plot.py [Path to 'kdts.pkl' file with file name] [The type of communication pattern you used] anacin-x/event_graph_analysis/graph_kernel_policies/wlst_5iters_logical_timestamp_label.json [The name of a file to store the visualization in (excluding the file type)] 0.0 0.1 1.0
+```
+
+A png file that visualizes the relationship between kernel distance and percentage of message non-determinism in your communication pattern will be produced and placed in the working directory if no absolute path is given for output or in the absolute path provided as an output file.  Note that there's no need to include the file type (.png) at the end of your output file name, as it will be attached automatically.
+
+If you are generating a callstack visualization, you will need to input the following sequence of commands from within your project directory.  **Note**, the second of the following commands, running the script 'callstack_analysis.py', may take a significant amount of time to complete:
+
+```
+python3 anacin-x/event_graph_analysis/anomaly_detection.py [Path to 'kdts.pkl' file with file name] anacin-x/event_graph_analysis/anomaly_detection_policies/naive_max.json -o flagged_indices.pkl
+
+python3 anacin-x/event_graph_analysis/callstack_analysis.py ['flagged_indices.pkl file name with same path as 'kdts.pkl'] [Path to 'kdts.pkl' file with file name] apps/comm_pattern_generator/build/comm_pattern_generator
+
+python3 anacin-x/event_graph_analysis/visualization/visualize_callstack_report.py ['non_anomaly_report_for_policy_naive_max.txt' file name with same path as 'kdts.pkl'] --plot_type="bar_chart"
+```
+
+You will find a file title 'callstack_distribution.png' within your project directory that will visualize the callstack functions with highest graph kernel distance.  In particular, it will visualize which callstack functions have a likely impact on non-determinism in your communication pattern.
+
+If you're doing your work and producing visualizations on a remote machine, remember to copy your png image(s) to your local machine using a tool like scp to view the image.
 
 ### Supported Systems:
 
