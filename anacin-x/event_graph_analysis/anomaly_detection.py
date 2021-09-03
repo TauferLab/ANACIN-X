@@ -72,7 +72,7 @@ def detect_anomalies( kernel_distance_seq, policy ):
         for slice_idx,distance_mat in enumerate( kernel_distance_seq ):
             distances = get_flat_distances( distance_mat )
             slice_max = max( distances)
-            if max_distance_in_slice > max_dist:
+            if slice_max > max_dist:
                 max_dist = slice_max
                 max_dist_slice_idx = slice_idx
         return [ max_dist_slice_idx ]

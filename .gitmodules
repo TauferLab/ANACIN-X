@@ -10,9 +10,6 @@
 [submodule "submodules/dumpi_to_graph"]
 	path = submodules/dumpi_to_graph
 	url = https://github.com/TauferLab/dumpi_to_graph
-[submodule "submodules/Src_CSMPI"]
-	path = submodules/Src_CSMPI
-	url = https://github.com/TauferLab/Src_CSMPI.git
 [submodule "submodules/CSMPI"]
 	path = submodules/CSMPI
 	url = https://github.com/TauferLab/CSMPI.git
