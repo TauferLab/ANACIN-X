@@ -200,8 +200,8 @@ def main( flagged_slices_path, kdts_path, executable_path ):
         all_slice_indices = set( slice_idx_to_data.keys() )
         non_flagged_indices = all_slice_indices - set(slice_indices)
 
-        #callstack_to_count = get_callstack_to_count( slice_indices, slice_idx_to_callstacks )
-        callstack_to_count = get_callstack_to_count( non_flagged_indices, slice_idx_to_callstacks )
+        callstack_to_count = get_callstack_to_count( slice_indices, slice_idx_to_callstacks )
+        #callstack_to_count = get_callstack_to_count( non_flagged_indices, slice_idx_to_callstacks )
                     
         ## Clean up callstacks
         #cleaned_callstack_to_count = {}
@@ -233,6 +233,7 @@ def main( flagged_slices_path, kdts_path, executable_path ):
                         func_name = decode_address( dwarf_info, address )
                         containing_file, line_num = lookup_location( dwarf_info, address )
                         if func_name is not None:
+#print("Found function name: ", func_name)
                             func_name = str( func_name, encoding="ascii" )
                             if func_name not in fn_to_location:
                                 containing_file = str( containing_file, encoding="ascii" )

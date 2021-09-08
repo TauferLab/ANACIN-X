@@ -75,7 +75,7 @@ def make_callstack_frequency_bar_plot( callstack_to_count, y_axis="normalized" )
     # Annotate y-axis
     y_axis_label = "Frequency"
     ax.set_ylabel( y_axis_label )
-    ax.set_ylim(0, 0.15)
+    #ax.set_ylim(0, 0.15)
     
     #plt.show()
 

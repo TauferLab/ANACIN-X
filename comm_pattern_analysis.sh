@@ -38,6 +38,8 @@ Help() {
     echo "[-c]    When running the unstructured mesh communication pattern, use this with 3 arguments to define the grid coordinates. (Ex. -c 2 3 4)"
     echo "        The 3 coordinate values must multiply together to equal the number of processes used."
     echo "        The 3 coordinate values must also multiply together to be greater than or equal 10."
+    echo "[-ct]   Defines the tool to use during callstack backtracing. (Defaults to "glibc")"
+    echo "        The options for this are "glibc" and "libunwind"."
     echo "[-v]    If used, will display the execution settings prior to running the execution."
     echo "[-h]    Used to display the list of switch options."
     echo "[-nd]   Takes 3 arguments in decinal format (start percent, step size, end percent) to define message non-determinism percentages present in the final data."
@@ -73,6 +75,7 @@ while [ -n "$1" ]; do
 	    -r)  run_count=$2; shift; shift ;;
 	    -o)  results_path=$2; shift; shift ;;
 	    -c)  x_procs=$2; y_procs=$3; z_procs=$4; shift; shift; shift; shift ;;
+	    -ct) impl=$2; shift; shift ;;
 	    -cp) comm_pattern=$2; shift; shift ;;
 	    -sc) scheduler=$2; shift; shift ;;
 	    -nd) nd_start=$2; nd_iter=$3; nd_end=$4; shift; shift; shift; shift ;;
@@ -204,6 +207,15 @@ while (( $(echo "$run_count < 2" |bc -l) )) || (( $(echo "$run_count > 999" |bc 
         echo "Number of simulation executions was set too low or is not an integer."
         echo "Please set number of executions to an integer greater than 1. We recommend using at least 20."
         read -p "Number of simulation executions requested: " run_count
+done
+
+# Confirm correctness of callstack tracing tool
+while true; do
+        case ${impl} in
+                "glibc" | "libunwind" ) break ;;
+                * ) echo "The selected tool for backtracing MPI functions is not supported by CSMPI at this time."
+                        read -p "Please select one of the listed options for backtracing functions (glibc, libunwind). Input is case sensitive. " impl ;;
+        esac
 done
 
 # Ensure the output path is a valid path.

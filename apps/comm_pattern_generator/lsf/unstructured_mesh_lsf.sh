@@ -92,7 +92,7 @@ do
 	    #n_procs_per_node=$((n_procs/n_nodes))
             if [ ${proc_placement} == "pack" ]; then
                 #n_nodes_trace=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
-                trace_stdout=$( bsub -n ${n_procs} -R "span[ptile=$((n_procs_per_node+1))]" -q ${queue} -W ${time_limit} -o ${debugging_path}/trace_exec_output.txt -e ${debugging_path}/trace_exec_error.txt ${job_script_trace_pack_procs} ${n_procs} ${app} ${config} )
+                trace_stdout=$( bsub -n ${n_procs} -R "span[ptile=$((n_procs_per_node+1))]" -q ${queue} -W ${time_limit} -o ${debugging_path}/trace_exec_output.txt -e ${debugging_path}/trace_exec_error.txt ${job_script_trace_pack_procs} ${n_procs} ${app} ${config} ${example_paths_dir} )
             elif [ ${proc_placement} == "spread" ]; then
                 n_nodes_trace=${n_procs}
                 trace_stdout=$( bsub -nnodes ${n_nodes_trace} ${job_script_trace_spread_procs} ${n_procs} ${app} ${config} )

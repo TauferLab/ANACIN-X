@@ -14,4 +14,4 @@ slicing_policy=$4
 #fi
 #n_nodes=$(echo "(${n_procs} + ${n_procs_per_node} - 1)/${n_procs_per_node}" | bc)
 
-mpirun -np ${n_procs} ${extract_slices_script} ${event_graph} ${slicing_policy} > "slices"
+mpirun -np ${n_procs} ${extract_slices_script} ${event_graph} ${slicing_policy} -o "slices"

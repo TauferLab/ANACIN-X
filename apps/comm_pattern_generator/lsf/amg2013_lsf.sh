@@ -47,7 +47,7 @@ kdts_job_dep_str=$( join_by "&&" ${kdts_job_deps[@]} )
 #echo ${kdts_job_dep_str}
 cd ${run_dir}/../
 echo "Submitting job to compute KDTS data for AMG2013 communication pattern with $((run_idx_high+1)) runs on scheduler=lsf."
-bsub -n ${n_procs} -R "span[ptile=$((n_procs_per_node+1))]" -w ${kdts_job_dep_str} -o compute_kdts_output.txt -e compute_kdts_error.txt ${compute_kdts_script} "${run_dir}/../" ${graph_kernel} --slice_dir_name "slices" -o "kdts.pkl"
+bsub -n ${n_procs} -R "span[ptile=$((n_procs_per_node+1))]" -w ${kdts_job_dep_str} -o compute_kdts_output.txt -e compute_kdts_error.txt ${compute_kdts_script} "${run_dir}/../" ${graph_kernel} --slice_dir_name "slices" -o "kdts.pkl" -c
 
 
 
