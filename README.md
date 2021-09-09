@@ -198,6 +198,8 @@ Use the 'comm_pattern_analysis.sh' script to generate traces of a selected commu
 
 **Important**: Make sure that the system you're running on supports the inputs you provide from the options below.  If you request that the system use more processes or nodes than are available, or if you select a different scheduler from what is available, the program will fail.
 
+**Note**: If you come across any errors while running your code, be sure to make sure that your version of the code is up to date using git commands like 'git pull'.
+
 The following command line switches can be used to define parameters for your job submission:
 * -p        : Defines the size of the mpi communicator (number of MPI processes)
                 used when generating communication patterns. 
@@ -225,6 +227,7 @@ The following command line switches can be used to define parameters for your jo
 * -ct      : Used to define which backtracing tool should be used during callstack tracing.
 	        Must be one of the following options: glibc or libunwind.
 	        (Defaults to glibc)
+		Note that if this is changed from default, then CSMPI will need to be built with the corresponding library.  Instructions are at the CSMPI github repository.
 * -o        : If used, allows the user to define their own path to 
                 store output from the project. 
                 Be sure to define an absolute path that can exist on your machine.
@@ -326,8 +329,8 @@ python3 anacin-x/event_graph_analysis/visualization/make_message_nd_plot.py [Pat
 
 If you are generating a kdts visualization from provided sample kdts data, then do the following steps:
 1. Get the full path to the root of your ANACIN-X project. (It should be of the form '/home/<your_path>/ANACIN-X/')
-2. Get the full path to the provided sample kdts file you're using. (It should be of the form '/home/<your_path>/ANACIN-X/sample_kdts/<kdts_file_name>')
-3. Get the name of the communication pattern used from the name of the kdts file you're using. (The file name should be of the form samp_<communication pattern name>_kdts_<parameters used>.pkl)
+2. Get the full path to the provided sample kdts file you're using. (It should be of the form '/home/<your_path>/ANACIN-X/sample\_kdts/<kdts_file_name>')
+3. Get the name of the communication pattern used from the name of the kdts file you're using. (The file name should be of the form samp\_<communication pattern name>\_kdts\_<parameters used>.pkl)
 4. The use the following command from the root project directory to generate a .png visualization for the provided data:
 
 ```
@@ -336,17 +339,21 @@ python3 anacin-x/event_graph_analysis/visualization/make_message_nd_plot.py [Pat
 
 A png file that visualizes the relationship between kernel distance and percentage of message non-determinism in your communication pattern will be produced and placed in the working directory if no absolute path is given for output or in the absolute path provided as an output file.  Note that there's no need to include the file type (.png) at the end of your output file name, as it will be attached automatically.
 
-If you are generating a callstack visualization, you will need to input the following sequence of commands from within your project directory.  **Note**, the second of the following commands, running the script 'callstack_analysis.py', may take a significant amount of time to complete:
+If you are generating a callstack visualization, you will need to input the following sequence of commands from within your project directory.
+
+**Important**: In the second command below, the file apps/comm\_pattern\_generator/build/comm\_pattern\_generator is an executable file for your project.  Be sure that you run the below commands on KDTS data that was generated from the same executable file as what you input below!
+
+**Note**, also for the second of the following commands, running the script 'callstack_analysis.py', may take a few minutes time to complete:
 
 ```
-python3 anacin-x/event_graph_analysis/anomaly_detection.py [Path to 'kdts.pkl' file with file name] anacin-x/event_graph_analysis/anomaly_detection_policies/naive_max.json -o flagged_indices.pkl
+python3 anacin-x/event_graph_analysis/anomaly_detection.py [Path to 'kdts.pkl' file with file name] anacin-x/event_graph_analysis/anomaly_detection_policies/all.json -o flagged_indices.pkl
 
 python3 anacin-x/event_graph_analysis/callstack_analysis.py ['flagged_indices.pkl file name with same path as 'kdts.pkl'] [Path to 'kdts.pkl' file with file name] apps/comm_pattern_generator/build/comm_pattern_generator
 
-python3 anacin-x/event_graph_analysis/visualization/visualize_callstack_report.py ['non_anomaly_report_for_policy_naive_max.txt' file name with same path as 'kdts.pkl'] --plot_type="bar_chart"
+python3 anacin-x/event_graph_analysis/visualization/visualize_callstack_report.py ['non_anomaly_report_for_policy_all.txt' file name with same path as 'kdts.pkl'] --plot_type="bar_chart"
 ```
 
-You will find a file title 'callstack_distribution.png' within your project directory that will visualize the callstack functions with highest graph kernel distance.  In particular, it will visualize which callstack functions have a likely impact on non-determinism in your communication pattern.
+If the above commands completed with no errors, you will find a file titled 'callstack_distribution.png' within your project directory that will visualize the relative normalized frequencies of callstacks within your communication pattern.  In particular, it will visualize the relative likelihood that each callstack function has an impact on non-determinism in your communication pattern.
 
 If you're doing your work and producing visualizations on a remote machine, remember to copy your png image(s) to your local machine using a tool like scp to view the image.
 
@@ -358,6 +365,9 @@ Currently, the software supports the following types of scheduler systems for jo
 * Unscheduled systems (ex. Jetstream, personal computers)
 
 **Important**: Please refer to the list of command line switches above to determine what settings you can configure.  If your system cannot support the settings requested, then you will need to change them.  The program will not run correctly if you request more processes or nodes than are available in your computer.
+
+Note that if you are trying to generate a callstack visualization, it is strongly recommended to do so on a system that is not running through a virtual machine.  Errors can arise during visualization associated with callstack identification.  
+If you are only generating a KDTS visualization, then this is not a limitation.
 
 
 ## Project Team:

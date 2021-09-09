@@ -8,7 +8,7 @@ out = {"comm_patterns": []}
 
 if sys.argv[1] == "amg2013":
     nd_frac = float(sys.argv[5])
-    while (nd_frac <= float(sys.argv[7])):
+    while True:
         out["comm_patterns"].append( {"pattern_name": sys.argv[1],
                                    "n_iters": int(sys.argv[3]),
                                    "nd_fraction": round(nd_frac, 1),
@@ -19,12 +19,14 @@ if sys.argv[1] == "amg2013":
                                        }
                                    ]})
         nd_frac += float(sys.argv[6])
+        if ( (nd_frac > float(sys.argv[7])) or (float(sys.argv[6]) == 0) ):
+            break;
     with open("{}/config/amg2013_msg_size_{}_niters_{}_ndp_{}_{}_{}.json".format(sys.argv[4], int(sys.argv[2]), int(sys.argv[3]), float(sys.argv[5]), float(sys.argv[6]), float(sys.argv[7])), 'w+') as f:
         json.dump(out, f, indent=4)
 
 elif sys.argv[1] == "naive_reduce":
     nd_frac = float(sys.argv[5])
-    while (nd_frac <= float(sys.argv[7])):
+    while True:
         out["comm_patterns"].append({"pattern_name": sys.argv[1],
                                    "n_iters": int(sys.argv[3]),
                                    "nd_fraction": round(nd_frac, 1),
@@ -35,13 +37,15 @@ elif sys.argv[1] == "naive_reduce":
                                        }
                                    ]})
         nd_frac += float(sys.argv[6])
+        if ( (nd_frac > float(sys.argv[7])) or (float(sys.argv[6]) == 0) ):
+            break;
     with open("{}/config/message_race_msg_size_{}_niters_{}_ndp_{}_{}_{}.json".format(sys.argv[4], int(sys.argv[2]), int(sys.argv[3]), float(sys.argv[5]), float(sys.argv[6]), float(sys.argv[7])), 'w+') as f:
         json.dump(out, f, indent=4)
 
 
 elif sys.argv[1] == "unstructured_mesh":
     nd_frac = float(sys.argv[9])
-    while (nd_frac <= float(sys.argv[11])):
+    while True:
         out["comm_patterns"].append({"pattern_name": sys.argv[1],
                                      "n_iters": int(sys.argv[7]),
                                    "nd_fraction": round(nd_frac, 1),
@@ -80,6 +84,8 @@ elif sys.argv[1] == "unstructured_mesh":
                                        }
                                    ]})
         nd_frac += float(sys.argv[10])
+        if (nd_frac > float(sys.argv[11])) or (float(sys.argv[10]) == 0):
+            break;
     with open("{}/config/unstructured_mesh_{}x{}x{}_nd_neighbor_fraction_{}_msg_size_{}_niters_{}_ndp_{}_{}_{}.json".format(sys.argv[8], int(sys.argv[3]), int(sys.argv[4]), int(sys.argv[5]), sys.argv[2], int(sys.argv[6]), int(sys.argv[7]), float(sys.argv[9]), float(sys.argv[10]), float(sys.argv[11])), 'w+') as f:
         json.dump(out, f, indent=4)
 

@@ -149,7 +149,11 @@ while true; do
 		read -p "Non-determinism Percentage Step Size: " nd_iter
 		read -p "Ending Non-determinism Percentage: " nd_end
 	fi
-	ndp_step_count=$(echo "scale=1; ($nd_end - $nd_start)/$nd_iter" |bc -l)
+	if (( $(echo "$nd_iter == 0.0" |bc -l) )); then
+		ndp_step_count=0.0;
+	else
+		ndp_step_count=$(echo "scale=1; ($nd_end - $nd_start)/$nd_iter" |bc -l)
+	fi
 	if ! [[ "$ndp_step_count" =~ ^[0-9]+[.][0]$ ]] || [ -z "$nd_start" ] || [ -z "$nd_iter" ] || [ -z "$nd_end" ]; then
 		echo "Your non-determinism percentage defining values do not satisfy the needed following constraint or are not all set."
         	echo "Please ensure that they satisfy: start percent + step size * step count = end percent."
@@ -157,11 +161,19 @@ while true; do
         	read -p "Non-determinism Percentage Step Size: " nd_iter
         	read -p "Ending Non-determinism Percentage: " nd_end
 	fi
-	ndp_step_count=$(echo "scale=1; ($nd_end - $nd_start)/$nd_iter" |bc -l)
+        if (( $(echo "$nd_iter == 0.0" |bc -l) )); then
+                ndp_step_count=0.0;
+        else
+                ndp_step_count=$(echo "scale=1; ($nd_end - $nd_start)/$nd_iter" |bc -l)
+        fi
 	if ! (( $(echo "$nd_start < 0" |bc -l) || $(echo "$nd_start > 1" |bc -l) || $(echo "$nd_iter < 0" |bc -l) || $(echo "$nd_iter > 1" |bc -l) || $(echo "$nd_end <= 0" |bc -l) || $(echo "$nd_end > 1" |bc -l) )) && [[ "$ndp_step_count" =~ ^[0-9]+[.][0]$ ]] && ! [ -z "$nd_start" ] && ! [ -z "$nd_iter" ] && ! [ -z "$nd_end" ]; then
 		break;
 	fi
 done
+if (( $(echo "$nd_iter == 0.0" |bc -l) && $(echo "$nd_end > $nd_start" |bc -l) )); then
+	echo "Warning: You have requested that the non-determinism percentage step size be 0.0 and that the final non-determinism percentage be different from the starting non-determinism percentage."
+	echo "         The requested final non-determinism percentage will not be used because the step size is 0.0."
+fi
 while [ ${comm_pattern} == "unstructured_mesh" ] && ( (( $(echo "$nd_topo < 0" |bc -l) || $(echo "$nd_topo > 1" |bc -l) )) || [ -z "$nd_topo" ] ); do
 	echo "The topological non-determinism percentage is not between 0 and 1 or is not set."
 	echo "Please set this value between 0 and 1, inclusive."

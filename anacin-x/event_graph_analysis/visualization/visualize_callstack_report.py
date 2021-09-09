@@ -8,6 +8,7 @@ import igraph
 import re
 import pprint
 import matplotlib
+import numpy as np
 #matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
@@ -48,7 +49,7 @@ def make_callstack_frequency_bar_plot( callstack_to_count, y_axis="normalized" )
     bar_positions = [ x*spacing_factor for x in range(len(sorted(callstack_to_count))) ]
     bar_heights = sorted(callstack_to_count.values())
     bar_width = 0.4*spacing_factor
-    ax.bar( bar_positions, bar_heights, width=bar_width )  
+    ax.bar( bar_positions, bar_heights, width=bar_width , color=(0.2, 0.4, 0.6, 1) )  
     # Set y-axis limit
     if y_axis == "normalized":
         ax.set_ylim(0, 1.0)
@@ -63,7 +64,9 @@ def make_callstack_frequency_bar_plot( callstack_to_count, y_axis="normalized" )
                 callstack_str += "\n"
         long_x_tick_labels.append( callstack_str )
 
-    ax.set_xlabel( x_axis_label )
+    text_size=20
+    cs_text_size=16
+    ax.set_xlabel( x_axis_label , fontsize=text_size )
     ax.set_xticks( bar_positions )
     ax.set_xlim(-0.5*spacing_factor, max(bar_positions)+(0.5*spacing_factor))
     
@@ -71,11 +74,12 @@ def make_callstack_frequency_bar_plot( callstack_to_count, y_axis="normalized" )
     long_to_short_x_tick_label = {}
     #x_tick_labels = [ long_to_short_x_tick_label[x] for x in long_x_tick_labels ]
 
-    ax.set_xticklabels( long_x_tick_labels, rotation=0, fontsize=8 )
+    ax.set_xticklabels( long_x_tick_labels, rotation=0, fontsize=cs_text_size )
     # Annotate y-axis
     y_axis_label = "Frequency"
-    ax.set_ylabel( y_axis_label )
-    #ax.set_ylim(0, 0.15)
+    ax.set_ylabel( y_axis_label , fontsize=text_size )
+    ax.set_yticklabels( np.around(np.arange(0.0, 1.1*max(bar_heights), 0.1) , 1 ) , fontsize=text_size )
+    ax.set_ylim(0, 1.2*max(bar_heights))
     
     #plt.show()
 
