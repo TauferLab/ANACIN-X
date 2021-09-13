@@ -341,6 +341,8 @@ A png file that visualizes the relationship between kernel distance and percenta
 
 If you are generating a callstack visualization, you will need to input the following sequence of commands from within your project directory.
 
+**Note**, if you are creating visualizations from sample data provided within ANACIN-X, you will not be able to use the following steps to generate a callstack visualization.  If you wish to generate a callstack visualization, you will need to generate your own data.
+
 **Important**: In the second command below, the file apps/comm\_pattern\_generator/build/comm\_pattern\_generator is an executable file for your project.  Be sure that you run the below commands on KDTS data that was generated from the same executable file as what you input below!
 
 **Note**, also for the second of the following commands, running the script 'callstack_analysis.py', may take a few minutes time to complete:
