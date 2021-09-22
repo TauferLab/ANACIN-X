@@ -155,7 +155,10 @@ def main( kdts_path, pattern, output, kernel_path, nd_start, nd_iter, nd_end, nd
     plt.ylim(ymin=0)
 
     # Plot annotation ( correlation coefficients )
-    step_count = int((nd_end - nd_start)/nd_iter);
+    if ( nd_iter == 0 ):
+        step_count = 0;
+    else:
+        step_count = int((nd_end - nd_start)/nd_iter);
     nd_fractions = [round(nd_start + (nd_iter * step_num), 2) for step_num in range(step_count + 1)]
     #nd_fractions = [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
     nd_fraction_seq = []

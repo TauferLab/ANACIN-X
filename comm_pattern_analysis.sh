@@ -36,7 +36,7 @@ Help() {
     echo "        When using this flag, be sure to provide an absolute path that can exist on your machine."
     echo "        If you run this script multiple times on the same settings, be sure to use different paths to avoid overlap and overwriting of files."
     echo "[-c]    When running the unstructured mesh communication pattern, use this with 3 arguments to define the grid coordinates. (Ex. -c 2 3 4)"
-    echo "        The 3 coordinate values must multiply together to equal the number of processes used."
+    echo "        The 3 coordinate values must be integers greater than 1 and multiply together to equal the number of processes used."
     echo "        The 3 coordinate values must also multiply together to be greater than or equal 10."
     echo "[-ct]   Defines the tool to use during callstack backtracing. (Defaults to "glibc")"
     echo "        The options for this are "glibc" and "libunwind"."
@@ -46,6 +46,7 @@ Help() {
     echo "        Start percent and end percent are the lowest and highest percentages used respectively.  The step size defines the percentages in between."
     echo "        For example, default values correspond to '-nd 0.0 0.1 1.0'. The percentages used from this are 0, 10, 20, 30, ..., 100"
     echo "        All 3 values must fall between 0 and 1, inclusive, and must satisfy the relationship 'start percent + step size * step count = end percent'."
+    echo "        All 3 values must also contain no more than 2 digits past the decimal."
     echo "[-nt]   When running the unstructured mesh communication pattern, takes the percentage of topological non-determinism in decimal format."
     echo "        For example, default values corresopnd to '-nt 0.5'."
     echo "        Value must fall in the range of 0 to 1, inclusive."
@@ -144,6 +145,7 @@ fi
 while true; do
 	if (( $(echo "$nd_start < 0" |bc -l) || $(echo "$nd_start > 1" |bc -l) || $(echo "$nd_iter < 0" |bc -l) || $(echo "$nd_iter > 1" |bc -l) || $(echo "$nd_end < 0" |bc -l) || $(echo "$nd_end > 1" |bc -l) )) || [ -z "$nd_start" ] || [ -z "$nd_iter" ] || [ -z "$nd_end" ]; then
 		echo "The 3 values defining non-determinism percentage are not all between 0 and 1 or are not all set."
+		echo "They are currecntly set to: ${nd_start} ${nd_iter} ${nd_end}"
 		echo "Please set these values between 0 and 1, inclusive."
 		read -p "Starting Non-determinism Percentage: " nd_start
 		read -p "Non-determinism Percentage Step Size: " nd_iter
@@ -156,6 +158,7 @@ while true; do
 	fi
 	if ! [[ "$ndp_step_count" =~ ^[0-9]+[.][0]$ ]] || [ -z "$nd_start" ] || [ -z "$nd_iter" ] || [ -z "$nd_end" ]; then
 		echo "Your non-determinism percentage defining values do not satisfy the needed following constraint or are not all set."
+		echo "They are currecntly set to: ${nd_start} ${nd_iter} ${nd_end}"
         	echo "Please ensure that they satisfy: start percent + step size * step count = end percent."
         	read -p "Starting Non-determinism Percentage: " nd_start
         	read -p "Non-determinism Percentage Step Size: " nd_iter
@@ -170,6 +173,14 @@ while true; do
 		break;
 	fi
 done
+if [[ "$nd_start" =~ ^[0-9]+[.][0-9][0-9][0-9]*$ ]] || [[ "$nd_iter" =~ ^[0-9]+[.][0-9][0-9][0-9]*$ ]] || [[ "$nd_end" =~ ^[0-9]+[.][0-9][0-9][0-9]*$ ]]; then
+	echo "Warning: The values defining message non-determinism have been set with too many decimal points."
+	echo "The 3 values will be adjusted to 2 decimal points of precision, per program requirements."
+	nd_start=$(printf "%.2f\n" "$nd_start")
+	nd_iter=$(printf "%.2f\n" "$nd_iter")
+	nd_end=$(printf "%.2f\n" "$nd_end")
+	echo "They will now be set to: ${nd_start} ${nd_iter} ${nd_end}"
+fi
 if (( $(echo "$nd_iter == 0.0" |bc -l) && $(echo "$nd_end > $nd_start" |bc -l) )); then
 	echo "Warning: You have requested that the non-determinism percentage step size be 0.0 and that the final non-determinism percentage be different from the starting non-determinism percentage."
 	echo "         The requested final non-determinism percentage will not be used because the step size is 0.0."
@@ -186,9 +197,9 @@ while (( $(echo "$n_procs < 1" |bc -l) )) || ! [[ "$n_procs" =~ ^[0-9]+$ ]] || [
 	echo "Please set number of processes to an integer greater than 0. We recommend using at least 10 if available."
 	read -p "Number of MPI processes requested: " n_procs
 done
-while [ ${comm_pattern} == "unstructured_mesh" ] && ( [ $(( x_procs*y_procs*z_procs )) -lt 10 ] || [ -z "$x_procs" ] || [ -z "$y_procs" ] || [ -z "$z_procs" ] ) ; do
-        echo "The 3 coordinate values of unstructured mesh currently multiply together to equal x_procs*y_procs*z_procs=$(( x_procs*y_procs*z_procs ))"
-        echo "The 3 value must multiply together to be greater than or equal to 10."
+while [ ${comm_pattern} == "unstructured_mesh" ] && ( ! [[ "$x_procs" =~ ^[0-9]+$ ]] || ! [[ "$y_procs" =~ ^[0-9]+$ ]] || ! [[ "$z_procs" =~ ^[0-9]+$ ]] || (( $(echo "$x_procs < 2" |bc -l) )) || (( $(echo "$y_procs < 2" |bc -l) )) || (( $(echo "$z_procs < 2" |bc -l) )) || [ $(( x_procs*y_procs*z_procs )) -lt 10 ] || [ -z "$x_procs" ] || [ -z "$y_procs" ] || [ -z "$z_procs" ] ) ; do
+        echo "The 3 coordinate values of unstructured mesh currently multiply together to equal x_procs*y_procs*z_procs=$(echo "$x_procs * $y_procs * $z_procs" |bc -l)"
+        echo "The 3 value must be integers greater than 1 and multiply together to be greater than or equal to 10."
         echo "Please adjust each coordinate so that they satisfy the conditions."
         read -p "x coordinate: " x_procs
         read -p "y coordinate: " y_procs
