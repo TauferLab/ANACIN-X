@@ -237,13 +237,14 @@ The following command line switches can be used to define parameters for your jo
                 Start percent and end percent are the lowest and highest percentages used respectively.  The step size defines the percentages in between.
                 For example, default values correspond to '-nd 0.0 0.1 1.0'. The percentages used from this are 0, 10, 20, 30, ..., 100. This is the recommended setting.
                 All 3 values must fall between 0 and 1, inclusive, and must satisfy the relationship 'start percent + (step size * number of percentages used) = end percent'.
+		All 3 values must also contain no more than 2 digits past the decimal. (i.e. corresponding to integer percentages)
                 (Defaults to starting percent of 0%, step size of 10%, and ending percent of 100%)
 * -nt       : When running the unstructured mesh communication pattern, takes the percentage of topological non-determinism in decimal format.
                 For example, default values correspond to '-nt 0.5'.
                 Value must fall in the range of 0 to 1, inclusive.
                 (Defaults to 50% topological non-determinism percentage)
 * -c        : When running the unstructured mesh communication pattern, 
-                use this with 3 arguments to define the grid coordinates. 
+                use this with 3 arguments (integers greater than 1) to define the grid coordinates. 
                 The three values must be set so that their product equals the number of processes used.
                 (Ex. -c 2 3 4)
 * -v        : If used, will display the execution settings prior 
