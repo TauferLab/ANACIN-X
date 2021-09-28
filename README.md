@@ -194,7 +194,7 @@ The following packages will be installed as submodules to the installation of AN
 
 ## **Running ANACIN-X**:
 
-Use the 'comm_pattern_analysis.sh' script to generate traces of a selected communication pattern and perform analysis on the event graphs.  
+Use the 'comm\_pattern\_analysis.sh' script to generate traces of a selected communication pattern and perform analysis on the event graphs.  
 
 **Important**: Make sure that the system you're running on supports the inputs you provide from the options below.  If you request that the system use more processes or nodes than are available, or if you select a different scheduler from what is available, the program will fail.
 
@@ -252,15 +252,9 @@ The following command line switches can be used to define parameters for your jo
 * -h        : Used to display the list of switch options.
 
 If you're running on a system that uses the Slurm scheduler, then the following switches can be used to define settings for job submission:
-* -sq       : Defines the queue to submit Slurm jobs to. 
+* -q       : Defines the queue to submit scheduled jobs to. 
                 (Defaults to the "normal" queue)
-* -st        : A maximum time limit in minutes on the time provided to jobs submitted. 
-                (Default 10 minutes)
-
-If you're running on a system that uses the LSF scheduler, then the following switch can be used to define settings for job submission:
-* -lq        : Defines the queue to submit LSF jobs to. 
-                (Defaults to the "normal" queue)
-* -lt        : A maximum time limit in minutes on the time provided to jobs submitted.
+* -t        : A maximum time limit in minutes on the time provided to jobs submitted. 
                 (Default 10 minutes)
                 
 
@@ -270,7 +264,7 @@ If the project is run with settings that are small, then the communication patte
 * Running with a small message size (using the -s flag) can increase the likelihood of non-determinism.
 * Running the program across multiple compute nodes (using the -n flag) can help to cause more non-determinism.
 
-Below is an example run of the script as one might submit it to run message_race on an unscheduled system.
+Below is an example run of the script as one might submit it to run message\_race on an unscheduled system.
 
 ```
 . ./comm_pattern_analysis.sh -p 20 -i 10 -v -r 100 -o $HOME/message_race_sim_1
