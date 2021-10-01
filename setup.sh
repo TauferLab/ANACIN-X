@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 
-run_csmpi=$1
+while [ -n "$1" ]; do
+	case "$1" in
+		-c)  run_csmpi="True"; shift ;;
+		-sc) scheduler=$2; shift; shift ;;
+	esac
+done
 
 # Clean up previous installations
 rm -rf ./submodules/*
@@ -122,11 +127,12 @@ echo
 
 # Set vars for job script infrastructure
 anacin_x_root=$(pwd)
-sed -i "s#anacin_x_root= #anacin_x_root=${anacin_x_root}#" ./apps/comm_pattern_generator/comm_pattern_config.config
+#sed -i "s#anacin_x_root= #anacin_x_root=${anacin_x_root}#" ./apps/comm_pattern_generator/comm_pattern_config.config
 sed -i "s#anacin_x_root= #anacin_x_root=${anacin_x_root}#" ./anacin-x/config/anacin_paths.config
-sed -i "s#anacin_x_root= #anacin_x_root=${anacin_x_root}#" ./apps/comm_pattern_generator/unscheduled/example_paths_unscheduled.config
-sed -i "s#anacin_x_root= #anacin_x_root=${anacin_x_root}#" ./apps/comm_pattern_generator/slurm/example_paths_slurm.config
-sed -i "s#anacin_x_root= #anacin_x_root=${anacin_x_root}#" ./apps/comm_pattern_generator/lsf/example_paths_lsf.config
+sed -i "s#scheduler= #scheduler=${scheduler}#" ./anacin-x/config/anacin_paths.config
+#sed -i "s#anacin_x_root= #anacin_x_root=${anacin_x_root}#" ./apps/comm_pattern_generator/unscheduled/example_paths_unscheduled.config
+#sed -i "s#anacin_x_root= #anacin_x_root=${anacin_x_root}#" ./apps/comm_pattern_generator/slurm/example_paths_slurm.config
+#sed -i "s#anacin_x_root= #anacin_x_root=${anacin_x_root}#" ./apps/comm_pattern_generator/lsf/example_paths_lsf.config
 if [ "${run_csmpi}" == "True" ]; then
 	sed -i "s#run_csmpi= #run_csmpi=${run_csmpi}#" ./anacin-x/config/anacin_paths.config
 	sed -i "s#csmpi_conf= #csmpi_conf=${anacin_x_root}/submodules/CSMPI/config/#" ./anacin-x/config/anacin_paths.config
