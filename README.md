@@ -123,11 +123,13 @@ If you're using the  [Jetstream cloud computer](https://jetstream-cloud.org) ima
 
 The script will begin by verifying some information.  Follow the prompts at the beginning, and then the installation will run on its own.  The installation of all dependencies may take some time to complete.
 
-Assuming all dependenices are installed and loaded, you should then be able to build all of ANACIN-X's components by running
+Assuming all dependenices are installed and loaded, you will build all of ANACIN-X's components by running
 
 ```
-. setup.sh
+. setup.sh -c
 ```
+
+If you do not wish to build ANACIN-X with callstack tracing functionality, remove the '-c' in the above command.
 
 ### Special Case:
 

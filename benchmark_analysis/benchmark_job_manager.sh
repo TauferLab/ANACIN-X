@@ -24,7 +24,12 @@ scheduler=${20}
 
 source ${paths_dir}/anacin_paths.config
 
-function join_by { local IFS="$1"; shift; echo "$*"; }
+if [ "${scheduler}" == "slurm" ]; then
+	function join_by { local IFS="$1"; shift; echo "$*"; }
+fi
+if [ "${scheduler}" == "lsf" ]; then
+	function join_by { local d=$1; shift; local f=$1; shift; printf %s "$f" "${@/#/$d}"; }
+fi
 
 proc_placement=("pack")
 comm_pattern_run_script=${anacin_x_root}/benchmark_analysis/benchmark_run_manager.sh
