@@ -48,7 +48,7 @@ if [ "${comm_pattern}" == "message_race" ]; then
 fi
 if [ ! -f "$app_config" ]; then
 	if [ "${comm_pattern}" == "unstructured_mesh" ]; then
-		python3 > ${debug_dir}/create_json_output.txt 2> ${debug_dir}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "unstructured_mesh" ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} ${msg_size} ${n_iters} "${anacin_x_root}/apps/comm_pattern_generator/" ${nd_start} ${nd_iter} ${nd_end}
+		python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "unstructured_mesh" ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} ${msg_size} ${n_iters} "${anacin_x_root}/apps/comm_pattern_generator/" ${nd_start} ${nd_iter} ${nd_end}
 	fi
 	if [ "${comm_pattern}" == "amg2013" ]; then
 		python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "amg2013" ${msg_size} ${n_iters} "${anacin_x_root}/apps/comm_pattern_generator/" ${nd_start} ${nd_iter} ${nd_end}
