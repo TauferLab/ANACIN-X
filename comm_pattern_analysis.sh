@@ -32,6 +32,7 @@ Help() {
     echo "        Must be one of the 3 provided benchmarks in the following format: message_race, amg2013, or unstructured_mesh."
     echo "[-sc]   Used to define which schedule system is currently in use. (Code will request this if not set)"
     echo "        Must be one of the following options: lsf, slurm, or unscheduled."
+    #echo "[-cs]   If used, then callstack tracing will be activated.  Doesn't take any arguments."
     echo "[-o]    If used, allows the user to define their own path to store output from the project. (Defaults to the directory '$HOME/comm_pattern_output')"
     echo "        When using this flag, be sure to provide an absolute path that can exist on your machine."
     echo "        If you run this script multiple times on the same settings, be sure to use different paths to avoid overlap and overwriting of files."
@@ -51,14 +52,17 @@ Help() {
     echo "        For example, default values corresopnd to '-nt 0.5'."
     echo "        Value must fall in the range of 0 to 1, inclusive."
     echo ""
-    echo "If you're running on a system that uses the Slurm scheduler, then the following switches can be used to define settings for job submission:"
-    echo "[-sq]   Defines the queue to submit Slurm jobs to. (Defaults to the "normal" queue)"
-    echo "[-st]   A maximum time limit in minutes on the time provided to jobs submitted. (Default 10 minutes)"
-    echo ""
-    echo "If you're running on a system that uses the LSF scheduler, then the following switches can be used to define settings for job submission:"
-    echo "[-lq]   Defines the queue to submit LSF jobs to. (Defaults to the "normal" queue)"
-    echo "[-lt]   A maximum time limit in minutes on the time provided to jobs submitted. (Default 10 minutes)"
-    echo ""
+    echo "If you're running on a scheduled system, then the following switches can be used to define settings for job submission:"
+    echo "[-q]    Defines the queue to submit jobs to. (Defaults to the "normal" queue)"
+    echo "[-t]    A maximum time limit in minutes on the time provided for communication pattern runs. (Default 10 minutes)"
+#    echo "If you're running on a system that uses the Slurm scheduler, then the following switches can be used to define settings for job submission:"
+#    echo "[-sq]   Defines the queue to submit Slurm jobs to. (Defaults to the "normal" queue)"
+#    echo "[-st]   A maximum time limit in minutes on the time provided to jobs submitted. (Default 10 minutes)"
+#    echo ""
+#    echo "If you're running on a system that uses the LSF scheduler, then the following switches can be used to define settings for job submission:"
+#    echo "[-lq]   Defines the queue to submit LSF jobs to. (Defaults to the "normal" queue)"
+#    echo "[-lt]   A maximum time limit in minutes on the time provided to jobs submitted. (Default 10 minutes)"
+#    echo ""
 
 }
 
@@ -69,10 +73,13 @@ while [ -n "$1" ]; do
 	    -i)  n_iters=$2; shift; shift ;;
 	    -s)  msg_sizes=$2; shift; shift ;;
 	    -n)  n_nodes=$2; shift; shift ;; 
-	    -sq) slurm_queue=$2; shift; shift ;;
-	    -st) slurm_time_limit=$2; shift; shift ;;
-	    -lq) lsf_queue=$2; shift; shift ;;
-            -lt) lsf_time_limit=$2; shift; shift ;;
+	    #-sq) slurm_queue=$2; shift; shift ;;
+	    #-st) slurm_time_limit=$2; shift; shift ;;
+	    #-lq) lsf_queue=$2; shift; shift ;;
+            #-lt) lsf_time_limit=$2; shift; shift ;;
+	    -q)  queue=$2; shift; shift ;;
+	    -t)  time_limit=$2; shift; shift ;;
+	    #-cs) run_csmpi="True"; shift ;;
 	    -r)  run_count=$2; shift; shift ;;
 	    -o)  results_path=$2; shift; shift ;;
 	    -c)  x_procs=$2; y_procs=$3; z_procs=$4; shift; shift; shift; shift ;;
@@ -121,23 +128,26 @@ run_count="${run_count:=2}"
 nd_start="${nd_start:=0.0}"
 nd_iter="${nd_iter:=0.1}"
 nd_end="${nd_end:=1.0}"
+#run_csmpi="${run_csmpi:="False"}"
 impl="${impl:="glibc"}"
 nd_topo="${nd_topo:=0.5}"
 results_path="${results_path:=$HOME/comm_pattern_output/${comm_pattern}_$(date +%s)/}"
-if [ ${scheduler} == "slurm" ]; then
-    slurm_queue="${slurm_queue:="normal"}"
-    slurm_time_limit="${slurm_time_limit:=10}"
-else
-    slurm_queue=""
-    slurm_time_limit=""
-fi
-if [ ${scheduler} == "lsf" ]; then
-    lsf_queue="${lsf_queue:="normal"}"
-    lsf_time_limit="${lsf_time_limit:=10}"
-else
-    lsf_queue=""
-    lsf_time_limit=""
-fi
+#if [ ${scheduler} == "slurm" ]; then
+#    slurm_queue="${slurm_queue:="normal"}"
+#    slurm_time_limit="${slurm_time_limit:=10}"
+#else
+#    slurm_queue=""
+#    slurm_time_limit=""
+#fi
+queue="${queue:="normal"}"
+time_limit="${time_limet:=10}"
+#if [ ${scheduler} == "lsf" ]; then
+#    lsf_queue="${lsf_queue:="normal"}"
+#    lsf_time_limit="${lsf_time_limit:=10}"
+#else
+#    lsf_queue=""
+#    lsf_time_limit=""
+#fi
 
 # Ensure ND% values are valid, between 0 and 1, satisfy iteration condition
 #ndp_step_count=$(echo "scale=1; ($nd_end - $nd_start)/$nd_iter" |bc -l)
@@ -231,6 +241,11 @@ while (( $(echo "$run_count < 2" |bc -l) )) || (( $(echo "$run_count > 999" |bc 
         echo "Please set number of executions to an integer greater than 1. We recommend using at least 20."
         read -p "Number of simulation executions requested: " run_count
 done
+if ! [ ${comm_pattern} == "unstructured_mesh" ]; then
+	x_procs=1
+	y_procs=1
+	z_procs=1
+fi
 
 # Confirm correctness of callstack tracing tool
 while true; do
@@ -283,14 +298,14 @@ if [ "${verbose}" == "true" ]; then
     if [ ${comm_pattern} == "unstructured_mesh" ]; then
 	    echo "Topological Non-determinism Percentage ${nd_topo}"
     fi
-    if [ ${scheduler} == "slurm" ]; then
-        echo "Queue for Running through Slurm: ${slurm_queue}"
-        echo "Time Limit for Running through Slurm: ${slurm_time_limit}"
-    fi
-    if [ ${scheduler} == "lsf" ]; then
-        echo "Queue for Running through LSF: ${lsf_queue}"
-        echo "Time Limit for Running through LSF: ${lsf_time_limit}"
-    fi
+    #if [ ${scheduler} == "slurm" ]; then
+    echo "Queue for Running Scheduled Jobs: ${queue}"
+    echo "Time Limit for Running Scheduled Jobs: ${time_limit}"
+    #fi
+    #if [ ${scheduler} == "lsf" ]; then
+    #    echo "Queue for Running through LSF: ${lsf_queue}"
+    #    echo "Time Limit for Running through LSF: ${lsf_time_limit}"
+    #fi
     echo "Number of Execution Runs: ${run_count}"
     if [ ${comm_pattern} == "unstructured_mesh" ]; then
         echo "Unstructured Mesh Coordinates x*y*z = ${x_procs}*${y_procs}*${z_procs}"
@@ -302,12 +317,12 @@ fi
 
 
 # Define Needed Paths
-cd apps/comm_pattern_generator/${scheduler}
+cd anacin-x/config
 example_paths_dir=$(pwd)
 cd ${project_path}
-source ${example_paths_dir}/example_paths_${scheduler}.config
+source ${example_paths_dir}/anacin_paths.config
 config_path=${anacin_x_root}/apps/comm_pattern_generator/config
-comm_pattern_path=${anacin_x_root}/apps/comm_pattern_generator/${scheduler}
+comm_pattern_path=${anacin_x_root}/benchmark_analysis/benchmark_job_manager.sh
 
 
 # Copy Run Configuration into Output Files
@@ -326,14 +341,14 @@ echo "Ending Non-determinism Percentage: ${nd_end}" >> ${user_config_file}
 if [ ${comm_pattern} == "unstructured_mesh" ]; then
 	echo "Topological Non-determinism Percentage: ${nd_topo}" >> ${user_config_file}
 fi
-if [ ${scheduler} == "slurm" ]; then
-    echo "Queue for Running through Slurm: ${slurm_queue}" >> ${user_config_file}
-    echo "Time Limit for Running through Slurm: ${slurm_time_limit}" >> ${user_config_file}
-fi
-if [ ${scheduler} == "lsf" ]; then
-    echo "Queue for Running through LSF: ${lsf_queue}" >> ${user_config_file}
-    echo "Time Limit for Running through LSF: ${lsf_time_limit}" >> ${user_config_file}
-fi
+#if [ ${scheduler} == "slurm" ]; then
+    echo "Queue for Running Scheduled Jobs: ${queue}" >> ${user_config_file}
+    echo "Time Limit for Running Scheduled Jobs: ${time_limit}" >> ${user_config_file}
+#fi
+#if [ ${scheduler} == "lsf" ]; then
+#    echo "Queue for Running through LSF: ${lsf_queue}" >> ${user_config_file}
+#    echo "Time Limit for Running through LSF: ${lsf_time_limit}" >> ${user_config_file}
+#fi
 echo "Number of Execution Runs: ${run_count}" >> ${user_config_file}
 if [ ${comm_pattern} == "unstructured_mesh" ]; then
     echo "Unstructured Mesh Coordinates x*y*z = ${x_procs}*${y_procs}*${z_procs}" >> ${user_config_file}
@@ -342,26 +357,22 @@ echo "Output will be stored in ${results_path}" >> ${user_config_file}
 
 
 # Run Comm Pattern Script
-if [ ${comm_pattern} == "message_race" ]; then
-    bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${slurm_queue} ${slurm_time_limit} ${lsf_queue} ${lsf_time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir} ${nd_start} ${nd_iter} ${nd_end} ${impl}
-    echo "Your kernel distance data will be stored in output file: ${results_path}/msg_size_${msg_sizes}/n_procs_${n_procs}/n_iters_${n_iters}/ndp_${nd_start}_${nd_iter}_${nd_end}/kdts.pkl"
-elif [ ${comm_pattern} == "amg2013" ]; then
-    bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${slurm_queue} ${slurm_time_limit} ${lsf_queue} ${lsf_time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir} ${nd_start} ${nd_iter} ${nd_end} ${impl}
-    echo "Your kernel distance data will be stored in output file: ${results_path}/msg_size_${msg_sizes}/n_procs_${n_procs}/n_iters_${n_iters}/ndp_${nd_start}_${nd_iter}_${nd_end}/kdts.pkl"
-elif [ ${comm_pattern} == "unstructured_mesh" ]; then
-    bash ${comm_pattern_path}/${comm_pattern}_${scheduler}.sh ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${slurm_queue} ${slurm_time_limit} ${lsf_queue} ${lsf_time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir} ${x_procs} ${y_procs} ${z_procs} ${nd_start} ${nd_iter} ${nd_end} ${nd_topo} ${impl}
-    echo "Your kernel distance data will be stored in output file: ${results_path}/msg_size_${msg_sizes}/n_procs_${n_procs}/n_iters_${n_iters}/ndp_${nd_start}_${nd_iter}_${nd_end}/proc_placement_pack/nd_topological_${nd_topo}/kdts.pkl"
+bash ${comm_pattern_path} ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${queue} ${time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir} ${x_procs} ${y_procs} ${z_procs} ${nd_start} ${nd_iter} ${nd_end} ${nd_topo} ${impl} ${comm_pattern} ${scheduler}
+if [ ${comm_pattern} == "unstructured_mesh" ]; then
+	echo "Your kernel distance data will be stored in output file: ${results_path}/msg_size_${msg_sizes}/n_procs_${n_procs}/n_iters_${n_iters}/ndp_${nd_start}_${nd_iter}_${nd_end}/nd_topological_${nd_topo}/kdts.pkl"
+else
+	echo "Your kernel distance data will be stored in output file: ${results_path}/msg_size_${msg_sizes}/n_procs_${n_procs}/n_iters_${n_iters}/ndp_${nd_start}_${nd_iter}_${nd_end}/kdts.pkl"
 fi
 
 
 # Communicate where to find visualization files
-echo "Used the communication pattern type:        ${comm_pattern}"
-echo "Used graph kernel JSON file:                ${graph_kernel}"
-echo "Starting non-determinism percentage:        ${nd_start}"
-echo "Non-determinism percentage step size:       ${nd_iter}"
-echo "Ending non-determinism percentage:          ${nd_end}"
+echo "Used the communication pattern type:                     ${comm_pattern}"
+echo "Used graph kernel JSON file:                             ${graph_kernel}"
+echo "Starting non-determinism percentage:                     ${nd_start}"
+echo "Non-determinism percentage step size:                    ${nd_iter}"
+echo "Ending non-determinism percentage:                       ${nd_end}"
 if [ ${comm_pattern} == "unstructured_mesh" ]; then
-	echo "Topological non-determinism percentage:     ${nd_topo}"
+	echo "Topological non-determinism percentage:                  ${nd_topo}"
 fi
 
 
