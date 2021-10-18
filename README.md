@@ -189,14 +189,20 @@ The following packages will be installed via pip:
 The following packages will be installed as submodules to the installation of ANACIN-X:
 * [PnMPI](https://github.com/LLNL/PnMPI/tree/f6fcc801ab9305352c510420c6439b7d48a248dc)
 * [sst-dumpi](https://github.com/TauferLab/sst-dumpi/tree/b47bb77ccbe3b87d585e3701e1a5c2f8d3626176)
-* [Pluto](https://github.com/TauferLab/Src_Pluto/tree/main)
-* [dumpi_to_graph](https://github.com/TauferLab/Src_dumpi_to_graph/tree/3966d25a916ddf0cd5e4e71ce71702798c0f39e1)
+* [Pluto](https://github.com/TauferLab/Pluto/tree/main)
+* [dumpi_to_graph](https://github.com/TauferLab/dumpi_to_graph/tree/3966d25a916ddf0cd5e4e71ce71702798c0f39e1)
 * [CSMPI](https://github.com/TauferLab/CSMPI/tree/367a1c3bdba1511ad5d415daecf714ea01c536c6)
 
 
 ## **Running ANACIN-X**:
 
-Use the 'comm\_pattern\_analysis.sh' script to generate traces of a selected communication pattern and perform analysis on the event graphs.  
+ANACIN-X must be run along with another application.  There are 2 categories of this.
+* Firstly, for demonstration purposes, ANACIN-X comes packaged with 3 non-deterministic benchmark applications to analyze. These benchmark applications are accompanied by automation scripts to simplify the process of running ANACIN-X with them. See the section below for options.
+* Secondly, for running ANACIN-X with an external application (e.g., a user defined communication pattern such as MiniAMR or MCB Grid), we will describe the procedure for running the ANACIN-X framework.
+
+### Running ANACIN-X with Benchmark Applications
+
+Use the 'comm\_pattern\_analysis.sh' script to generate traces of a selected benchmark communication pattern and perform analysis on the event graphs.  
 
 **Important**: Make sure that the system you're running on supports the inputs you provide from the options below.  If you request that the system use more processes or nodes than are available, or if you select a different scheduler from what is available, the program will fail.
 
@@ -282,15 +288,93 @@ If a communication pattern or a scheduler type has not been provided to the scri
 
 Be aware that if you run the project on some machines and some job queues, there will be a limit to the number of jobs that can be submitted.  In such cases, you may lose some jobs if you try to run the program with settings that produce more jobs than are allowed in the queue being used.
 
+### Running ANACIN-X with an External Application
+
+As described in the software overview at the top of this README, there are 3 major stages of the ANACIN-X framework prior to visualization.  We will describe how to use each of these.  As a reminder, the three stages are:
+* Execution Trace Collection
+* Event Graph Construction
+* Event Grph Kernel Analysis
+
+Be sure to install all dependencies listed in the 'Dependencies' section above prior to running the stages. 
+
+#### Execution Trace Collection
+
+In this stage of the ANACIN-X framework, you will trace an input application using a 'stack' of MPI profiling interface (PMPI) tools.  Specifically, you will trace the application using the following tools:
+* [sst-dumpi](https://github.com/TauferLab/sst-dumpi/tree/b47bb77ccbe3b87d585e3701e1a5c2f8d3626176)
+* [Pluto](https://github.com/TauferLab/Pluto/tree/main)
+* [CSMPI](https://github.com/TauferLab/CSMPI/tree/367a1c3bdba1511ad5d415daecf714ea01c536c6) (CSMPI is optional for the purpose of visualizing kernel distance data, but is required to visualize callstack data.)
+
+To 'stack' the above software tools, use the interface [PnMPI](https://github.com/LLNL/PnMPI/tree/f6fcc801ab9305352c510420c6439b7d48a248dc), open-source, MPI tool infrastructure that builds on top of the standardized PMPI interface.
+
+Be sure to configure all the PMPI tools prior to tracing.  And be sure to link the PMPI tools using PnMPI prior to tracing.  See their respective GitHub pages linked above for more details.  PnMPI will need to be configured to use the linked modules.  See the PnMPI [GitHub page](https://github.com/LLNL/PnMPI/tree/f6fcc801ab9305352c510420c6439b7d48a248dc) for more information on linking software and configuring PnMPI.
+
+Your command to trace your application will likely look something of the form:
+
+```
+LD_PRELOAD=\<path to libpnmpi.so\> PNMPI_LIB_PATH=\<path to pnmpi linking directory\> PNMPI_CONF=\<path to pnmpi configuration directory\> mpirun -np [number of processes] [application executable to be traced] [arguments to traced application]
+```
+
+You will need to run the above command many times to produce a sample of traces.  The traces across runs will be compared in subsequent stages.  
+
+Be sure to configure each of the PMPI tools to store their output for a single run in the same directory.  We will call it a 'run directory'.  Suppose you make 100 runs of your application.  There should then be 100 'run directories' adjacent to each other, each one storing all the trace files from a run.
+
+#### Event Graph Construction
+
+Once you have generated a set of traces for a given application, the traces must be used to generate 'event graphs' for the purpose of analysis.  We use the [dumpi_to_graph](https://github.com/TauferLab/dumpi_to_graph/tree/3966d25a916ddf0cd5e4e71ce71702798c0f39e1) software tool to convert traces into event graphs.
+
+Dumpi_to_graph must be configured prior to use.  Please see the dumpi_to_graph [GitHub page](https://github.com/TauferLab/dumpi_to_graph/tree/3966d25a916ddf0cd5e4e71ce71702798c0f39e1) to create a configuration file for your needs, using the examples that dumpi_to_graph provides as a reference.  For ease of use, store any configuration files you create within dumpi_to_graph's config directory.
+
+Use a command of the following form to construct an event graph from the traces within one run directory.  Note that dumpi_to_graph is designed to be parallelized using MPI.
+
+```
+mpirun -np [number of MPI processes requested] [executable file for dumpi_to_graph found in its build directory] [configuration file for dumpi_to_graph found in its config directory] [path to a trace file directory (i.e., a run directory)]
+```
+
+An automation file titled 'build_graph.sh' is provided within the 'anacin-x/workflow_scripts' directory to implement the above command.  The build_graph.sh script must take as arguments all 4 of the arguments listed in the above command in the order they appear.
+
+The above command must be run for each run directory.  An event graph will be stored in each run directory that the above command is used on.  Then the event graphs can be compared in the next stage of ANACIN-X.
+
+#### Event Graph Kernel Analysis
+
+Event graph kernel analysis is composed of two parts:
+1. Event graph slice extraction
+2. Event graph kernel calculations
+
+The first of these, slice extraction, requires the use of a policy file to define where to start and stop slices of a graph.  Policy files are provided and can be found within the 'anacin-x/event_graph_analysis/slicing_policies' directory.  Each one will break the graph up into components based on different functions or data and may be relevant to different applications.  If your application uses barriers, we recommend using one of the slicing policy files with 'barrier_delimited_' in the title.
+
+Event graph slice extraction must take place for each event graph.  Once you have decided on a slicing policy to use, run the following command for each event graph using the extract slices script 'anacin-x/event_graph_analysis/extract_slice.py'.  Note that this script is parallelized using mpi4py.
+
+```
+mpirun -np [number of MPI processes requested] [full path to extract_slices.py script] [full path to event graph from one run] [full path to slicing policy file] -o "slices"
+```
+
+An automation file titled 'extract_slices.sh' is provided within the 'anacin-x/workflow_scripts' directory to implement the above command.  The extract_slices.sh script must take as arguments all 4 of the arguments listed in the above command in the order they appear.
+
+After slice extraction is complete for all event graphs, the final step to creating kernel distance data is kernel calculations on the event graph slices.
+
+To perform kernel calculations, use the 'compute_kernel_distance_time_series.py' script within the 'anacin-x/event_graph_analysis' directory.  Note that this script is parallelized using mpi4py.
+
+To run this script, you will need to select a graph kernel policy file.  We suggest using the file 'anacin-x/event_graph_analysis/wlst_5iters_logical_timestamp_label.json' because it is the most well tested with the workflow.  This file corresponds to running the Weisfeiller-Lehmann subtree (WLST) graph kernel with 5 iterations and the logical timestamp for vertex label data.  More information about this kernel can be found in the paper ["Weisfeiller-lehmann graph kernels"](https://www.jmlr.org/papers/volume12/shervashidze11a/shervashidze11a.pdf).  See the file 'wlst_sweep_vertex_labels.json' within the same directory as the recommended kernel file for examples of other vertex labels to use with the WLST kernel.  You can change the graph kernel file to fit what is best for your project.
+
+Finally, run the following command to generate kernel distance data.
+
+```
+mpirun -np [number of MPI processes requested] [full path to compute_kernel_distance_time_series.py script] [directory storing each run directory] [full path to graph kernel policy file] --slicing_policy [full path to slicing policy file] -o "kdts.pkl" --slice_dir_name "slices" [-c (only to be used if you traced your application with CSMPI to collect callstack data)]
+```
+
+Unlike the previous stages of the workflow, the kernel calculation command above only takes place once for all runs of the traced application.
+
 ### **Result Visualization**: 
 
-There are two methods to visualize kernel distance data from ANACIN-X.  We recommend using Jupyter Notebooks if you can pull it up from your machine.  If you can't use Jupyter notebooks on your machine, we provide 2 command line python tools to: (1) create a .png file for visualization of the relationship between kernel distance and percentage of message non-determinism, or kdts visualizations and (2) create a bar chart of of which callstack functions presented the highest impact on kernel distance during an applications runtime, or callstack visualizations.  
+There are two methods to visualize kernel distance data from ANACIN-X that corresponds to one of the three provided benchmark applications.  We recommend using Jupyter Notebooks if you can pull it up from your machine.  If you can't use Jupyter notebooks on your machine, we provide 2 command line python tools to: (1) create a .png file for visualization of the relationship between kernel distance and percentage of message non-determinism, or kdts visualizations and (2) create a bar chart of of which callstack functions presented the highest impact on kernel distance during an applications runtime, or callstack visualizations.  
+
+If you are visualizing data that corresponds to an external application (i.e., you did not use the 'comm_pattern_analysis.sh' script to generate data), we provide a command line python tool that visualizes how the kernel distance changes across slices of an applications execution.  Read below the 'Command Line Visualization' section for details.
 
 In either case, we provide the user with sample KDTS data within the ANACIN-X project under the sub-directory 'sample_kdts'.  The user has the option to visualzie the provided sample results or to visualize their own generated results.  We describe each visualization method in more detail below.
 
 #### Method 1 - Jupyter
 
-If you can use Jupyter to visualize the data for the project, input the following command from the machine where you ran your copy of ANACIN-X:
+If you can use Jupyter to visualize the data for the project and you generated data from one of the three provided benchmark applications, input the following command from the machine where you ran your copy of ANACIN-X:
 
 ```
 jupyter notebook
@@ -326,9 +410,9 @@ python3 anacin-x/event_graph_analysis/visualization/make_message_nd_plot.py [Pat
 
 If you are generating a kdts visualization from provided sample kdts data, then do the following steps:
 1. Get the full path to the root of your ANACIN-X project. (It should be of the form '/home/<your_path>/ANACIN-X/')
-2. Get the full path to the provided sample kdts file you're using. (It should be of the form '/home/<your_path>/ANACIN-X/sample\_kdts/<kdts_file_name>')
+2. Get the full path to the provided sample kdts file you're using. (It should be of the form '/home/<your\_path>/ANACIN-X/sample\_kdts/<kdts_file_name>')
 3. Get the name of the communication pattern used from the name of the kdts file you're using. (The file name should be of the form samp\_<communication pattern name>\_kdts\_<parameters used>.pkl)
-4. The use the following command from the root project directory to generate a .png visualization for the provided data:
+4. Then use the following command from the root project directory to generate a .png visualization for the provided data.
 
 ```
 python3 anacin-x/event_graph_analysis/visualization/make_message_nd_plot.py [Path to 'kdts.pkl' file with file name] [The type of communication pattern you used] anacin-x/event_graph_analysis/graph_kernel_policies/wlst_5iters_logical_timestamp_label.json [The name of a file to store the visualization in (excluding the file type)] 0.0 0.1 1.0
@@ -355,6 +439,40 @@ python3 anacin-x/event_graph_analysis/visualization/visualize_callstack_report.p
 If the above commands completed with no errors, you will find a file titled 'callstack_distribution.png' within your project directory that will visualize the relative normalized frequencies of callstacks within your communication pattern.  In particular, it will visualize the relative likelihood that each callstack function has an impact on non-determinism in your communication pattern.
 
 If you're doing your work and producing visualizations on a remote machine, remember to copy your png image(s) to your local machine using a tool like scp to view the image.
+	
+#### Visualizing External Data
+	
+If you're visualizing data from an external application (i.e., not one of the provided three benchmark applications), use the following collection of commands to visualize data.
+	
+If you're generating a kdts visualization, run the following command from within the directory 'anacin-x/event_graph_analysis'.
+	
+```
+python3 visualization/visualize_kernel_distance_time_series.py [Path to 'kdts.pkl' file with file name. This can be found in the directory that stores all your run directories.] --plot_type=box
+```
+	
+This will create the visualization file titled 'kernel_distance_time_series.png' within the directory you're currently in.
+	
+If you're visualizing callstack data, do so with the following commands from within the root directory of your project.
+	
+```
+python3 anacin-x/event_graph_analysis/anomaly_detection.py [Path to 'kdts.pkl' file with file name] anacin-x/event_graph_analysis/anomaly_detection_policies/all.json -o flagged_indices.pkl
+
+python3 anacin-x/event_graph_analysis/callstack_analysis.py ['flagged_indices.pkl file name with same path as 'kdts.pkl'] [Path to 'kdts.pkl' file with file name] [path to executable filed used during tracing (must be the exact same file without being recompiled!)]
+
+python3 anacin-x/event_graph_analysis/visualization/visualize_callstack_report.py ['non_anomaly_report_for_policy_all.txt' file name with same path as 'kdts.pkl'] --plot_type="bar_chart"
+```
+
+### Reproducing Published Results
+	
+Visualizations of the above types have been used to produce figures in the publications listed in the publications section below, particularly the paper "Identifying Degrees and Sources of Non-Determinism in MPI Applications via Graph Kernels.".  If the user has access to the applications miniAMR and MCB, such visualizations can be reproduced in the following manners:
+	
+1. For Figure 17, corresponding to visualizations of the kernel distance time series for MCB, run the kdts visualization script in the visualization section above for external applications. (i.e., use the 'visualize_kernel_distance_time_series.py' script)
+2. For Figure 14, corresponding to visualization of callstacks from the miniAMR tool, run the callstack visualization script for external applications. (i.e., use the 'visualize_callstack_report.py' script in the manner outlined above)
+3. For Figure 13, corresponding to visualization of kernel distances across different miniAMR time steps, the 'visualize_kernel_distance_time_series.py' script can also be used, but must be accompanied by 'application events' specific to miniAMR.  For miniAMR, these application events correspond to the number of blocks transferred per mesh refinement in a pickle file format.  This is seen in the line showing the '# of Blocks Transferred per Mesh Refinement' in the referenced figure.  The following command shows how to pass these application events into the visualization script.
+	
+```
+python3 visualization/visualize_kernel_distance_time_series.py [Path to 'kdts.pkl' file with file name. This can be found in the directory that stores all your run directories.] --plot_type=box --application_events=blocks_transferred.pkl
+```
 
 ### Supported Systems:
 
