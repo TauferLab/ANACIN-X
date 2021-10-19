@@ -9,8 +9,19 @@
 
 ## Introduction
 
-Non-deterministic results often arise unexpectedly in High Performance Computing (HPC) applications.  These make reproducible and correct results difficult to create.  As such, there is a need to improve the ability of software developers and scientists to comprehend root sources of non-determinism in their applications.  To this end, we present ANACIN-X.  This document is organized in the following order:
+Non-deterministic results often arise unexpectedly in High Performance Computing (HPC) applications.  These make reproducible and correct results difficult to create.  As such, there is a need to improve the ability of software developers and scientists to comprehend root sources of non-determinism in their applications.  To this end, we present ANACIN-X.
 
+This repository contains a suite of tools for trace-based analysis of non-deterministic behavior in MPI applications. The core components of this tool suite are as follows.  
+* A Framework for Characterizing Root Sources of Non-Determinism as Graph Similarity: This is broken down into the following stages
+  1. Execution Trace Collection
+  2. Event Graph Construction
+  3. Event Graph Kernel Analysis
+  4. Kernel Distance Visualization
+* Use Case Communication Patterns
+
+The best way to learn more details on how ANACIN-X works is to see either the [Software Overview](https://github.com/TauferLab/ANACIN-X/wiki/Software-Overview) page on the ANACIN-X wiki or review the [publications](#publications) listed at the bottom of this README.
+
+This document is organized in the following order:
 * The first section describes the components of the software.  
 * The second section describes instructions for installation of the software.  **Please read this section carefully as there are a variety of different steps involved.**
 * The third section lists the dependencies that the installation procedure will install on its own.  **We do not recommend installing all of the dependencies on your own.  Instead, use instructions in the installation section to install the dependencies, starting with those on installing Spack and Conda.**
@@ -22,56 +33,6 @@ Non-deterministic results often arise unexpectedly in High Performance Computing
   1. The project team
   2. Publications associated with the software
   3. Copyright and license information
-  
-## Software Overview
-
-This repository contains a suite of tools for trace-based analysis of non-deterministic behavior in MPI applications. The core components of this tool suite are as follows.  More detail for each can be found in sections below: 
-* **A Framework for Characterizing Root Sources of Non-Determinism as Graph Similarity**: To meet the challenges of non-determinism in HPC applications, we design a workflow for approximating the measure of non-determinism in a programs execution via graph kernel analysis.  This workflow is broken down into the following three stages that are described in more detail below this list:
-  1. Execution Trace Collection
-  2. Event Graph Construction
-  3. Event Graph Kernel Analysis
-* **Use Case Communication Patterns for Testing**: So that the user can test the framework mentioned above, we implement some representative sample MPI point-to-point, non-deterministic communication patterns for illustrating the value of the ANACIN-X workflow in the process of debugging non-determinism.  We provide the user with the option to choose one of three communication patterns for a given executation of ANACIN-X: 
-  1. Message Race
-  2. The Algebraic Multigrid 2013 (AMG 2013) pattern
-  3. The Unstructured Mesh pattern
-* **Kernel Distance Visualization**: After executing the framework mentioned above on one of the provided use cases, the user will have access to kernel distance data related to the execution made.  To help the user view the relationship between kernel distance and percent of non-determinism in a given communication pattern, we provide 2 ways to create a .png figure for data from a given set of runs. 
-  1. Use a Jupyter notebook to generate and view the figure
-  2. Use a command line tool to generate the figure.
-  
-### Outline of the Framework for Characterizing Root Sources of Non-Determinism
-The framework for characterizing root sources of non-determinism as graph similarity is broken up into 3 stages.  We describe each in more detail:
-* **Execution Trace Collection**: We use a stack of PMPI modules composed with [PnMPI](https://github.com/LLNL/PnMPI) to trace executions of non-deterministic MPI applications.  In particular, we use the [sst-dumpi](https://github.com/TauferLab/sst-dumpi/tree/b47bb77ccbe3b87d585e3701e1a5c2f8d3626176), [Pluto](https://github.com/TauferLab/Src_Pluto/tree/main), and [CSMPI](https://github.com/TauferLab/CSMPI/tree/367a1c3bdba1511ad5d415daecf714ea01c536c6) tracing modules.
-  * sst-dumpi traces relationships between MPI events.  With this, we can determine the message order of these MPI events in time.
-  * Pluto traces memory addresses of MPI requests associated with non-blocking MPI events.  We use these memory addresses as unique identifiers of MPI requests to distinguish between different types of non-blocking MPI events
-  * CSMPI traces callstacks of MPI function calls. We use these to identify which function calls are associated with the highest amounts of non-determinism in the traced application.
-* **Event Graph Construction**: We convert each execution's traces into a graph-structured model of the interprocess communication that took place during the execution using the [dumpi_to_graph](https://github.com/TauferLab/Src_dumpi_to_graph/tree/3966d25a916ddf0cd5e4e71ce71702798c0f39e1) tool.
-  * dumpi_to_graph takes information about the addresses of MPI events from Pluto and about happens before MPI relationships from sst-dumpi to construct a unique directed acyclic graph of the [graphml](https://en.wikipedia.org/wiki/GraphML) format which models the underlying communication pattern.
-* **Event Graph Kernel Analysis**: We implement workflows for identifying root causes of non-deterministic behavior using the Weisfeiler-Lehmann Subtree (WLST) graph kernel.  This kernel analysis is implemented using the [GraphKernels](https://github.com/BorgwardtLab/GraphKernels) software package.
-  * The WLST graph kernel iteratively encodes graph structure into node labels by refining each node label based on its neighbors labels.  More information on WLST kernels can be found in the paper ["Weisfeiller-lehmann graph kernels"](https://www.jmlr.org/papers/volume12/shervashidze11a/shervashidze11a.pdf) by Shervashidze et al.
-  * GraphKernels is a software package that implements a variety of kernels on graph structured data.  
-    
-### Use Case Descriptions
-We provide 3 benchmark use case communication patterns for the purpose of testing the ability of the ANACIN-X workflow to characterize non-determinism.  In each case, we quantify and vary the percentage of non-determinism present ranging from 0% non-determinism up to 100% non-determinism at intervals of 10%.  We provide a brief description below about each communication pattern.  For more information about the communication patterns in question, please see the most recent publication in the publications section of this README.md document.  The patterns are as follows:
-* **Message Race**: 
-  * When executed on N processes, this pattern consists of N-1 sender processes sending a single message to a root process that receives them in arbitrary order.  
-  * It is the core pattern that models receiver-side non-determinism.
-* **Algebraic Multigrid 2013 (AMG 2013)**: 
-  * The AMG2013 communication pattern is extracted from the proxy application of the same name in the [CORAL Benchmark Suite](https://gitlab.com/arm-hpc/benchmarks/coral-2).
-  * We select this pattern due to its expression of both receiver-side and sender-side non-determinism, a property that has been highlighted in prior work on communication non-determinism.
-* **Unstructured Mesh**: 
-  * This communication pattern is extracted from the [Chatterbug Communication Pattern Suite](https://github.com/hpcgroup/chatterbug).
-  * It exhibits non-determinism due to a randomized process topology, resulting in run-to-run variation in terms of which processes communicate with which others.
-  
-### Kernel Distance Visualization
-Here we provide a brief description of each tool for visualizing ANACIN-X kernel distance and callstack data.  Instructions for using these visualization options are provided in the 'Result Visualization' section farther down in this README.
-* **Jupyter Notebook**:
-  * As one method for visualizing kernel distance data, we created a Jupyter notebook which is able to display your .png visualization without needing to copy the .png file across machines.
-  * For more information about Jupyter notebooks, see their website [here](https://jupyter.org).
-* **Command Line Python Tools**:
-  * You may not have easy access to Jupyter notebooks on the machine you run ANACIN-X from.  In that case, we provide instructions for generating the same visualization from the command line.
-  * Those instructions can be found farther down this document in the section titled 'Result Visualization'.
-  
-If effective inputs are set when running the ANACIN-X software, the user will be able to use the .png visualization generated by one of the methods listed above to see how varying non-determinism in a communication pattern can correlate well with the kernel distance between different runs of that communication pattern.
 
 
 ## **Building ANACIN-X**
@@ -196,7 +157,7 @@ The following packages will be installed as submodules to the installation of AN
 
 ## **Running ANACIN-X**:
 
-ANACIN-X must be run along with another application.  There are 2 categories of this.
+ANACIN-X must be run alongside another application.  There are 2 categories of this.
 * Firstly, for demonstration purposes, ANACIN-X comes packaged with 3 non-deterministic benchmark applications to analyze. These benchmark applications are accompanied by automation scripts to simplify the process of running ANACIN-X with them. See the section below for options.
 * Secondly, for running ANACIN-X with an external application (e.g., a user defined communication pattern such as MiniAMR or MCB Grid), we will describe the procedure for running the ANACIN-X framework.
 
