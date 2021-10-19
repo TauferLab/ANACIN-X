@@ -22,17 +22,14 @@ This repository contains a suite of tools for trace-based analysis of non-determ
 The best way to learn more details on how ANACIN-X works is to see either the [Software Overview](https://github.com/TauferLab/ANACIN-X/wiki/Software-Overview) page on the ANACIN-X wiki or review the [publications](#publications) listed at the bottom of this README.
 
 This document is organized in the following order:
-* The first section describes the components of the software.  
-* The second section describes instructions for installation of the software.  **Please read this section carefully as there are a variety of different steps involved.**
-* The third section lists the dependencies that the installation procedure will install on its own.  **We do not recommend installing all of the dependencies on your own.  Instead, use instructions in the installation section to install the dependencies, starting with those on installing Spack and Conda.**
-* The fourth section describes how to run the software.  This is broken up into 3 main parts:
-  1. How to run the software that produces kernel distance data.
-  2. How to visualize data produced in the first part.
-  3. Systems and settings that the project supports.
-* At the end, we describe the following 3 things:
-  1. The project team
-  2. Publications associated with the software
-  3. Copyright and license information
+* [Building ANACIN-X](#building-anacin-x)
+* [Running ANACIN-X](#running-anacin-x)
+* [Visualization Results](#result-visualization)
+* [Reproducting Published Results](#reproducting-published-results)
+* Additional Project Details
+  1. [The project team](#project-team)
+  2. [Publications associated with the software](#publications)
+  3. [Copyright and license information](#copyright-and-license)
 
 
 ## **Building ANACIN-X**
@@ -448,7 +445,7 @@ Note that if you are trying to generate a callstack visualization, it is strongl
 If you are only generating a KDTS visualization, then this is not a limitation.
 
 
-## Project Team:
+## Project Team
 
 Developers:
 * Nick Bell
@@ -460,7 +457,7 @@ Project Advisors:
 * Dr. Sanjukta Bhowmick
 * Dr. Michela Taufer (Project Lead)
 
-## Publications:
+## Publications
 	
 Patrick Bell, Kae Suarez, Dylan Chapp, Nigel Tan, Sanjukta Bhowmick, and Michela Taufer. **ANACIN-X: A Software Framework for Studying Non-determinism in MPI Applications.** *Software Impacts, 10:100151*, (2021).
 
@@ -472,7 +469,7 @@ D. Chapp, K. Sato, D. Ahn, and M. Taufer. **Record-and-Replay Techniques for HPC
 
 D. Chapp, T. Johnston, and M. Taufer. **On the Need for Reproducible Numerical Accuracy through Intelligent Runtime Selection of Reduction Algorithms at the Extreme Scale.** *In Proceedings of IEEE Cluster Conference, pp. 166 – 175. Chicago, Illinois, USA.* September 8 – 11, 2015.
 
-## Copyright and License:
+## Copyright and License
 
 Copyright (c) 2021, Global Computing Lab
 
