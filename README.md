@@ -350,12 +350,18 @@ Project Advisors:
 * Dr. Michela Taufer (Project Lead)
 
 ## Publications
-	
-Patrick Bell, Kae Suarez, Dylan Chapp, Nigel Tan, Sanjukta Bhowmick, and Michela Taufer. **ANACIN-X: A Software Framework for Studying Non-determinism in MPI Applications.** *Software Impacts, 10:100151*, (2021).
-[Link to Publication](https://www.sciencedirect.com/science/article/pii/S2665963821000634)
+
+*This paper presents theory, artifacts, and results on which ANACIN-X is built:*
 
 D. Chapp, N. Tan, S. Bhowmick, and M. Taufer. **Identifying Degrees and Sources of Non-Determinism in MPI Applications via Graph Kernels.** *Journal of IEEE Transactions on Parallel and Distributed Systems (IEEE TPDS)*, (2021).
 [Link to Publication](https://ieeexplore.ieee.org/document/9435018)
+
+*This paper describes the ANACIN-X software modules and how they are linked to run the included benchmarks:*
+
+Patrick Bell, Kae Suarez, Dylan Chapp, Nigel Tan, Sanjukta Bhowmick, and Michela Taufer. **ANACIN-X: A Software Framework for Studying Non-determinism in MPI Applications.** *Software Impacts, 10:100151*, (2021).
+[Link to Publication](https://www.sciencedirect.com/science/article/pii/S2665963821000634)
+
+## Supporting Publications
 
 D. Chapp, D. Rorabaugh, K. Sato, D. Ahn, and M. Taufer. **A Three-phase Workflow for General and Expressive Representations of Nondeterminism in HPC Applications.** *International Journal of High-Performance Computing Applications(IJHPCA), 1175-1184* (2019).
 [Link to Publication](https://journals.sagepub.com/doi/abs/10.1177/1094342019868826?journalCode=hpcc)
