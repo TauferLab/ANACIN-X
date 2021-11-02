@@ -337,7 +337,13 @@ AR    Anomaly report file with same path as kdts.pkl file (i.e., 'non_anomaly_re
 If you wish to use this repository to reproduce results published in the ['Publications'](#publications) section below, see the [ANACIN-X wiki page](https://github.com/TauferLab/ANACIN-X/wiki/Reproducing-Published-Results) on 'Reproducing Published Results'.
 
 
-## Project Team
+## Acknowledgments
+
+This work partially developed and tested using the following [XSEDE computing resources](https://portal.xsede.org/group/xup/resource-monitor):
+* Stampede2
+* Jetstream
+
+### Project Team
 
 Developers:
 * Nick Bell
