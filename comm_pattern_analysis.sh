@@ -116,6 +116,14 @@ while true; do
     esac
 done
 
+# Notify user of unused values
+if [ ${comm_pattern} != "unstructured_mesh" ] && ( [ ! -z ${x_procs} ] || [ ! -z ${y_procs} ] || [ ! -z ${z_procs} ] ) ; then
+        echo "Warning: the Unstructured Mesh grid size has been set. These values will not be used for the selected communication pattern - ${comm_pattern}"
+fi
+if [ ${comm_pattern} != "unstructured_mesh" ] && [ ! -z ${nd_topo} ] ; then
+        echo "Warning: the Unstructured Mesh topological non-determinism percentage has been set.  This value will not be used for the selected commnication pattern - ${comm_pattern}"
+fi
+
 
 # Assign Default Values
 n_procs="${n_procs:=10}"
@@ -276,13 +284,6 @@ while true; do
 done
 cd ${project_path}
 
-# Notify user of unused values
-if [ ${comm_pattern} != "unstructured_mesh" ] && ( [ ! -z ${x_procs} ] || [ ! -z ${y_procs} ] || [ ! -z ${z_procs} ] ) ; then
-        echo "Warning: the Unstructured Mesh grid size has been set. These values will not be used for the selected communication pattern - ${comm_pattern}"
-fi
-if [ ${comm_pattern} != "unstructured_mesh" ] && [ ! -z ${nd_topo} ] ; then
-        echo "Warning: the Unstructured Mesh topological non-determinism percentage has been set.  This value will not be used for the selected commnication pattern - ${comm_pattern}"
-fi
 
 # Report Variable Values if User Requests Verbose Execution
 if [ "${verbose}" == "true" ]; then
