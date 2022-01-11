@@ -167,29 +167,31 @@ def main( kdts_path, pattern, output, kernel_path, nd_start, nd_iter, nd_end, nd
         for d in idx_to_distances[i]:
             nd_fraction_seq.append( nd_fractions[i] )
             dist_seq.append( d )
-    pearson_r, pearson_p = pearsonr( nd_fraction_seq, dist_seq )
-    spearman_r, spearman_p = spearmanr( nd_fraction_seq, dist_seq )
+
+    if ( len(nd_fraction_seq) > 1 ):
+        pearson_r, pearson_p = pearsonr( nd_fraction_seq, dist_seq )
+        spearman_r, spearman_p = spearmanr( nd_fraction_seq, dist_seq )
     #pearson_correlation_txt = "Kernel distance vs. % ND → Pearson-R = {}, p = {}".format(np.round(pearson_r, 2), pearson_p)
     #spearman_correlation_txt = "Kernel distance vs. % ND → Spearman-R = {}, p = {}".format(np.round(spearman_r, 2), spearman_p)
 
-    pearson_correlation_txt = "Your Pearson's r value     = {}\n".format(np.round(pearson_r, 2))
-    pearson_p_txt = "It's corresponding p value = {}\n".format(pearson_p)
-    spearman_correlation_txt = "Your Spearman's ρ value    = {}\n".format(np.round(spearman_r, 2))
-    spearman_p_txt = "It's corresponding p value = {}\n".format(spearman_p)
-    print( pearson_correlation_txt )
-    print( pearson_p_txt)
-    print( "\n" )
-    print( spearman_correlation_txt )
-    print( spearman_p_txt)
+        pearson_correlation_txt = "Your Pearson's r value     = {}\n".format(np.round(pearson_r, 2))
+        pearson_p_txt = "It's corresponding p value = {}\n".format(pearson_p)
+        spearman_correlation_txt = "Your Spearman's ρ value    = {}\n".format(np.round(spearman_r, 2))
+        spearman_p_txt = "It's corresponding p value = {}\n".format(spearman_p)
+        print( pearson_correlation_txt )
+        print( pearson_p_txt)
+        print( "\n" )
+        print( spearman_correlation_txt )
+        print( spearman_p_txt)
 
-    annotation_lines = [ "Kernel Distance vs. % Non-Deterministic Receives: Correlation Coefficients\n",
+        annotation_lines = [ "Kernel Distance vs. % Non-Deterministic Receives: Correlation Coefficients\n",
                          #"=================================================================\n",
                          pearson_correlation_txt,
                          spearman_correlation_txt
                        ]
     
-    annotation_txt = "".join(annotation_lines)
-    annotation_font_size = 18
+        annotation_txt = "".join(annotation_lines)
+        annotation_font_size = 18
     #ax.annotate( annotation_txt, 
     #             xy=(0.55, 0.25), 
     #             xycoords='axes fraction',

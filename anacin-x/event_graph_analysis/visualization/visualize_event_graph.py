@@ -104,7 +104,10 @@ def visualize( graph, barrier_adjustment=False ):
             patch = Circle( ( x_coord, y_coord ), radius = vertex_size, color = "red" )
             recv_patches.append( patch ) 
         else:
-            patch = Circle( ( x_coord, y_coord ), radius = vertex_size, color = "green" )
+            if ( x_coord == 0 ):
+                patch = Circle( ( x_coord, y_coord ), radius = vertex_size, color = "green" )
+            else:
+                patch = Circle( ( max_lts, y_coord ), radius = vertex_size, color = "green" )
             misc_patches.append( patch ) 
 
     program_order_lines = []
@@ -112,6 +115,7 @@ def visualize( graph, barrier_adjustment=False ):
     for e in graph.es[:]:
         src_vid = e.source
         dst_vid = e.target
+        event_type = graph.vs[ dst_vid ][ "event_type" ]
         src_pid = graph.vs[ src_vid ][ "process_id" ]
         dst_pid = graph.vs[ dst_vid ][ "process_id" ]
         #if barrier_adjustment:
@@ -122,7 +126,9 @@ def visualize( graph, barrier_adjustment=False ):
         #if barrier_adjustment:
         #    dst_x = graph.vs[ dst_vid ][ "logical_time" ] + pid_to_offset[ dst_pid ]
         #else:
-        dst_x = graph.vs[ dst_vid ][ "logical_time" ] 
+        dst_x = graph.vs[ dst_vid ][ "logical_time" ]
+        if ( event_type != "barrier" ) and ( event_type != "send" ) and ( event_type != "recv" ) and ( dst_x != 0 ):
+            dst_x = max_lts
         dst_y = graph.vs[ dst_vid ][ "process_id" ] 
         line = [ ( src_x, src_y ), ( dst_x, dst_y ) ]
         if src_pid == dst_pid:

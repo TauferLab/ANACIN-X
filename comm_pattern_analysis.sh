@@ -187,7 +187,7 @@ while true; do
         else
                 ndp_step_count=$(echo "scale=1; ($nd_end - $nd_start)/$nd_iter" |bc -l)
         fi
-	if ! (( $(echo "$nd_start < 0" |bc -l) || $(echo "$nd_start > 1" |bc -l) || $(echo "$nd_iter < 0" |bc -l) || $(echo "$nd_iter > 1" |bc -l) || $(echo "$nd_end <= 0" |bc -l) || $(echo "$nd_end > 1" |bc -l) )) && [[ "$ndp_step_count" =~ ^[0-9]+[.][0]$ ]] && ! [ -z "$nd_start" ] && ! [ -z "$nd_iter" ] && ! [ -z "$nd_end" ]; then
+	if ! (( $(echo "$nd_start < 0" |bc -l) || $(echo "$nd_start > 1" |bc -l) || $(echo "$nd_iter < 0" |bc -l) || $(echo "$nd_iter > 1" |bc -l) || $(echo "$nd_end < 0" |bc -l) || $(echo "$nd_end > 1" |bc -l) )) && [[ "$ndp_step_count" =~ ^[0-9]+[.][0]$ ]] && ! [ -z "$nd_start" ] && ! [ -z "$nd_iter" ] && ! [ -z "$nd_end" ]; then
 		break;
 	fi
 done
