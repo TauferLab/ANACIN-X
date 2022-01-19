@@ -24,7 +24,7 @@ from utilities import ( timer,
 def visualize( graph, barrier_adjustment=False ):
     max_lts = max( graph.vs[:]["logical_time"] )
     max_pid = max( graph.vs[:]["process_id"] )
-    vertex_size = 0.1
+    vertex_size = 0.2
 
     # Compute x-axis offsets for each process based on LTS of barrier 
     if barrier_adjustment:
@@ -87,12 +87,16 @@ def visualize( graph, barrier_adjustment=False ):
     send_patches = []
     recv_patches = []
     misc_patches = []
+    x_ticks = set( [] )
+    y_ticks = set( [] )
     for v in graph.vs[:]:
         #if barrier_adjustment:
         #    x_coord = v["logical_time"] + pid_to_offset[ v["process_id"] ]
         #else:
         x_coord = v["logical_time"] 
         y_coord = v["process_id"]
+        x_ticks.add(x_coord)
+        y_ticks.add(y_coord)
         event_type = v["event_type"]
         if event_type == "barrier":
             patch = Circle( ( x_coord, y_coord ), radius = vertex_size, color = "black" )
@@ -141,24 +145,45 @@ def visualize( graph, barrier_adjustment=False ):
     send_collection = PatchCollection( send_patches, facecolor="blue", zorder=10 )
     recv_collection = PatchCollection( recv_patches, facecolor="red", zorder=10 )
     misc_collection = PatchCollection( misc_patches, facecolor="green", zorder=10 )
-    
+
     # Create line collections for each kind of edge
+    edge_line_width = 2
     message_order_edge_collection = LineCollection( message_order_lines, 
                                                     colors="black", 
-                                                    linewidth=0.25, 
+                                                    linewidth=edge_line_width, 
                                                     linestyle="solid",
                                                     zorder=5
                                                   )
 
     program_order_edge_collection = LineCollection( program_order_lines, 
                                                     colors="gray", 
-                                                    linewidth=0.25, 
-                                                    linestyle="dashed",
+                                                    linewidth=edge_line_width, 
+                                                    linestyle="solid",
                                                     zorder=5
                                                   )
 
     figure_size = ( 48, 8 )
     fig, ax = plt.subplots( figsize = figure_size )
+
+    x_tick_vals = list(range(len(x_ticks)))
+    x_tick_labels = [ str(x) for x in x_tick_vals ]
+    y_tick_vals = list(range(len(y_ticks)))
+    y_tick_vals.reverse()
+    #y_tick_labels = [ str(y) for y in y_tick_vals ]
+    y_tick_labels = []
+    x_axis_label = "Logical Time of MPI Event"
+    #y_axis_label = "MPI Process Rank"
+    y_axis_label = ""
+    tick_label_fontdict = {"fontsize" : 28}
+    axis_label_fontdict = {"fontsize" : 30}
+
+    ax.set_xticks( x_tick_vals )
+    ax.set_xticklabels( x_tick_labels , rotation=0 , fontdict=tick_label_fontdict )
+    ax.set_yticks( y_tick_vals )
+    ax.set_yticklabels( y_tick_labels , rotation=0 , fontdict=tick_label_fontdict )
+    ax.set_xlabel( x_axis_label , fontdict=axis_label_fontdict )
+    ax.set_ylabel( y_axis_label , fontdict=axis_label_fontdict )
+    
 
     #ax.add_collection( barrier_collection )
     ax.add_collection( send_collection )
