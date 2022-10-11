@@ -119,7 +119,7 @@ def main( kdts_path, pattern, output, kernel_path, nd_start, nd_iter, nd_end, nd
 
     for sprops in bp['bodies']:
         #sprops.set_facecolor('#D43F3A')
-        sprops.set_facecolor('tab:olive')
+        sprops.set_facecolor('tab:blue')
         sprops.set_edgecolor('black')
         sprops.set_alpha(1)
 
