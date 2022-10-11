@@ -34,6 +34,13 @@ if [ "${run_csmpi}" == "True" ]; then
 	export CSMPI_CONFIG=${csmpi_conf}/${default_config}
 fi
 
+	# # Determine interleaving number - JACK - Must be moved inside if statement & receive opt trough args
+	option="interleaved"
+	if [ ${option} == "interleaved" ]; then
+		interleaving=1
+	elif [ ${option} == "non_interleaved" ]; then
+		interleaving=0
+	fi
 
 # Create app config if doesn't exist
 proc_grid="${x_procs}x${y_procs}x${z_procs}"
@@ -46,6 +53,9 @@ fi
 if [ "${comm_pattern}" == "message_race" ]; then
 	app_config=${anacin_x_root}/apps/comm_pattern_generator/config/message_race_msg_size_${msg_size}_niters_${n_iters}_ndp_${nd_start}_${nd_iter}_${nd_end}.json
 fi
+if [ "${comm_pattern}" == "mcb_grid" ]; then
+	app_config=${anacin_x_root}/apps/comm_pattern_generator/config/mini_mcb_${option}_niters_${n_iters}.json
+fi
 if [ ! -f "$app_config" ]; then
 	if [ "${comm_pattern}" == "unstructured_mesh" ]; then
 		python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "unstructured_mesh" ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} ${msg_size} ${n_iters} "${anacin_x_root}/apps/comm_pattern_generator/" ${nd_start} ${nd_iter} ${nd_end}
@@ -55,6 +65,9 @@ if [ ! -f "$app_config" ]; then
 	fi
 	if [ "${comm_pattern}" == "message_race" ]; then
 		python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "naive_reduce" ${msg_size} ${n_iters} "${anacin_x_root}/apps/comm_pattern_generator/" ${nd_start} ${nd_iter} ${nd_end}
+	fi
+	if [ "${comm_pattern}" == "mcb_grid" ]; then
+		python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "mcb_grid" ${interleaving} ${n_iters} "${anacin_x_root}/apps/comm_pattern_generator/"
 	fi
 fi
 
