@@ -43,6 +43,7 @@ elif sys.argv[1] == "naive_reduce":
         json.dump(out, f, indent=4)
 
 elif sys.argv[1] == "mini_mcb":
+    print(f'Creating mini mcb json')
     nd_frac = 0.0
     for i in range(0, 11):
         out["comm_patterns"].append({"pattern_name": sys.argv[1],
@@ -59,7 +60,7 @@ elif sys.argv[1] == "mini_mcb":
                                        },
                                        {
                                            "key": "n_reduction_steps",
-                                           "val": "4"
+                                           "val": "0"
                                        },
                                        {
                                            "key": "interleave_nd_iters",
