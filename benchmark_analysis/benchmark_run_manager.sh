@@ -36,9 +36,9 @@ fi
 
 	# # Determine interleaving number - JACK - Must be moved inside if statement & receive opt trough args
 	# option="interleaved"
-	if [ ${in_option} == "interleaved" ]; then
+	if [ "${in_option}" == "interleaved" ]; then
 		interleaving=1
-	elif [ ${in_option} == "non_interleaved" ]; then
+	elif [ "${in_option}" == "non_interleaved" ]; then
 		interleaving=0
 	fi
 
