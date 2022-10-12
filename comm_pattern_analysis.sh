@@ -217,7 +217,7 @@ done
 while [ ${comm_pattern} == "mcb_grid" ] && ! [[ ${in_option} =~ ^(interleaved|non_interleaved)$ ]]; do
 	echo "The interleaved option must be set."
 	echo "Please set this value between the two options (interleaved, non_interleaved)"
-	read -p "Topological Non-determinism Percentage: " nd_topo
+	read -p "Interleave Option: " in_option 
 done
 
 # Ensure the input values are valid to program requirements
