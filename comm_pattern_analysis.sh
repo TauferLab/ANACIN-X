@@ -143,6 +143,7 @@ nd_end="${nd_end:=1.0}"
 impl="${impl:="glibc"}"
 nd_topo="${nd_topo:=0.5}"
 results_path="${results_path:=$HOME/comm_pattern_output/${comm_pattern}_$(date +%s)/}"
+in_option="${in_option:="interleaved"}"
 #if [ ${scheduler} == "slurm" ]; then
 #    slurm_queue="${slurm_queue:="normal"}"
 #    slurm_time_limit="${slurm_time_limit:=10}"
