@@ -17,7 +17,7 @@ nd_neighbor_fraction=${13}
 x_procs=${14}
 y_procs=${15}
 z_procs=${16}
-
+in_option=${17}
 
 source ${paths_dir}/anacin_paths.config
 
@@ -35,10 +35,10 @@ if [ "${run_csmpi}" == "True" ]; then
 fi
 
 	# # Determine interleaving number - JACK - Must be moved inside if statement & receive opt trough args
-	option="interleaved"
-	if [ ${option} == "interleaved" ]; then
+	# option="interleaved"
+	if [ ${in_option} == "interleaved" ]; then
 		interleaving=1
-	elif [ ${option} == "non_interleaved" ]; then
+	elif [ ${in_option} == "non_interleaved" ]; then
 		interleaving=0
 	fi
 
