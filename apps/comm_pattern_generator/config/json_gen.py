@@ -44,8 +44,10 @@ elif sys.argv[1] == "naive_reduce":
 
 elif sys.argv[1] == "mini_mcb":
     print(f'Creating mini mcb json')
-    nd_frac = 0.0
-    for i in range(0, 11):
+    # nd_frac = 0.0
+    nd_frac = float(sys.argv[5])
+    # for i in range(0, 11):
+    while True:
         out["comm_patterns"].append({"pattern_name": sys.argv[1],
                                    "n_iters": int(sys.argv[3]),
                                    "nd_fraction": round(nd_frac, 1),
@@ -67,7 +69,10 @@ elif sys.argv[1] == "mini_mcb":
                                            "val": sys.argv[2]
                                        }
                                    ]})
-        nd_frac += 0.1
+        # nd_frac += 0.1
+        nd_frac += float(sys.argv[6])
+        if ( (nd_frac > float(sys.argv[7])) or (float(sys.argv[6]) == 0) ):
+            break;
     with open("{}/config/mini_mcb_{}_niters_{}.json".format(sys.argv[4],("interleaved" if (int(sys.argv[2]) == 1) else "non_interleaved"), int(sys.argv[3])), 'w+') as f:
         json.dump(out, f, indent=4)
 
