@@ -34,8 +34,7 @@ if [ "${run_csmpi}" == "True" ]; then
 	export CSMPI_CONFIG=${csmpi_conf}/${default_config}
 fi
 
-	# # Determine interleaving number - JACK - Must be moved inside if statement & receive opt trough args
-	# option="interleaved"
+	# # Determine interleaving number 
 	if [ "${in_option}" == "interleaved" ]; then
 		interleaving=1
 	elif [ "${in_option}" == "non_interleaved" ]; then
