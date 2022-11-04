@@ -66,7 +66,7 @@ if [ ! -f "$app_config" ]; then
 		python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "naive_reduce" ${msg_size} ${n_iters} "${anacin_x_root}/apps/comm_pattern_generator/" ${nd_start} ${nd_iter} ${nd_end}
 	fi
 	if [ "${comm_pattern}" == "mcb_grid" ]; then
-		python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "mini_mcb" ${interleaving} ${n_iters} "${anacin_x_root}/apps/comm_pattern_generator/"
+		python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "mini_mcb" ${interleaving} ${n_iters} "${anacin_x_root}/apps/comm_pattern_generator/" ${nd_start} ${nd_iter} ${nd_end}
 	fi
 fi
 
