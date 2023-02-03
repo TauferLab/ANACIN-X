@@ -30,8 +30,8 @@ if [ "${run_csmpi}" == "True" ]; then
 	trace_dir=${run_dir}
 	default_config="default_config_${impl}_run_${run_idx}.json"
 	mkdir -p ${trace_dir}
-	python3 ${csmpi_conf}/generate_config.py -o ${csmpi_conf}/${default_config} --backtrace_impl ${impl} -d ${trace_dir}
-	export CSMPI_CONFIG=${csmpi_conf}/${default_config}
+	python3 ${csmpi_conf}/generate_config.py -o ${run_dir}/${default_config} --backtrace_impl ${impl} -d ${trace_dir}
+	export CSMPI_CONFIG=${run_dir}/${default_config}
 fi
 
 
