@@ -322,7 +322,8 @@ cd anacin-x/config
 example_paths_dir=$(pwd)
 cd ${project_path}
 source ${example_paths_dir}/anacin_paths.config
-config_path=${anacin_x_root}/apps/comm_pattern_generator/config
+#config_path=${anacin_x_root}/apps/comm_pattern_generator/config
+config_path=${results_path}/
 comm_pattern_path=${anacin_x_root}/benchmark_analysis/benchmark_job_manager.sh
 
 

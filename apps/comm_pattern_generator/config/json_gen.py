@@ -21,7 +21,8 @@ if sys.argv[1] == "amg2013":
         nd_frac += float(sys.argv[6])
         if ( (nd_frac > float(sys.argv[7])) or (float(sys.argv[6]) == 0) ):
             break;
-    with open("{}/config/amg2013_msg_size_{}_niters_{}_ndp_{}_{}_{}.json".format(sys.argv[4], int(sys.argv[2]), int(sys.argv[3]), float(sys.argv[5]), float(sys.argv[6]), float(sys.argv[7])), 'w+') as f:
+    #with open("{}/config/amg2013_msg_size_{}_niters_{}_ndp_{}_{}_{}.json".format(sys.argv[4], int(sys.argv[2]), int(sys.argv[3]), float(sys.argv[5]), float(sys.argv[6]), float(sys.argv[7])), 'w+') as f:
+    with open("{}/amg2013_msg_size_{}_niters_{}_ndp_{}_{}_{}.json".format(sys.argv[4], int(sys.argv[2]), int(sys.argv[3]), float(sys.argv[5]), float(sys.argv[6]), float(sys.argv[7])), 'w+') as f:
         json.dump(out, f, indent=4)
 
 elif sys.argv[1] == "naive_reduce":
@@ -39,7 +40,8 @@ elif sys.argv[1] == "naive_reduce":
         nd_frac += float(sys.argv[6])
         if ( (nd_frac > float(sys.argv[7])) or (float(sys.argv[6]) == 0) ):
             break;
-    with open("{}/config/message_race_msg_size_{}_niters_{}_ndp_{}_{}_{}.json".format(sys.argv[4], int(sys.argv[2]), int(sys.argv[3]), float(sys.argv[5]), float(sys.argv[6]), float(sys.argv[7])), 'w+') as f:
+    #with open("{}/config/message_race_msg_size_{}_niters_{}_ndp_{}_{}_{}.json".format(sys.argv[4], int(sys.argv[2]), int(sys.argv[3]), float(sys.argv[5]), float(sys.argv[6]), float(sys.argv[7])), 'w+') as f:
+    with open("{}/message_race_msg_size_{}_niters_{}_ndp_{}_{}_{}.json".format(sys.argv[4], int(sys.argv[2]), int(sys.argv[3]), float(sys.argv[5]), float(sys.argv[6]), float(sys.argv[7])), 'w+') as f:
         json.dump(out, f, indent=4)
 
 
@@ -86,6 +88,7 @@ elif sys.argv[1] == "unstructured_mesh":
         nd_frac += float(sys.argv[10])
         if (nd_frac > float(sys.argv[11])) or (float(sys.argv[10]) == 0):
             break;
-    with open("{}/config/unstructured_mesh_{}x{}x{}_nd_neighbor_fraction_{}_msg_size_{}_niters_{}_ndp_{}_{}_{}.json".format(sys.argv[8], int(sys.argv[3]), int(sys.argv[4]), int(sys.argv[5]), sys.argv[2], int(sys.argv[6]), int(sys.argv[7]), str(sys.argv[9]), str(sys.argv[10]), str(sys.argv[11])), 'w+') as f:
+    #with open("{}/config/unstructured_mesh_{}x{}x{}_nd_neighbor_fraction_{}_msg_size_{}_niters_{}_ndp_{}_{}_{}.json".format(sys.argv[8], int(sys.argv[3]), int(sys.argv[4]), int(sys.argv[5]), sys.argv[2], int(sys.argv[6]), int(sys.argv[7]), str(sys.argv[9]), str(sys.argv[10]), str(sys.argv[11])), 'w+') as f:
+    with open("{}/unstructured_mesh_{}x{}x{}_nd_neighbor_fraction_{}_msg_size_{}_niters_{}_ndp_{}_{}_{}.json".format(sys.argv[8], int(sys.argv[3]), int(sys.argv[4]), int(sys.argv[5]), sys.argv[2], int(sys.argv[6]), int(sys.argv[7]), str(sys.argv[9]), str(sys.argv[10]), str(sys.argv[11])), 'w+') as f:
         json.dump(out, f, indent=4)
 
