@@ -60,11 +60,9 @@ for run_idx in `seq -f "%03g" ${run_idx_low} ${run_idx_high}`; do
 	
 	if [ "${scheduler}" == "slurm" ]; then
 		comm_pattern_run_stdout=$( sbatch -N ${n_nodes} -p ${queue} -J ${comm_pattern_run_name} -t ${time_limit} -n ${n_procs} --ntasks-per-node=${n_procs_per_node} ${comm_pattern_run_script} ${n_procs} ${msg_size} ${n_iters} ${proc_placement} ${run_idx} ${run_dir} ${paths_dir} ${nd_start} ${nd_iter} ${nd_end} ${impl} ${comm_pattern} ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} )
-		while [ -z "$comm_pattern_run_id" ]; do
-			comm_pattern_run_id=$( sacct -n -X --format jobid --name ${comm_pattern_run_name} )
-		done
+		comm_pattern_run_id=$( echo ${comm_pattern_run_stdout} | sed 's/[^0-9]*//g' )
 		kdts_job_deps+=${comm_pattern_run_id}
-        	comm_pattern_run_id=""
+        comm_pattern_run_id=""
 	fi
 
 	if [ "${scheduler}" == "lsf" ]; then
