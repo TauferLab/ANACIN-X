@@ -463,7 +463,6 @@ def make_box_plots( slice_idx_to_data, slice_idx_lower, slice_idx_upper, wall_ti
     plt.title( plot_title )
 
     plt.show()
-    #edit here
     kdts_save_path = output_dir + "/kdts.png" if output_dir != "" else "kdts.png"
     #plt.savefig( "kdts.png", 
     plt.savefig( kdts_save_path, 
@@ -487,7 +486,6 @@ def main( kdts_path, plot_type, slice_idx_lower, slice_idx_upper, flagged_slices
             event_to_timings = pkl.load( infile )
 
     if plot_type == "box":
-        #edited
         make_box_plots( slice_idx_to_data, slice_idx_lower, slice_idx_upper, wall_time_layout, application_events, output_dir )
 
     elif plot_type == "scatter":
