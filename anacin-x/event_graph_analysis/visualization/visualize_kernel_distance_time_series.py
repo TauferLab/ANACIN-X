@@ -304,7 +304,7 @@ def get_requested_slices( slice_idx_to_data, slice_idx_lower, slice_idx_upper, s
 
 
 
-def make_box_plots( slice_idx_to_data, slice_idx_lower, slice_idx_upper, wall_time_layout, application_events ):
+def make_box_plots( slice_idx_to_data, slice_idx_lower, slice_idx_upper, wall_time_layout, application_events, output_dir ):
     # Unpack kernel distance stuff
     wall_times = [] 
     kernel_to_distance_data_seq = {}
@@ -463,7 +463,10 @@ def make_box_plots( slice_idx_to_data, slice_idx_lower, slice_idx_upper, wall_ti
     plt.title( plot_title )
 
     plt.show()
-    plt.savefig( "kdts.png", 
+    #edit here
+    kdts_save_path = output_dir + "/kdts.png" if output_dir != "" else "kdts.png"
+    #plt.savefig( "kdts.png", 
+    plt.savefig( kdts_save_path, 
                  bbox_inches="tight",
                  transparent=False,
                  pad_inches=0.05,
@@ -472,7 +475,7 @@ def make_box_plots( slice_idx_to_data, slice_idx_lower, slice_idx_upper, wall_ti
 
 
 
-def main( kdts_path, plot_type, slice_idx_lower, slice_idx_upper, flagged_slices, wall_time_layout, application_events ):
+def main( kdts_path, plot_type, slice_idx_lower, slice_idx_upper, flagged_slices, wall_time_layout, application_events, output_dir ):
 
     # Read in kdts data
     with open( kdts_path, "rb" ) as infile:
@@ -484,7 +487,8 @@ def main( kdts_path, plot_type, slice_idx_lower, slice_idx_upper, flagged_slices
             event_to_timings = pkl.load( infile )
 
     if plot_type == "box":
-        make_box_plots( slice_idx_to_data, slice_idx_lower, slice_idx_upper, wall_time_layout, application_events )
+        #edited
+        make_box_plots( slice_idx_to_data, slice_idx_lower, slice_idx_upper, wall_time_layout, application_events, output_dir )
 
     elif plot_type == "scatter":
         make_scatter_plot( slice_idx_to_data, slice_idx_lower, slice_idx_upper, ["min", "max", "median"] )
@@ -510,6 +514,8 @@ if __name__ == "__main__":
                         help="If enabled, place the kernel distance boxplots for each slice on the x-axis based on the wall-time of the slice")
     parser.add_argument("-a", "--application_events", required=False,
                         help="Path to pickle file of supplementary application-specific event data")
+    parser.add_argument("-o", "--output_dir", required=False, default="",
+                        help="Directory to store visualization output.")
     args = parser.parse_args()
 
     main( args.data, 
@@ -518,5 +524,6 @@ if __name__ == "__main__":
           args.upper, 
           args.flagged_slices,
           args.wall_time_layout, 
-          args.application_events )
+          args.application_events,
+          args.output_dir)
 
