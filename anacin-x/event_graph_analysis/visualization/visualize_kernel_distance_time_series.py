@@ -22,7 +22,7 @@ import seaborn as sns
 import sys
 sys.path.append(".")
 sys.path.append("..")
-sys.path.append("/$HOME/Src_ANACIN-X/anacin-x/event_graph_analysis/")
+sys.path.append("/$HOME/Src_ANACIN-X/anacin-x/event_graph_analysis/") #This needs to be fixed
 
 from graph_kernel_postprocessing import flatten_distance_matrix
 from kernel_distance_time_series_postprocessing import get_distances_seq, get_stats_seq
@@ -150,7 +150,7 @@ def make_barrier_time_series_plot( kernel_distance_data ):
               )
     plt.show()
         
-def make_violin_plots( slice_idx_to_data ):
+def make_violin_plots( slice_idx_to_data, output_dir ):
     # Unpack kernel distance stuff
     wall_times = [] 
     kernel_to_distance_data_seq = {}
@@ -234,12 +234,20 @@ def make_violin_plots( slice_idx_to_data ):
     #plt.title( plot_title )
 
     plt.show()
+    #This is incinclusive for now
+    kdts_save_path = output_dir + "/kdts.png" if output_dir != "" else "kdts.png"
+    #plt.savefig( "kdts.png", 
+    plt.savefig( kdts_save_path, 
+                 bbox_inches="tight",
+                 transparent=False,
+                 pad_inches=0.05,
+                 dpi=300 )
 
 
 
 
 
-def make_scatter_plot( slice_idx_to_data, slice_idx_lower, slice_idx_upper, stats ):
+def make_scatter_plot( slice_idx_to_data, slice_idx_lower, slice_idx_upper, stats , output_dir):
     # Select slice indices
     all_slice_indices = sorted( slice_idx_to_data.keys() )
     if slice_idx_lower is not None and slice_idx_upper is not None:
@@ -279,6 +287,14 @@ def make_scatter_plot( slice_idx_to_data, slice_idx_lower, slice_idx_upper, stat
     plt.title( plot_title )
 
     plt.show()
+    #This is inconclusive for now
+    kdts_save_path = output_dir + "/kdts.png" if output_dir != "" else "kdts.png"
+    #plt.savefig( "kdts.png", 
+    plt.savefig( kdts_save_path, 
+                 bbox_inches="tight",
+                 transparent=False,
+                 pad_inches=0.05,
+                 dpi=300 )
 
 def get_plot_element_positions( slice_idx_to_data, slice_idx_lower, slice_idx_upper, slice_indices, wall_time_layout ):
     requested_slices = get_requested_slices( slice_idx_to_data, slice_idx_lower, slice_idx_upper, slice_indices )
@@ -489,10 +505,10 @@ def main( kdts_path, plot_type, slice_idx_lower, slice_idx_upper, flagged_slices
         make_box_plots( slice_idx_to_data, slice_idx_lower, slice_idx_upper, wall_time_layout, application_events, output_dir )
 
     elif plot_type == "scatter":
-        make_scatter_plot( slice_idx_to_data, slice_idx_lower, slice_idx_upper, ["min", "max", "median"] )
+        make_scatter_plot( slice_idx_to_data, slice_idx_lower, slice_idx_upper, ["min", "max", "median"], output_dir )
 
     elif plot_type == "violin":
-        make_violin_plots( slice_idx_to_data )
+        make_violin_plots( slice_idx_to_data, output_dir )
 
 
 if __name__ == "__main__":
