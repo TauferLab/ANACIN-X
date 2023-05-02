@@ -22,7 +22,8 @@ import seaborn as sns
 import sys
 sys.path.append(".")
 sys.path.append("..")
-sys.path.append("/$HOME/Src_ANACIN-X/anacin-x/event_graph_analysis/") #This needs to be fixed
+#sys.path.append("/$HOME/Src_ANACIN-X/anacin-x/event_graph_analysis/") #This needs to be fixed
+sys.path.append(sys.path[0]+"/..")
 
 from graph_kernel_postprocessing import flatten_distance_matrix
 from kernel_distance_time_series_postprocessing import get_distances_seq, get_stats_seq
