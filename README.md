@@ -112,12 +112,13 @@ The following command line switches can be used to define parameters for your jo
 * `-s`        : The size in bytes of the messages passed when generating communication patterns.
 * `-n`        : The number of compute nodes requested for running the ANACIN-X workflow. 
 * `-r`        : The number of runs to make of the ANACIN-X workflow.
-* `-cp`       : Used to define the communication pattern benchmark for testing. (i.e., message_race, amg2013, or unstructured_mesh)
+* `-cp`       : Used to define the communication pattern benchmark for testing. (i.e., message_race, amg2013, unstructured_mesh, mcb_grid)
 * `-sc`      : Used to define which schedule system is currently in use. (i.e., lsf, slurm, or unscheduled)
 * `-ct`       : Used to define which backtracing tool should be used during callstack tracing. (i.e., glibc or libunwind)
 * `-o`        : Used to define a custom path to store output from the project. 
 * `-nd`       : Takes 3 arguments in decimal format (start percent, step size, end percent) to define message non-determinism percentages present in the final data.
 * `-nt`       : When running the unstructured mesh communication pattern, takes the percentage of topological non-determinism in decimal format.
+* `-in`       : When running the mini MCB communication pattern, takes the interleaved or non-interleaved option. (i.e. interlaved or non_interleaved).
 * `-c`        : When running the unstructured mesh communication pattern, takes 3 arguments (integers greater than 1) to define the grid coordinates.
 * `-v`        : If used, will display the execution settings prior to running the execution.
 * `-h`        : Used to display the list of switch options.
@@ -253,7 +254,7 @@ python3 anacin-x/event_graph_analysis/visualization/make_message_nd_plot.py KDTS
 
 Positional Arguments
 KDTS  Kernel distance time series file
-CP    The type of communication pattern benchmark used (i.e., message_race, amg2013, or unstructured_mesh)
+CP    The type of communication pattern benchmark used (i.e., message_race, amg2013, unstructured_mesh, or mcb_grid)
 KP    Graph kernel policy file used to generate data (i.e., anacin-x/event_graph_analysis/graph_kernel_policies/wlst_5iters_logical_timestamp_label.json)
 Ou    Output file to store the visualization in, excluding the file type (e.g., output_file or kdts_visualization)
 ```
@@ -265,7 +266,7 @@ python3 anacin-x/event_graph_analysis/visualization/make_message_nd_plot.py KDTS
 
 Positional Arguments
 KDTS  Kernel distance time series file
-CP    The type of communication pattern benchmark used (i.e., message_race, amg2013, or unstructured_mesh)
+CP    The type of communication pattern benchmark used (i.e., message_race, amg2013, unstructured_mesh, or mcb_grid)
 KP    Graph kernel policy file used to generate data
 Ou    Output file to store the visualization in, excluding the file type (e.g., output_file or kdts_visualization)
 NDPl  Lowest percentage of message non-determinism used in decimal format
