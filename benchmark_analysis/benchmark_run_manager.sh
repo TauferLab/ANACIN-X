@@ -54,7 +54,7 @@ if [ "${comm_pattern}" == "message_race" ]; then
     app_config=${run_root}/message_race_msg_size_${msg_size}_niters_${n_iters}_ndp_${nd_start}_${nd_iter}_${nd_end}.json
 fi
 if [ "${comm_pattern}" == "mcb_grid" ]; then
-	app_config=${anacin_x_root}/apps/comm_pattern_generator/config/mini_mcb_${option}_niters_${n_iters}.json
+	app_config=${anacin_x_root}/apps/comm_pattern_generator/config/mini_mcb_${in_option}_niters_${n_iters}.json
 fi
 if [ ! -f "$app_config" ]; then
 	if [ "${comm_pattern}" == "unstructured_mesh" ]; then

@@ -203,7 +203,6 @@ if [[ "$nd_start" =~ ^[0-9]+[.][0-9][0-9][0-9]*$ ]] || [[ "$nd_iter" =~ ^[0-9]+[
 	nd_end=$(printf "%.2f\n" "$nd_end")
 	echo "They will now be set to: ${nd_start} ${nd_iter} ${nd_end}"
 fi
-# JACK - double check this. I was having an error related to this.
 if (( $(echo "$nd_iter == 0.0" |bc -l) && $(echo "$nd_end > $nd_start" |bc -l) )); then
 	echo "Warning: You have requested that the non-determinism percentage step size be 0.0 and that the final non-determinism percentage be different from the starting non-determinism percentage."
 	echo "         The requested final non-determinism percentage will not be used because the step size is 0.0."
