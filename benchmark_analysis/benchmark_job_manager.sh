@@ -21,6 +21,7 @@ impl=${18}
 #run_csmpi=${19}
 comm_pattern=${19}
 scheduler=${20}
+in_option=${21}
 
 source ${paths_dir}/anacin_paths.config
 
@@ -59,20 +60,20 @@ for run_idx in `seq -f "%03g" ${run_idx_low} ${run_idx_high}`; do
 	comm_pattern_run_name=${comm_pattern}_run_$(date +%s.%N)
 	
 	if [ "${scheduler}" == "slurm" ]; then
-		comm_pattern_run_stdout=$( sbatch -N ${n_nodes} -p ${queue} -J ${comm_pattern_run_name} -t ${time_limit} -n ${n_procs} --ntasks-per-node=${n_procs_per_node} ${comm_pattern_run_script} ${n_procs} ${msg_size} ${n_iters} ${proc_placement} ${run_idx} ${run_dir} ${paths_dir} ${nd_start} ${nd_iter} ${nd_end} ${impl} ${comm_pattern} ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} )
+		comm_pattern_run_stdout=$( sbatch -N ${n_nodes} -p ${queue} -J ${comm_pattern_run_name} -t ${time_limit} -n ${n_procs} --ntasks-per-node=${n_procs_per_node} ${comm_pattern_run_script} ${n_procs} ${msg_size} ${n_iters} ${proc_placement} ${run_idx} ${run_dir} ${paths_dir} ${nd_start} ${nd_iter} ${nd_end} ${impl} ${comm_pattern} ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} ${in_option})
 		comm_pattern_run_id=$( echo ${comm_pattern_run_stdout} | sed 's/[^0-9]*//g' )" "
 		kdts_job_deps+=${comm_pattern_run_id}
         comm_pattern_run_id=""
 	fi
 
 	if [ "${scheduler}" == "lsf" ]; then
-		comm_pattern_run_stdout=$( bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -q ${queue} -W ${time_limit} -o ${debugging_path}/lsf_output.txt -e ${debugging_path}/lsf_error.txt ${comm_pattern_run_script} ${n_procs} ${msg_size} ${n_iters} ${proc_placement} ${run_idx} ${run_dir} ${paths_dir} ${nd_start} ${nd_iter} ${nd_end} ${impl} ${comm_pattern} ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} )
+		comm_pattern_run_stdout=$( bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -q ${queue} -W ${time_limit} -o ${debugging_path}/lsf_output.txt -e ${debugging_path}/lsf_error.txt ${comm_pattern_run_script} ${n_procs} ${msg_size} ${n_iters} ${proc_placement} ${run_idx} ${run_dir} ${paths_dir} ${nd_start} ${nd_iter} ${nd_end} ${impl} ${comm_pattern} ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} ${in_option})
 		comm_pattern_job_id=$( echo ${comm_pattern_run_stdout} | sed 's/[^0-9]*//g' )
 		kdts_job_deps+=("done(${comm_pattern_job_id})")
 	fi
 	
 	if [ "${scheduler}" == "unscheduled" ]; then
-		bash ${comm_pattern_run_script} ${n_procs} ${msg_size} ${n_iters} ${proc_placement} ${run_idx} ${run_dir} ${paths_dir} ${nd_start} ${nd_iter} ${nd_end} ${impl} ${comm_pattern} ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs}
+		bash ${comm_pattern_run_script} ${n_procs} ${msg_size} ${n_iters} ${proc_placement} ${run_idx} ${run_dir} ${paths_dir} ${nd_start} ${nd_iter} ${nd_end} ${impl} ${comm_pattern} ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} ${in_option}
 	fi
 
 
