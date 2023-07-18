@@ -351,6 +351,8 @@ Developers:
 * Dylan Chapp
 * Kae Suarez
 * Nigel Tan
+* Jack Marquez
+* Befikir Bogale
 
 Project Advisors:
 * Dr. Sanjukta Bhowmick
@@ -358,7 +360,7 @@ Project Advisors:
 
 ## Publications
 
-*This paper presents theory, artifacts, and results on which ANACIN-X is built:*
+*This paper presents the theory, artifacts, and results on which ANACIN-X is built:*
 
 D. Chapp, N. Tan, S. Bhowmick, and M. Taufer. **Identifying Degrees and Sources of Non-Determinism in MPI Applications via Graph Kernels.** *Journal of IEEE Transactions on Parallel and Distributed Systems (IEEE TPDS)*, (2021).
 [Link to Publication](https://ieeexplore.ieee.org/document/9435018)
