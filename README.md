@@ -341,7 +341,9 @@ If you wish to use this repository to reproduce results published in the ['Publi
 
 ## Reproducibility
 
-We have created a container with all the dependencies need to execute ANACIN-X. This is an Apptainer (formerly call Singularity) container with the instructions to use ANACIN-X with the benchmarks included or with an external application. This ready-to-use container is [here](https://hub.docker.com/repository/docker/globalcomputinglab/anacinx_prod/general) 
+We have created a container with all the dependencies need to execute ANACIN-X. This is an Apptainer (formerly call Singularity) container with the instructions to use ANACIN-X with the benchmarks included or with an external application. This ready-to-use container is [here](https://hub.docker.com/repository/docker/globalcomputinglab/anacinx_prod/general).
+
+With this container we provide a Jupyter notebook you can find [here](https://github.com/TauferLab/ANACIN-X/tree/master/anacin_jupyter) to execute ANACIN-X with the parameters you wish and test all the benchmarks mentioned in the documentation.
 
 
 ## Acknowledgments
@@ -359,6 +361,7 @@ Developers:
 * Nigel Tan
 * Jack Marquez
 * Befikir Bogale
+* Aashish Pandey
 
 Project Advisors:
 * Dr. Sanjukta Bhowmick
