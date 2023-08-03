@@ -36,6 +36,8 @@ This document is organized in the following order:
   2. [Publications associated with the software](#publications)
   3. [Copyright and license information](#copyright-and-license)
 
+* [Reproducibility -> ready-to-use](#reproducibility)
+
 
 ## **Installation**
 
@@ -335,6 +337,10 @@ AR    Anomaly report file with same path as kdts.pkl file (i.e., 'non_anomaly_re
 ```
 
 If you wish to use this repository to reproduce results published in the ['Publications'](#publications) section below, see the [ANACIN-X wiki page](https://github.com/TauferLab/ANACIN-X/wiki/Reproducing-Published-Results) on 'Reproducing Published Results'.
+
+## Reproducibility
+
+We have created a container with all the dependencies need to execute ANACIN-X. This is an Apptainer (formerly call Singularity) container with the instructions to use ANACIN-X with the benchmarks included or with an external application. This ready-to-use container is [here](https://hub.docker.com/repository/docker/globalcomputinglab/anacinx_prod/general) 
 
 
 ## Acknowledgments
