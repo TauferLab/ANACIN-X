@@ -22,7 +22,8 @@ import seaborn as sns
 import sys
 sys.path.append(".")
 sys.path.append("..")
-sys.path.append("/$HOME/Src_ANACIN-X/anacin-x/event_graph_analysis/")
+#sys.path.append("/$HOME/Src_ANACIN-X/anacin-x/event_graph_analysis/") #This needs to be fixed
+sys.path.append(sys.path[0]+"/..")
 
 from graph_kernel_postprocessing import flatten_distance_matrix
 from kernel_distance_time_series_postprocessing import get_distances_seq, get_stats_seq
@@ -150,7 +151,7 @@ def make_barrier_time_series_plot( kernel_distance_data ):
               )
     plt.show()
         
-def make_violin_plots( slice_idx_to_data ):
+def make_violin_plots( slice_idx_to_data, output_dir ):
     # Unpack kernel distance stuff
     wall_times = [] 
     kernel_to_distance_data_seq = {}
@@ -234,12 +235,20 @@ def make_violin_plots( slice_idx_to_data ):
     #plt.title( plot_title )
 
     plt.show()
+    #This is incinclusive for now
+    kdts_save_path = output_dir + "/kdts.png" if output_dir != "" else "kdts.png"
+    #plt.savefig( "kdts.png", 
+    plt.savefig( kdts_save_path, 
+                 bbox_inches="tight",
+                 transparent=False,
+                 pad_inches=0.05,
+                 dpi=300 )
 
 
 
 
 
-def make_scatter_plot( slice_idx_to_data, slice_idx_lower, slice_idx_upper, stats ):
+def make_scatter_plot( slice_idx_to_data, slice_idx_lower, slice_idx_upper, stats , output_dir):
     # Select slice indices
     all_slice_indices = sorted( slice_idx_to_data.keys() )
     if slice_idx_lower is not None and slice_idx_upper is not None:
@@ -279,6 +288,14 @@ def make_scatter_plot( slice_idx_to_data, slice_idx_lower, slice_idx_upper, stat
     plt.title( plot_title )
 
     plt.show()
+    #This is inconclusive for now
+    kdts_save_path = output_dir + "/kdts.png" if output_dir != "" else "kdts.png"
+    #plt.savefig( "kdts.png", 
+    plt.savefig( kdts_save_path, 
+                 bbox_inches="tight",
+                 transparent=False,
+                 pad_inches=0.05,
+                 dpi=300 )
 
 def get_plot_element_positions( slice_idx_to_data, slice_idx_lower, slice_idx_upper, slice_indices, wall_time_layout ):
     requested_slices = get_requested_slices( slice_idx_to_data, slice_idx_lower, slice_idx_upper, slice_indices )
@@ -304,7 +321,7 @@ def get_requested_slices( slice_idx_to_data, slice_idx_lower, slice_idx_upper, s
 
 
 
-def make_box_plots( slice_idx_to_data, slice_idx_lower, slice_idx_upper, wall_time_layout, application_events ):
+def make_box_plots( slice_idx_to_data, slice_idx_lower, slice_idx_upper, wall_time_layout, application_events, output_dir ):
     # Unpack kernel distance stuff
     wall_times = [] 
     kernel_to_distance_data_seq = {}
@@ -463,7 +480,9 @@ def make_box_plots( slice_idx_to_data, slice_idx_lower, slice_idx_upper, wall_ti
     plt.title( plot_title )
 
     plt.show()
-    plt.savefig( "kdts.png", 
+    kdts_save_path = output_dir + "/kdts.png" if output_dir != "" else "kdts.png"
+    #plt.savefig( "kdts.png", 
+    plt.savefig( kdts_save_path, 
                  bbox_inches="tight",
                  transparent=False,
                  pad_inches=0.05,
@@ -472,7 +491,7 @@ def make_box_plots( slice_idx_to_data, slice_idx_lower, slice_idx_upper, wall_ti
 
 
 
-def main( kdts_path, plot_type, slice_idx_lower, slice_idx_upper, flagged_slices, wall_time_layout, application_events ):
+def main( kdts_path, plot_type, slice_idx_lower, slice_idx_upper, flagged_slices, wall_time_layout, application_events, output_dir ):
 
     # Read in kdts data
     with open( kdts_path, "rb" ) as infile:
@@ -484,13 +503,13 @@ def main( kdts_path, plot_type, slice_idx_lower, slice_idx_upper, flagged_slices
             event_to_timings = pkl.load( infile )
 
     if plot_type == "box":
-        make_box_plots( slice_idx_to_data, slice_idx_lower, slice_idx_upper, wall_time_layout, application_events )
+        make_box_plots( slice_idx_to_data, slice_idx_lower, slice_idx_upper, wall_time_layout, application_events, output_dir )
 
     elif plot_type == "scatter":
-        make_scatter_plot( slice_idx_to_data, slice_idx_lower, slice_idx_upper, ["min", "max", "median"] )
+        make_scatter_plot( slice_idx_to_data, slice_idx_lower, slice_idx_upper, ["min", "max", "median"], output_dir )
 
     elif plot_type == "violin":
-        make_violin_plots( slice_idx_to_data )
+        make_violin_plots( slice_idx_to_data, output_dir )
 
 
 if __name__ == "__main__":
@@ -510,6 +529,8 @@ if __name__ == "__main__":
                         help="If enabled, place the kernel distance boxplots for each slice on the x-axis based on the wall-time of the slice")
     parser.add_argument("-a", "--application_events", required=False,
                         help="Path to pickle file of supplementary application-specific event data")
+    parser.add_argument("-o", "--output_dir", required=False, default="",
+                        help="Directory to store visualization output.")
     args = parser.parse_args()
 
     main( args.data, 
@@ -518,5 +539,6 @@ if __name__ == "__main__":
           args.upper, 
           args.flagged_slices,
           args.wall_time_layout, 
-          args.application_events )
+          args.application_events,
+          args.output_dir)
 

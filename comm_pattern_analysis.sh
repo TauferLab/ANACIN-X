@@ -29,7 +29,7 @@ Help() {
     echo "[-r]    The number of runs to make of the ANACIN-X workflow. (Default 2 executions)"
     echo "        The number of runs must be at least 2"
     echo "[-cp]   Used to define the communication pattern benchmark for testing. (Code will request this if not set)"
-    echo "        Must be one of the 3 provided benchmarks in the following format: message_race, amg2013, or unstructured_mesh."
+    echo "        Must be one of the 4 provided benchmarks in the following format: message_race, amg2013, unstructured_mesh or mcb_grid"
     echo "[-sc]   Used to define which schedule system is currently in use. (Code will request this if not set)"
     echo "        Must be one of the following options: lsf, slurm, or unscheduled."
     #echo "[-cs]   If used, then callstack tracing will be activated.  Doesn't take any arguments."
@@ -55,6 +55,8 @@ Help() {
     echo "If you're running on a scheduled system, then the following switches can be used to define settings for job submission:"
     echo "[-q]    Defines the queue to submit jobs to. (Defaults to the "normal" queue)"
     echo "[-t]    A maximum time limit in minutes on the time provided for communication pattern runs. (Default 10 minutes)"
+    echo "[-in]   When running the mini MCB communication pattern, takes the interleaved or non-interleaved option. (Code will request this if not set)"
+    echo "        Must be one of the following options: interleaved or non_interleaved."
 #    echo "If you're running on a system that uses the Slurm scheduler, then the following switches can be used to define settings for job submission:"
 #    echo "[-sq]   Defines the queue to submit Slurm jobs to. (Defaults to the "normal" queue)"
 #    echo "[-st]   A maximum time limit in minutes on the time provided to jobs submitted. (Default 10 minutes)"
@@ -88,7 +90,8 @@ while [ -n "$1" ]; do
 	    -sc) scheduler=$2; shift; shift ;;
 	    -nd) nd_start=$2; nd_iter=$3; nd_end=$4; shift; shift; shift; shift ;;
 	    -nt) nd_topo=$2; shift; shift ;;
-	    -v)  verbose="true"; shift ;;
+        -in) in_option=$2; shift; shift ;;
+	    -v)  verbose="true"; shift ;;        
 	    -h)  Help; exit ;;
 	    *)   echo "$1 is not an option"; exit ;;
     esac
@@ -97,12 +100,12 @@ done
 
 # Comm Pattern definition
 while true; do
-    #read -p "Which communication pattern would you like to analyze? Input is case sensitive. (message_race, amg2013, unstructured_mesh) " comm_pattern
+    #read -p "Which communication pattern would you like to analyze? Input is case sensitive. (message_race, amg2013, unstructured_mesh, mcb_grid) " comm_pattern
     case ${comm_pattern} in
-	    "message_race" | "amg2013" | "unstructured_mesh" ) break ;;
-	    #* ) echo "Please respond with one of the listed options. Input is case sensitive. (message_race, amg2013, unstructured_mesh) " ;;
+	    "message_race" | "amg2013" | "unstructured_mesh" | "mcb_grid" ) break ;;
+	    #* ) echo "Please respond with one of the listed options. Input is case sensitive. (message_race, amg2013, unstructured_mesh, mcb_grid) " ;;
 	    * ) echo "The communication pattern must be selected from one of the provided benchmarks."
-		read -p "Please select one of the three provided options. Input is case sensitive. (message_race, amg2013, unstructured_mesh) " comm_pattern ;;
+		read -p "Please select one of the three provided options. Input is case sensitive. (message_race, amg2013, unstructured_mesh, mcb_grid) " comm_pattern ;;
     esac
 done
 
@@ -140,6 +143,7 @@ nd_end="${nd_end:=1.0}"
 impl="${impl:="glibc"}"
 nd_topo="${nd_topo:=0.5}"
 results_path="${results_path:=$HOME/comm_pattern_output/${comm_pattern}_$(date +%s)/}"
+in_option="${in_option:="interleaved"}"
 #if [ ${scheduler} == "slurm" ]; then
 #    slurm_queue="${slurm_queue:="normal"}"
 #    slurm_time_limit="${slurm_time_limit:=10}"
@@ -207,6 +211,12 @@ while [ ${comm_pattern} == "unstructured_mesh" ] && ( (( $(echo "$nd_topo < 0" |
 	echo "The topological non-determinism percentage is not between 0 and 1 or is not set."
 	echo "Please set this value between 0 and 1, inclusive."
 	read -p "Topological Non-determinism Percentage: " nd_topo
+done
+
+while [ ${comm_pattern} == "mcb_grid" ] && ! [[ ${in_option} =~ ^(interleaved|non_interleaved)$ ]]; do
+	echo "The interleaved option must be set."
+	echo "Please set this value between the two options (interleaved, non_interleaved)"
+	read -p "Interleave Option: " in_option 
 done
 
 # Ensure the input values are valid to program requirements
@@ -299,6 +309,9 @@ if [ "${verbose}" == "true" ]; then
     if [ ${comm_pattern} == "unstructured_mesh" ]; then
 	    echo "Topological Non-determinism Percentage ${nd_topo}"
     fi
+    if [ ${comm_pattern} == "mcb_grid" ]; then
+	    echo "Interleaved option: ${in_option}"
+    fi
     #if [ ${scheduler} == "slurm" ]; then
     echo "Queue for Running Scheduled Jobs: ${queue}"
     echo "Time Limit for Running Scheduled Jobs: ${time_limit}"
@@ -322,7 +335,7 @@ cd anacin-x/config
 example_paths_dir=$(pwd)
 cd ${project_path}
 source ${example_paths_dir}/anacin_paths.config
-config_path=${anacin_x_root}/apps/comm_pattern_generator/config
+config_path=${results_path}/
 comm_pattern_path=${anacin_x_root}/benchmark_analysis/benchmark_job_manager.sh
 
 
@@ -342,6 +355,9 @@ echo "Ending Non-determinism Percentage: ${nd_end}" >> ${user_config_file}
 if [ ${comm_pattern} == "unstructured_mesh" ]; then
 	echo "Topological Non-determinism Percentage: ${nd_topo}" >> ${user_config_file}
 fi
+if [ ${comm_pattern} == "mcb_grid" ]; then
+    echo "Interleaved option: ${in_option}" >> ${user_config_file}
+fi
 #if [ ${scheduler} == "slurm" ]; then
     echo "Queue for Running Scheduled Jobs: ${queue}" >> ${user_config_file}
     echo "Time Limit for Running Scheduled Jobs: ${time_limit}" >> ${user_config_file}
@@ -358,7 +374,7 @@ echo "Output will be stored in ${results_path}" >> ${user_config_file}
 
 
 # Run Comm Pattern Script
-bash ${comm_pattern_path} ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${queue} ${time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir} ${x_procs} ${y_procs} ${z_procs} ${nd_start} ${nd_iter} ${nd_end} ${nd_topo} ${impl} ${comm_pattern} ${scheduler}
+bash ${comm_pattern_path} ${n_procs} ${n_iters} ${msg_sizes} ${n_nodes} ${queue} ${time_limit} 0 $((run_count-1)) ${results_path} ${example_paths_dir} ${x_procs} ${y_procs} ${z_procs} ${nd_start} ${nd_iter} ${nd_end} ${nd_topo} ${impl} ${comm_pattern} ${scheduler} ${in_option}
 if [ ${comm_pattern} == "unstructured_mesh" ]; then
 	echo "Your kernel distance data will be stored in output file: ${results_path}/msg_size_${msg_sizes}/n_procs_${n_procs}/n_iters_${n_iters}/ndp_${nd_start}_${nd_iter}_${nd_end}/nd_topological_${nd_topo}/kdts.pkl"
 else
@@ -373,7 +389,10 @@ echo "Starting non-determinism percentage:                     ${nd_start}"
 echo "Non-determinism percentage step size:                    ${nd_iter}"
 echo "Ending non-determinism percentage:                       ${nd_end}"
 if [ ${comm_pattern} == "unstructured_mesh" ]; then
-	echo "Topological non-determinism percentage:                  ${nd_topo}"
+	echo "Topological non-determinism percentage:              ${nd_topo}"
+fi
+if [ ${comm_pattern} == "mcb_grid" ]; then
+    echo "Interleaved option:                                   ${in_option}"
 fi
 
 
