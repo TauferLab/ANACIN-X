@@ -239,6 +239,13 @@ def listen_benchmark_type(change):
     global param_benchmark_type
     param_benchmark_type = change.new
 
+    clear_output()
+    display(widgets.HBox([benchmark_type_selector_widget, extern_type_selector_widget]))
+    if param_benchmark_type == "message_race" or "amg2013":
+        display(benchmark_type_widget, num_processes_widget, num_runs_widget, num_iterations_widget, pnmpi_conf_widget, step_start_widget, step_size_widget, step_end_widget, message_size_widget)
+    else:
+        print("Noppies")
+
 
 # print(param_num_processes)
 # print(param_num_runs)
@@ -254,17 +261,13 @@ def on_button_clicked_0(button):
     clear_output()
     display(button)
     if button == trace_widget:
+        tmp_param = ""
+
         print("Tracing...")
         if clean_output_dir(param_output_dir) == 0:
             print("Invalid output directory")
             return
-#         def trace_execution(executable_path, args, num_processes, num_runs, num_iterations, pnmpi_conf, output_dir):
-#         trace_execution("/ANACIN-X/apps/comm_pattern_generator/build/comm_pattern_generator", "/home/bbogale/results/message_race_msg_size_512_niters_5_ndp_0.0_0.1_1.0.json /ANACIN-X/anacin-x/config", 30, 10, "dumpi_pluto_csmpi.conf", "/home/bbogale/results")
-        #trace_execution("/ANACIN-X/apps/comm_pattern_generator/build/comm_pattern_generator", "/home/bbogale/results/message_race_msg_size_512_niters_5_ndp_0.0_0.1_1.0.json /ANACIN-X/anacin-x/config", param_num_processes, param_num_runs, param_num_iterations, param_pnmpi_config, "/home/bbogale/results")
-        #DONT PUSH WITHOUT NEW BRANCH
-        #How to make it so that the steps are variable?
-        #tmp_param = param_output_dir + "/message_race_msg_size_512_niters_" + str(param_num_iterations) + "_ndp_0.0_0.1_1.0.json" + " /ANACIN-X/anacin-x/config"
-        tmp_param = ""
+
         if(param_benchmark_type == "message_race" or param_benchmark_type == "amg2013"):
             # tmp_param = param_output_dir + "/message_race_msg_size_"+ str(param_message_size) + "_niters_" + str(param_num_iterations) + "_ndp_" + str(param_step_start) + "_" + str(param_step_size) + "_" + str(param_step_end) + ".json" + " /ANACIN-X/anacin-x/config"
             tmp_param = param_output_dir + "/" + param_benchmark_type + "_msg_size_"+ str(param_message_size) + "_niters_" + str(param_num_iterations) + "_ndp_" + str(param_step_start) + "_" + str(param_step_size) + "_" + str(param_step_end) + ".json" + " /ANACIN-X/anacin-x/config"
@@ -315,7 +318,8 @@ def on_button_clicked_1(button):
     clear_output()
     display(widgets.HBox([benchmark_type_selector_widget, extern_type_selector_widget]))
     if button == benchmark_type_selector_widget:
-        display(benchmark_type_widget, num_processes_widget, num_runs_widget, num_iterations_widget, pnmpi_conf_widget, step_start_widget, step_size_widget, step_end_widget, message_size_widget)
+        # display(benchmark_type_widget, num_processes_widget, num_runs_widget, num_iterations_widget, pnmpi_conf_widget, step_start_widget, step_size_widget, step_end_widget, message_size_widget)
+        display(benchmark_type_widget)
     elif button == extern_type_selector_widget:
         display(num_processes_widget, num_runs_widget, num_iterations_widget, pnmpi_conf_widget, executable_widget, executable_args_widget)
     
