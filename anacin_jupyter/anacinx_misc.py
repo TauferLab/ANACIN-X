@@ -59,20 +59,6 @@ trace_widget = widgets.Button(
     layout=layout
 )
 
-create_instance_widget =  widgets.Button(
-    description='Create Instance',
-    style= {'description_width': 'initial'},
-    button_style='success',
-    layout=layout
-)
-
-kill_instance_widget =  widgets.Button(
-    description='Kill Instance',
-    style= {'description_width': 'initial'},
-    button_style='danger',
-    layout=layout
-)
-
 gen_event_graph_widget = widgets.Button(
     description='Generate Event Graph',
     style= {'description_width': 'initial'},
@@ -275,28 +261,22 @@ def on_button_clicked_0(button):
             tmp_param = param_output_dir + "/" + param_benchmark_type + "_msg_size_"+ str(param_message_size) + "_niters_" + str(param_num_iterations) + "_ndp_" + str(param_step_start) + "_" + str(param_step_size) + "_" + str(param_step_end) + ".json" + " /ANACIN-X/anacin-x/config"
 	        # app_config=${run_root}/unstructured_mesh_${proc_grid}_nd_neighbor_fraction_${nd_neighbor_fraction}_msg_size_${msg_size}_niters_${n_iters}_ndp_${nd_start}_${nd_iter}_${nd_end}.json
 
-        trace_execution("/ANACIN-X/apps/comm_pattern_generator/build/comm_pattern_generator", tmp_param, param_benchmark_type, param_num_processes, param_num_runs, param_num_iterations, param_pnmpi_config, param_step_start, param_step_size, param_step_end, param_message_size, param_output_dir)
-    elif button == kill_instance_widget:
-        print("Killing Instance..")
-        kill_instance()
-    elif button == create_instance_widget:
-        print("Creating Instance..")
-        create_instance(param_output_dir, param_image_path)
+        trace_execution("/ANACIN-X/apps/comm_pattern_generator/build/comm_pattern_generator", tmp_param, param_benchmark_type, param_num_processes, param_num_runs, param_num_iterations, param_pnmpi_config, param_step_start, param_step_size, param_step_end, param_message_size, param_output_dir, param_image_path)
     elif button == gen_event_graph_widget:
         print("Generating Event Graph...")
 #         generate_event_graph(30, 10, "dumpi_and_csmpi.json", "/home/bbogale/results/")
         #generate_event_graph(param_num_processes, param_num_runs, "dumpi_and_csmpi.json", "/home/bbogale/results/")
-        generate_event_graph(param_num_processes, param_num_runs, "dumpi_and_csmpi.json", param_output_dir)
+        generate_event_graph(param_num_processes, param_num_runs, "dumpi_and_csmpi.json", param_output_dir, param_image_path)
     elif button == slice_extraction_widget:
         print("Extracting Slices...")
 #         extract_slices(30, 10,  "barrier_delimited_full.json", "/home/bbogale/results/")
         #extract_slices(param_num_processes, param_num_runs,  "barrier_delimited_full.json", "/home/bbogale/results/")
-        extract_slices(param_num_processes, param_num_runs,  "barrier_delimited_full.json", param_output_dir)
+        extract_slices(param_num_processes, param_num_runs,  "barrier_delimited_full.json", param_output_dir, param_image_path)
     elif button == compute_kdts_widget:
         print("Computing the KDTS...")
 #         compute_kdts(30, "barrier_delimited_full.json", "/home/bbogale/results/")
         #compute_kdts(param_num_processes, "barrier_delimited_full.json", "/home/bbogale/results/")        
-        compute_kdts(param_num_processes, "barrier_delimited_full.json", param_output_dir)
+        compute_kdts(param_num_processes, "barrier_delimited_full.json", param_output_dir, param_image_path)
         print("Done!")
     elif button == create_visualization_widget:
         print("Creating Visualization...")
@@ -307,7 +287,7 @@ def on_button_clicked_0(button):
        #anacin-x/event_graph_analysis/graph_kernel_policies/wlst_5iters_logical_timestamp_label.json \
        #/home/bbogale/results/kdts \
        #0.0 0.1 1.0'
-        create_graph(param_output_dir, param_step_start, param_step_size, param_step_end)
+        create_graph(param_output_dir, param_step_start, param_step_size, param_step_end, param_image_path)
     elif button == display_visualization_widget:
 #         display(display_visualization_widget)
         param_tmp = param_output_dir + "/kdts.png"
@@ -340,8 +320,6 @@ benchmark_type_widget.observe(listen_benchmark_type, names='value')
 
 
 trace_widget.on_click(on_button_clicked_0)
-create_instance_widget.on_click(on_button_clicked_0)
-kill_instance_widget.on_click(on_button_clicked_0)
 gen_event_graph_widget.on_click(on_button_clicked_0)
 slice_extraction_widget.on_click(on_button_clicked_0)
 compute_kdts_widget.on_click(on_button_clicked_0)
