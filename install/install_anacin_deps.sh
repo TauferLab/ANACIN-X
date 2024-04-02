@@ -33,36 +33,13 @@ done
 #   Don't try to find external MPI.  If they have MPI already, don't try to load it here and tell user to update environment file
 #   Don't find compilers here.  If user has specific c compiler, tell them to call spack compiler find prior to making environment and then update compilers.yaml file.
 
-
-### Set Up Spack Package Manager
-# Clone Spack
-if [ "yes" = "no" ]; then
-echo
-if [ ${has_spack} = "no" ]; then
-    echo "Cloning and Activating Spack"
-    echo ${progress_delimiter}
-    cd ${spack_path}
-    git clone https://github.com/spack/spack.git
-    cd -
-    echo ${progress_delimiter}
-fi
-
-# Add Spack to bashrc
-echo ${progress_delimiter}
-echo ". ${spack_path}/spack/share/spack/setup-env.sh" >> ~/.bashrc
-. ${spack_path}/spack/share/spack/setup-env.sh
-echo ${progress_delimiter}
-echo "Done Preparing Spack"
-echo
-fi
-
 # Install zlib
 echo
 echo "Set up and Activate Spack Environment"
 echo ${progress_delimiter}
-path_to_spack=$(which spack)
-spack_root=${path_to_spack%/bin/spack}
-. ${spack_root}/share/spack/setup-env.sh
+#path_to_spack=$(which spack)
+#spack_root=${path_to_spack%/bin/spack}
+#. ${spack_root}/share/spack/setup-env.sh
 spack install zlib
 echo ${progress_delimiter}
 # Create and activate spack environment
@@ -122,7 +99,7 @@ if [ ${has_mpi} == "no" ]; then
 fi
 spack load libunwind;
 spack load boost;
-spack load cmake;
+spack load cmake@3.22.6;
 spack load nlohmann-json;
 spack load spdlog;
 spack load igraph;
@@ -130,46 +107,6 @@ spack load eigen;
 echo ${progress_delimiter}
 echo "Done Loading Spack Packages"
 echo
-
-
-### Set Up Conda Packages
-# wget Anaconda
-echo
-echo "Setting up Conda"
-if [ "yes" = "no" ]; then
-if [ ${os_for_conda} = "linux86" ]; then
-    echo ${progress_delimiter}
-    wget https://repo.anaconda.com/archive/Anaconda3-2020.11-Linux-x86_64.sh
-    echo ${progress_delimiter}
-    # Install conda with bash script
-    echo ${progress_delimiter}
-    bash Anaconda3-2020.11-Linux-x86_64.sh -b? -p ${conda_path}
-    echo ${progress_delimiter}
-fi
-if [ ${os_for_conda} = "linuxP9" ]; then
-    echo ${progress_delimiter}
-    wget https://repo.anaconda.com/archive/Anaconda3-2020.11-Linux-ppc64le.sh
-    echo ${progress_delimiter}
-    # Install conda with bash script
-    echo ${progress_delimiter}
-    bash Anaconda3-2020.11-Linux-ppc64le.sh -b? -p ${conda_path}
-    echo ${progress_delimiter}
-fi
-if [ ${os_for_conda} = "mac" ]; then
-    echo ${progress_delimiter}
-    wget https://repo.anaconda.com/archive/Anaconda3-2020.11-MacOSX-x86_64.sh
-    echo ${progress_delimiter}
-    # Install conda with bash script
-    echo ${progress_delimiter}
-    bash Anaconda3-2020.11-MacOSX-x86_64.sh -b? -p ${conda_path}
-    echo ${progress_delimiter}
-fi
-
-# Update bashrc to include conda in path
-echo ${progress_delimiter}
-echo "export PATH=./anaconda3/bin:$PATH" >> ~/.bashrc
-echo ${progress_delimiter}
-fi
 
 # Add conda-forge to channels
 echo ${progress_delimiter}
@@ -179,6 +116,7 @@ conda config --append channels conda-forge
 echo ${progress_delimiter}
 echo "Done Setting up Conda"
 echo
+
 
 # conda install packages
 echo
@@ -193,24 +131,22 @@ echo
 echo
 echo "Installing Pip Packages"
 echo ${progress_delimiter}
-pip install grakel
-pip install python-igraph
-#pip install scikit-learn
-pip install mpi4py
-pip install ipyfilechooser
+pip install grakel==0.1.8
+pip install python-igraph==0.9.11
+pip install ipyfilechooser==0.6.0
+conda install -y mpi4py
 echo ${progress_delimiter}
 
 # Set up to install graphkernels
 echo ${progress_delimiter}
-spack unload eigen
-# Edit eigen cflags for graphkernels install
+
 eigpath=$(pkg-config --variable=pcfiledir eigen3)
 eigpath="${eigpath}/eigen3.pc"
 sed -i 's/include\/eigen3/include/' ${eigpath}
-pip install graphkernels
-# Undo edit to eigen cflags
+pip install graphkernels==0.2.1
 sed -i 's/include/include\/eigen3/' ${eigpath}
-spack load eigen
+spack unload eigen@3.3.7
+spack load eigen@3.3.7
 echo ${progress_delimiter}
 echo "Done Installing Pip Packages"
 echo

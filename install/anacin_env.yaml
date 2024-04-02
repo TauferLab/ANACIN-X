@@ -3,19 +3,17 @@
 # It describes a set of packages to be installed, along with
 # configuration settings.
 spack:
-  definitions:
-  - packages: [eigen@3.3.7 ^cmake@3.16.2, boost@1.70.0+atomic+chrono~clanglibcpp~context~coroutine
-      cxxstd=98 +date_time~debug+exception~fiber+filesystem+graph~icu+iostreams+locale+log+math+mpi+multithreaded~numpy
-      ~pic+program_options~python+random+regex+serialization+shared+signals~singlethreaded+system~taggedlayout+test+thread+timer~versionedlayout
-      visibility=hidden +wave, nlohmann-json@3.7.0 ^cmake@3.16.2, igraph@0.7.1, libunwind, spdlog ^cmake@3.16.2]
   # add package specs to the `specs` list
-  specs: 
-  - matrix:
-    - [$packages]
-  config: {}
-  mirrors: {}
-  modules:
-    enable: []
-  packages: {}
-  repos: []
-  upstreams: {}
+  specs:
+  - eigen@3.3.7
+  - libtool
+  - libunwind
+  - nlohmann-json@3.7.0
+  - igraph@0.7.1
+  - spdlog
+  - boost@1.70.0+atomic+chrono~clanglibcpp~context~coroutine+date_time~debug+exception~fiber+filesystem+graph~icu+iostreams+locale+log+math+mpi+multithreaded~numpy+pic+program_options~python+random+regex+serialization+shared+signals~singlethreaded+system~taggedlayout+test+thread+timer~versionedlayout+wave
+    cxxstd=98 visibility=hidden
+  - cmake@3.22.6
+  view: true
+  concretizer:
+    unify: true
