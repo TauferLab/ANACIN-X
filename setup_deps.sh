@@ -33,21 +33,26 @@ while true; do
 		* ) echo "Please respond with either yes or no: " ;;
 	esac
 done
+
+
 while true; do
-	read -p "Do you already have a version of mpi installed? (yes/no) " user_has_mpi
+    read -p "Do you already have a version of mpi installed? (yes/no) " user_has_mpi
 	case ${user_has_mpi} in
-                [yY] | [yY][eE][sS] ) has_mpi="yes"; while true; do
-		      read -p "Which mpi installation do you have? Input is case sensitive. (openmpi, mvapich2, mpich) " user_mpi_name
-		      case ${user_mpi_name} in
-                          "openmpi" | "mvapich2" | "mpich" ) break ;;
-			  * ) echo "Please respond with one of the listed options. Input is case sensitive. (openmpi, mvapich2, mpich) " ;;
-		      esac
-	        done; break ;;
-		#[yY] | [yY][eE][sS] ) has_mpi="yes"; break ;;
-		[nN] | [nN][oO] ) has_mpi="no"; break ;;
-                * ) echo "Please respond with either yes or no: " ;;
-        esac
+        [yY] | [yY][eE][sS] ) has_mpi="yes"; while true; do
+            read -p "Which mpi installation do you have? Input is case sensitive. (openmpi, mvapich2, mpich) " user_mpi_name
+                case ${user_mpi_name} in
+                    "openmpi" | "mvapich2" | "mpich" ) break ;;
+                    * ) echo "Please respond with one of the listed options. Input is case sensitive. (openmpi, mvapich2, mpich) " ;;
+                esac
+            done; break ;;
+		[nN] | [nN][oO] ) has_mpi="no"
+			echo "Please install a version of mpi before continuing"
+			echo "Please see https://github.com/TauferLab/ANACIN-X for a full list of necessary installs."
+			exit ;;
+		* ) echo "Please respond with either yes or no: " ;;
+	esac
 done
+
 #while true; do
 #	read -p "Which operating system are you using? Input is case sensitive. (linux x86_64, linux Power9, mac) " user_os_name
 #	case ${user_os_name} in
@@ -60,30 +65,32 @@ done
 
 # Set up for Package Management
 while true; do
-        read -p "Do you already have the Spack package manager installed? (yes/no) " user_has_spack
-        case ${user_has_spack} in
-        	[yY] | [yY][eE][sS] ) has_spack="yes"; break ;;
-		[nN] | [nN][oO] ) echo "You will need to install Spack prior to installation."
-			echo "Please review instructions for spack installation at https://spack.readthedocs.io/en/latest/getting_started.html"
-			echo "Please see https://github.com/TauferLab/ANACIN-X for a full list of necessary installs."
-			exit ;;
-                * ) echo "Please respond with either yes or no: " ;;
-        esac
-done
-read -p "Please provide a name for a project spack environment.  It can be anything. (Press enter for default anacin_spack_env) " user_spack_name
-while true; do
-	read -p "Do you already have the Conda package manager installed? (yes/no) " user_has_conda
-	case ${user_has_conda} in
-		[yY] | [yY][eE][sS] ) has_conda="yes"; break ;;
-		[nN] | [nN][oO] ) echo "You will need to set up use of Anaconda prior to installation."
-			echo "Please review instructions for how to do so at https://conda.io/projects/conda/en/latest/user-guide/install/index.html"
-			echo "Please see https://github.com/TauferLab/ANACIN-X for a full list of necessary installs."
-			exit ;;
-                #[nN] | [nN][oO] ) has_conda="no";  read -p "Where would you like to install Conda? (Press enter for your home directory.) " user_conda; break ;;
-                * ) echo "Please respond with either yes or no: " ;;
-	esac
+    read -p "Do you already have the Spack package manager installed? (yes/no) " user_has_spack
+    case ${user_has_spack} in
+        [yY] | [yY][eE][sS] ) has_spack="yes"; break ;;
+        [nN] | [nN][oO] ) has_spack="no";
+            echo "You will need to install Spack prior to installation."
+            echo "Please review instructions for spack installations at https://spack.readthedocs.io/en/latest/getting_started.html"
+            echo "Please see https://github.com/TauferLab/ANACIN-X for a full list of necessary installs."
+            exit ;;
+        * ) echo "Please respond with either yes or no: " ;;
+    esac
 done
 
+
+
+while true; do
+	read -p "Do you already have the Conda package manager installed? (yes/no) " user_has_conda
+    case ${user_has_conda} in
+        [yY] | [yY][eE][sS] ) has_conda="yes"; break ;;
+        [nN] | [nN][oO] ) has_conda="no";
+            echo "You will need to set up use of Anaconda prior to installation."
+			echo "Please review instructions for how to do so at https://conda.io/projects/conda/en/latest/user-guide/install/index.html"
+			echo "Please see https://github.com/TauferLab/ANACIN-X for a full list of necessary installs."
+            exit ;;
+        * ) echo "Please respond with either yes or no: " ;;
+    esac
+done
 
 
 ### Define variables to pass to install script

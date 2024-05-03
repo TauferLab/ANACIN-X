@@ -23,6 +23,7 @@ The best way to learn more details on how ANACIN-X works is to see either the [S
 
 This document is organized in the following order:
 * [Installation](#installation)
+  * [Prerequisites](#prerequisites)
   * [Dependencies](#dependencies)
   * [Installing ANACIN-X](#building-anacin-x)
 * [Running ANACIN-X](#running-anacin-x)
@@ -45,7 +46,17 @@ Here, we outline the procedure to install ANACIN-X and its dependencies.
 
 For more details about the information in this section, please see the [wiki page on 'Installation'](https://github.com/TauferLab/ANACIN-X/wiki/Installation).  A complete list of software dependencies for ANACIN-X can be found at the ['Dependencies' wiki page](https://github.com/TauferLab/ANACIN-X/wiki/Dependencies).
 
-**We strongly recommend installing the Spack and Conda package managers before installing ANACIN-X**.  We use these to help automate the installation of dependencies.
+
+### Prerequisites
+
+Before installing the dependencies, please ensure that you have the following tools installed:
+
+- **Spack**: Spack is a flexible package manager for supercomputers, Linux, and macOS. You can find more information about Spack and installation instructions [here](https://spack.io/).
+
+- **Conda**: Conda is an open-source package management and environment management system for installing multiple versions of software packages and their dependencies. You can find more information about Conda and installation instructions [here](https://docs.anaconda.com/).
+
+Make sure both Spack and Conda are properly installed on your system before proceeding with the installation of dependencies.
+
 
 ### Dependencies
 
