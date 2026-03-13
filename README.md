@@ -359,6 +359,8 @@ With this container we provide a Jupyter notebook you can find [here](https://gi
 
 ## Acknowledgments
 
+This material is based upon work supported by the National Science Foundation under Grant No. 1900888.
+
 This work partially developed and tested using the following [XSEDE computing resources](https://portal.xsede.org/group/xup/resource-monitor):
 * Stampede2
 * Jetstream
