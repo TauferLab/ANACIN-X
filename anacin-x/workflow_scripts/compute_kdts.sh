@@ -13,13 +13,13 @@ source ${paths_dir}/anacin_paths.config
 
 # graphkernels 0.2.1 may be built against a newer libstdc++ than the one
 # bundled in older Conda base environments. Prefer the system runtime here.
-if [ -f /usr/lib/x86_64-linux-gnu/libstdc++.so.6 ]; then
-	export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6${LD_PRELOAD:+:${LD_PRELOAD}}
+if [ -n "${system_libstdcxx}" ] && [ -f "${system_libstdcxx}" ]; then
+	export LD_PRELOAD="${system_libstdcxx}${LD_PRELOAD:+:${LD_PRELOAD}}"
 fi
 
-python_bin=python3
-if [ -x /home/exouser/anaconda3/bin/python3 ]; then
-	python_bin=/home/exouser/anaconda3/bin/python3
+python_bin="${python_bin:=python3}"
+if [ -n "${CONDA_PREFIX:-}" ] && [ -x "${CONDA_PREFIX}/bin/python3" ]; then
+	python_bin="${CONDA_PREFIX}/bin/python3"
 fi
 
 if [ "${run_csmpi}" == "True" ]; then

@@ -33,7 +33,7 @@ if [ "${run_csmpi}" == "True" ]; then
 	trace_dir=${run_dir}
 	default_config="default_config_${impl}_run_${run_idx}.json"
 	mkdir -p ${trace_dir}
-	python3 ${csmpi_conf}/generate_config.py -o ${run_dir}/${default_config} --backtrace_impl ${impl} -d ${trace_dir}
+	${python_bin} ${csmpi_conf}/generate_config.py -o ${run_dir}/${default_config} --backtrace_impl ${impl} -d ${trace_dir}
 	export CSMPI_CONFIG=${run_dir}/${default_config}
 fi
 
@@ -60,16 +60,16 @@ if [ "${comm_pattern}" == "mcb_grid" ]; then
 fi
 if [ ! -f "$app_config" ]; then
 	if [ "${comm_pattern}" == "unstructured_mesh" ]; then
-		python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "unstructured_mesh" ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} ${msg_size} ${n_iters} "${run_root}/" ${nd_start} ${nd_iter} ${nd_end}
+		${python_bin} > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "unstructured_mesh" ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} ${msg_size} ${n_iters} "${run_root}/" ${nd_start} ${nd_iter} ${nd_end}
 	fi
 	if [ "${comm_pattern}" == "amg2013" ]; then
-		python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "amg2013" ${msg_size} ${n_iters} "${run_root}/" ${nd_start} ${nd_iter} ${nd_end}
+		${python_bin} > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "amg2013" ${msg_size} ${n_iters} "${run_root}/" ${nd_start} ${nd_iter} ${nd_end}
 	fi
 	if [ "${comm_pattern}" == "message_race" ]; then
-        python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "naive_reduce" ${msg_size} ${n_iters} "${run_root}/" ${nd_start} ${nd_iter} ${nd_end}
+        ${python_bin} > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "naive_reduce" ${msg_size} ${n_iters} "${run_root}/" ${nd_start} ${nd_iter} ${nd_end}
 	fi
 	if [ "${comm_pattern}" == "mcb_grid" ]; then
-		python3 > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "mini_mcb" ${interleaving} ${n_iters} "${anacin_x_root}/apps/comm_pattern_generator/" ${nd_start} ${nd_iter} ${nd_end}
+		${python_bin} > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "mini_mcb" ${interleaving} ${n_iters} "${anacin_x_root}/apps/comm_pattern_generator/" ${nd_start} ${nd_iter} ${nd_end}
 	fi
 fi
 

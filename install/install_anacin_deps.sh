@@ -19,6 +19,13 @@ spack_env="${user_spack_name:="anacin_spack_env"}"
 conda_path="${user_conda:=""}"
 spack_path="${user_spack:=".."}"
 os_for_conda="${user_os:="linux86"}"
+python_bin="${ANACIN_X_PYTHON:-}"
+if [ -z "${python_bin}" ] && [ -n "${CONDA_PREFIX:-}" ] && [ -x "${CONDA_PREFIX}/bin/python3" ]; then
+    python_bin="${CONDA_PREFIX}/bin/python3"
+fi
+if [ -z "${python_bin}" ]; then
+    python_bin="$(command -v python3)"
+fi
 
 ### Create Delimiter and Workflow Variables
 n_columns=$(stty size | awk '{print $2}')
@@ -33,6 +40,17 @@ done
 #   Don't try to find external MPI.  If they have MPI already, don't try to load it here and tell user to update environment file
 #   Don't find compilers here.  If user has specific c compiler, tell them to call spack compiler find prior to making environment and then update compilers.yaml file.
 
+if ! command -v spack >/dev/null 2>&1; then
+    echo "Error: spack was not found in PATH. Source Spack before running this script."
+    echo "Example: . /path/to/spack/share/spack/setup-env.sh"
+    return 1 2>/dev/null || exit 1
+fi
+
+if ! command -v conda >/dev/null 2>&1; then
+    echo "Error: conda was not found in PATH. Activate Conda before running this script."
+    return 1 2>/dev/null || exit 1
+fi
+
 # Install zlib
 echo
 echo "Set up and Activate Spack Environment"
@@ -46,7 +64,6 @@ echo ${progress_delimiter}
 echo ${progress_delimiter}
 spack env create ${spack_env} ./anacin_env.yaml
 echo ${progress_delimiter}
-#. /home/mushi11/spack/share/spack/setup-env.sh
 spack env activate ${spack_env}
 #echo "spack env activate ${spack_env}" >> ~/.bashrc
 echo ${progress_delimiter}
@@ -77,11 +94,11 @@ echo
 echo
 echo "Concretize and Install Spack Packages"
 echo ${progress_delimiter}
-spack concretize -f
+spack concretize -f --deprecated
 echo ${progress_delimiter}
 # Spack install
 echo ${progress_delimiter}
-spack install
+spack install --deprecated
 echo ${progress_delimiter}
 
 
@@ -107,9 +124,9 @@ echo
 
 # Add conda-forge to channels
 echo ${progress_delimiter}
-path_to_conda=$(which conda)
+path_to_conda=$(command -v conda)
 export PATH=${path_to_conda%/conda}:$PATH
-conda config --append channels conda-forge
+conda config --prepend channels conda-forge
 echo ${progress_delimiter}
 echo "Done Setting up Conda"
 echo
@@ -119,7 +136,7 @@ echo
 echo
 echo "Installing Conda Packages"
 echo ${progress_delimiter}
-conda install -y ruptures pyelftools pkg-config pkgconfig eigen=3.3.7
+conda install -y --solver=classic -c conda-forge ruptures pyelftools pkg-config pkgconfig mpi4py libstdcxx-ng libgcc-ng
 echo ${progress_delimiter}
 echo "Done Installing Conda Packages"
 echo
@@ -128,10 +145,9 @@ echo
 echo
 echo "Installing Pip Packages"
 echo ${progress_delimiter}
-pip install grakel==0.1.8
-pip install python-igraph==0.9.11
-pip install ipyfilechooser==0.6.0
-conda install -y mpi4py
+${python_bin} -m pip install grakel==0.1.8
+${python_bin} -m pip install python-igraph==0.9.11
+${python_bin} -m pip install ipyfilechooser==0.6.0
 echo ${progress_delimiter}
 
 # Set up to install graphkernels
@@ -140,15 +156,12 @@ echo ${progress_delimiter}
 eigpath=$(pkg-config --variable=pcfiledir eigen3)
 eigpath="${eigpath}/eigen3.pc"
 sed -i 's/include\/eigen3/include/' ${eigpath}
-pip install graphkernels==0.2.1
+${python_bin} -m pip install graphkernels==0.2.1
 sed -i 's/include/include\/eigen3/' ${eigpath}
 spack unload eigen@3.3.7
 spack load eigen@3.3.7
 echo ${progress_delimiter}
 echo "Done Installing Pip Packages"
 echo
-
-
-
 
 
