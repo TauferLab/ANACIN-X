@@ -169,11 +169,17 @@ echo
 # Persist local installation-specific settings without hardcoding them in the
 # tracked repo config file.
 python_bin="${ANACIN_X_PYTHON:-}"
+if [ -n "${CONDA_PREFIX:-}" ] && [ -d "${CONDA_PREFIX}/bin" ]; then
+	export PATH="${CONDA_PREFIX}/bin:${PATH}"
+fi
+if [ -z "${python_bin}" ] && [ -n "${CONDA_PREFIX:-}" ] && [ -x "${CONDA_PREFIX}/bin/python" ]; then
+	python_bin="${CONDA_PREFIX}/bin/python"
+fi
 if [ -z "${python_bin}" ] && [ -n "${CONDA_PREFIX:-}" ] && [ -x "${CONDA_PREFIX}/bin/python3" ]; then
 	python_bin="${CONDA_PREFIX}/bin/python3"
 fi
 if [ -z "${python_bin}" ]; then
-	python_bin="$(command -v python3)"
+	python_bin="$(command -v python || command -v python3)"
 fi
 
 system_libstdcxx=""

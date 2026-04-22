@@ -20,11 +20,17 @@ conda_path="${user_conda:=""}"
 spack_path="${user_spack:=".."}"
 os_for_conda="${user_os:="linux86"}"
 python_bin="${ANACIN_X_PYTHON:-}"
+if [ -n "${CONDA_PREFIX:-}" ] && [ -d "${CONDA_PREFIX}/bin" ]; then
+    export PATH="${CONDA_PREFIX}/bin:${PATH}"
+fi
+if [ -z "${python_bin}" ] && [ -n "${CONDA_PREFIX:-}" ] && [ -x "${CONDA_PREFIX}/bin/python" ]; then
+    python_bin="${CONDA_PREFIX}/bin/python"
+fi
 if [ -z "${python_bin}" ] && [ -n "${CONDA_PREFIX:-}" ] && [ -x "${CONDA_PREFIX}/bin/python3" ]; then
     python_bin="${CONDA_PREFIX}/bin/python3"
 fi
 if [ -z "${python_bin}" ]; then
-    python_bin="$(command -v python3)"
+    python_bin="$(command -v python || command -v python3)"
 fi
 
 ### Create Delimiter and Workflow Variables
@@ -48,6 +54,12 @@ fi
 
 if ! command -v conda >/dev/null 2>&1; then
     echo "Error: conda was not found in PATH. Activate Conda before running this script."
+    return 1 2>/dev/null || exit 1
+fi
+
+if [ -z "${CONDA_PREFIX:-}" ]; then
+    echo "Error: no active Conda environment detected."
+    echo "Please run: conda activate <your-conda-environment>"
     return 1 2>/dev/null || exit 1
 fi
 
@@ -148,6 +160,7 @@ echo ${progress_delimiter}
 ${python_bin} -m pip install grakel==0.1.8
 ${python_bin} -m pip install python-igraph==0.9.11
 ${python_bin} -m pip install ipyfilechooser==0.6.0
+${python_bin} -m pip install psutil
 echo ${progress_delimiter}
 
 # Set up to install graphkernels
@@ -163,5 +176,3 @@ spack load eigen@3.3.7
 echo ${progress_delimiter}
 echo "Done Installing Pip Packages"
 echo
-
-

@@ -151,6 +151,8 @@ The dependency installer assumes that:
 * `conda` is already available in `PATH`
 * the active Conda environment is the one where ANACIN-X Python packages should be installed
 
+If Spack also provides a `python` executable on your system, keep the Conda environment active while running the installer and build steps.  The ANACIN-X scripts now prefer `${CONDA_PREFIX}/bin/python` automatically when a Conda environment is active.
+
 Recent Spack releases may mark some versions required by ANACIN-X as deprecated.  The installer handles this automatically with `spack concretize -f --deprecated` and `spack install --deprecated`.
 
 Follow the prompts at the beginning, and then the installation will run on its own.  The installation of dependencies may take some time to complete.
@@ -173,6 +175,7 @@ If you will install the dependencies of ANACIN-X manually, see the following lis
 * mpi4py
 * graphkernels
 * ipyfilechooser
+* psutil
 * [PnMPI](https://github.com/LLNL/PnMPI/tree/f6fcc801ab9305352c510420c6439b7d48a248dc)
 * [sst-dumpi](https://github.com/TauferLab/sst-dumpi/tree/b47bb77ccbe3b87d585e3701e1a5c2f8d3626176)
 * [Pluto](https://github.com/TauferLab/Pluto/tree/main)
