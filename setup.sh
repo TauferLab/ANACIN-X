@@ -65,6 +65,8 @@ git config --local url."https://github.com/".insteadOf git://github.com/
 git submodule update --init
 rewrite_pnmpi_submodule_urls
 git submodule update --init --recursive
+git submodule sync --recursive
+git submodule update --init --remote submodules/Pluto submodules/CSMPI submodules/dumpi_to_graph
 apply_submodule_compatibility_patches
 echo
 echo ${progress_delimiter}
