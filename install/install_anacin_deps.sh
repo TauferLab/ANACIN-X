@@ -77,14 +77,11 @@ echo
 echo
 echo "Concretize and Install Spack Packages"
 echo ${progress_delimiter}
-spack concretize
+spack concretize -f
 echo ${progress_delimiter}
 # Spack install
 echo ${progress_delimiter}
 spack install
-despacktivate
-spack install boost@1.70.0+atomic+chrono~clanglibcpp~context~coroutine cxxstd=98 +date_time~debug+exception~fiber+filesystem+graph~icu+iostreams+locale+log+math+mpi+multithreaded~numpy~pic+program_options~python+random+regex+serialization+shared+signals~singlethreaded+system~taggedlayout+test+thread+timer~versionedlayout visibility=hidden +wave ^${mpi_name}
-spack env activate ${spack_env}
 echo ${progress_delimiter}
 
 
@@ -94,7 +91,7 @@ echo
 echo "Loading Spack Packages"
 echo ${progress_delimiter}
 echo
-if [ ${has_mpi} == "no" ]; then
+if [ ${has_mpi} == "yes" ]; then
     spack load ${mpi_name};
 fi
 spack load libunwind;
@@ -150,8 +147,6 @@ spack load eigen@3.3.7
 echo ${progress_delimiter}
 echo "Done Installing Pip Packages"
 echo
-
-
 
 
 

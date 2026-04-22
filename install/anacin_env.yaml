@@ -11,8 +11,9 @@ spack:
   - nlohmann-json@3.7.0
   - igraph@0.7.1
   - spdlog
-  - boost@1.70.0+atomic+chrono~clanglibcpp~context~coroutine+date_time~debug+exception~fiber+filesystem+graph~icu+iostreams+locale+log+math+mpi+multithreaded~numpy+pic+program_options~python+random+regex+serialization+shared+signals~singlethreaded+system~taggedlayout+test+thread+timer~versionedlayout+wave
-    cxxstd=98 visibility=hidden
+  # ANACIN-X only requires Boost.MPI and Boost.Serialization in-tree.
+  # Keep this spec intentionally broad so newer Spack releases can concretize it.
+  - boost@1.69:+mpi+serialization
   - cmake@3.22.6
   view: true
   concretizer:

@@ -9,11 +9,12 @@ done
 
 rewrite_pnmpi_submodule_urls() {
 	git -C ./submodules/PnMPI config --local url."https://github.com/".insteadOf git://github.com/
+	sed -i 's#git://github.com/#https://github.com/#g' ./submodules/PnMPI/.gitmodules
 	git config -f ./submodules/PnMPI/.gitmodules --get-regexp '^submodule\..*\.url$' | while read -r name url
 	do
 		case "${url}" in
-			git://github.com/*)
-				git -C ./submodules/PnMPI config --local "${name}" "${url/git:\/\//https://}"
+			https://github.com/*)
+				git -C ./submodules/PnMPI config --local "${name}" "${url}"
 				;;
 		esac
 	done

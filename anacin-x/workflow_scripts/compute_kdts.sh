@@ -11,8 +11,19 @@ paths_dir=$6
 
 source ${paths_dir}/anacin_paths.config
 
+# graphkernels 0.2.1 may be built against a newer libstdc++ than the one
+# bundled in older Conda base environments. Prefer the system runtime here.
+if [ -f /usr/lib/x86_64-linux-gnu/libstdc++.so.6 ]; then
+	export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6${LD_PRELOAD:+:${LD_PRELOAD}}
+fi
+
+python_bin=python3
+if [ -x /home/exouser/anaconda3/bin/python3 ]; then
+	python_bin=/home/exouser/anaconda3/bin/python3
+fi
+
 if [ "${run_csmpi}" == "True" ]; then
-	mpirun -np ${n_procs} ${compute_kdts_script} ${traces_dir} ${graph_kernel} --slicing_policy ${slicing_policy} -o "kdts.pkl" --slice_dir_name "slices" -c
+	mpirun -np ${n_procs} ${python_bin} ${compute_kdts_script} ${traces_dir} ${graph_kernel} --slicing_policy ${slicing_policy} -o "kdts.pkl" --slice_dir_name "slices" -c
 else
-	mpirun -np ${n_procs} ${compute_kdts_script} ${traces_dir} ${graph_kernel} --slicing_policy ${slicing_policy} -o "kdts.pkl" --slice_dir_name "slices"
+	mpirun -np ${n_procs} ${python_bin} ${compute_kdts_script} ${traces_dir} ${graph_kernel} --slicing_policy ${slicing_policy} -o "kdts.pkl" --slice_dir_name "slices"
 fi

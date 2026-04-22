@@ -22,6 +22,8 @@ in_option=${17}
 
 source ${paths_dir}/anacin_paths.config
 
+extract_slices_n_procs=${n_procs}
+
 cd ${run_dir}
 debugging_path=${run_dir}/debug
 mkdir -p ${debugging_path}
@@ -80,5 +82,4 @@ bash > ${debugging_path}/build_graph_output.txt 2> ${debugging_path}/build_graph
 event_graph=${run_dir}/event_graph.graphml
 
 # Extract slices
-bash > ${debugging_path}/extract_slices_output.txt 2> ${debugging_path}/extract_slices_error.txt ${job_script_extract_slices} ${n_procs_extract_slices} ${extract_slices_script} ${event_graph} ${slicing_policy}
-
+bash > ${debugging_path}/extract_slices_output.txt 2> ${debugging_path}/extract_slices_error.txt ${job_script_extract_slices} ${extract_slices_n_procs} ${extract_slices_script} ${event_graph} ${slicing_policy}
