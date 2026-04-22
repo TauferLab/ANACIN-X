@@ -21,6 +21,26 @@ rewrite_pnmpi_submodule_urls() {
 	git -C ./submodules/PnMPI submodule sync --recursive
 }
 
+apply_submodule_compatibility_patches() {
+	csmpi_header="./submodules/CSMPI/include/csmpi/callstack.hpp"
+	dumpi_comm_manager="./submodules/dumpi_to_graph/src/CommunicatorManager.cpp"
+
+	if [ -f "${csmpi_header}" ]; then
+		if ! grep -q '^#include <cstdint>$' "${csmpi_header}"; then
+			sed -i '/#include "boost\/functional\/hash.hpp"/i #include <cstdint>' "${csmpi_header}"
+		fi
+		if ! grep -q '^#include <vector>$' "${csmpi_header}"; then
+			sed -i '/#include "boost\/functional\/hash.hpp"/i #include <vector>' "${csmpi_header}"
+		fi
+	fi
+
+	if [ -f "${dumpi_comm_manager}" ]; then
+		if ! grep -q '^#include <set>$' "${dumpi_comm_manager}"; then
+			sed -i '/#include <iostream>/a #include <set>' "${dumpi_comm_manager}"
+		fi
+	fi
+}
+
 # Clean up previous installations
 rm -rf ./submodules/*
 
@@ -45,6 +65,7 @@ git config --local url."https://github.com/".insteadOf git://github.com/
 git submodule update --init
 rewrite_pnmpi_submodule_urls
 git submodule update --init --recursive
+apply_submodule_compatibility_patches
 echo
 echo ${progress_delimiter}
 echo "Done fetching submodules."
