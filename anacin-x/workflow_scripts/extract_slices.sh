@@ -17,4 +17,19 @@ if [ -n "${CONDA_PREFIX:-}" ] && [ -x "${CONDA_PREFIX}/bin/python3" ]; then
 	python_bin="${CONDA_PREFIX}/bin/python3"
 fi
 
+mpi_launcher="$(command -v mpirun || true)"
+if [ -n "${mpi_launcher}" ]; then
+	mpi_lib_dir="$(cd "$(dirname "${mpi_launcher}")/../lib" 2>/dev/null && pwd)"
+	if [ -d "${mpi_lib_dir}" ]; then
+		export LD_LIBRARY_PATH="${mpi_lib_dir}${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"
+	fi
+fi
+
+if ! ${python_bin} -c "from mpi4py import MPI" >/dev/null 2>&1; then
+	echo "Error: mpi4py cannot import with ${python_bin}."
+	echo "This usually means mpi4py is linked to a different MPI than the active mpirun."
+	echo "Repair it with: . install/repair_mpi4py.sh"
+	exit 1
+fi
+
 mpirun -np ${n_procs} ${python_bin} ${extract_slices_script} ${event_graph} ${slicing_policy} -o "slices"

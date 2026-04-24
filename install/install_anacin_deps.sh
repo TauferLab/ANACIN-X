@@ -165,7 +165,7 @@ echo
 echo
 echo "Installing Conda Packages"
 echo ${progress_delimiter}
-conda install -y -c conda-forge ruptures pyelftools pkg-config pkgconfig mpi4py libstdcxx-ng libgcc-ng numpy pip
+conda install -y -c conda-forge ruptures pyelftools pkg-config pkgconfig libstdcxx-ng libgcc-ng numpy pip
 echo ${progress_delimiter}
 echo "Done Installing Conda Packages"
 echo
@@ -178,6 +178,14 @@ ${python_bin} -m pip install grakel==0.1.8 || return 1 2>/dev/null || exit 1
 ${python_bin} -m pip install python-igraph==0.9.11 || return 1 2>/dev/null || exit 1
 ${python_bin} -m pip install ipyfilechooser==0.6.0 || return 1 2>/dev/null || exit 1
 ${python_bin} -m pip install psutil || return 1 2>/dev/null || exit 1
+conda remove -y mpi4py >/dev/null 2>&1 || true
+${python_bin} -m pip uninstall -y mpi4py >/dev/null 2>&1 || true
+mpicc_bin="$(command -v mpicc || true)"
+if [ -z "${mpicc_bin}" ]; then
+    echo "Error: mpicc was not found after loading ${mpi_name}; cannot build mpi4py against the active MPI."
+    return 1 2>/dev/null || exit 1
+fi
+MPICC="${mpicc_bin}" ${python_bin} -m pip install --no-cache-dir --no-binary=mpi4py mpi4py==3.1.6 || return 1 2>/dev/null || exit 1
 echo ${progress_delimiter}
 
 # Set up to install graphkernels
