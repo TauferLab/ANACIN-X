@@ -78,7 +78,10 @@ for run_idx in `seq -f "%03g" ${run_idx_low} ${run_idx_high}`; do
 	fi
 	
 	if [ "${scheduler}" == "unscheduled" ]; then
-		bash ${comm_pattern_run_script} ${n_procs} ${msg_size} ${n_iters} ${proc_placement} ${run_idx} ${run_dir} ${paths_dir} ${nd_start} ${nd_iter} ${nd_end} ${impl} ${comm_pattern} ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} ${in_option}
+		if ! bash ${comm_pattern_run_script} ${n_procs} ${msg_size} ${n_iters} ${proc_placement} ${run_idx} ${run_dir} ${paths_dir} ${nd_start} ${nd_iter} ${nd_end} ${impl} ${comm_pattern} ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} ${in_option}; then
+			echo "Error: run_${run_idx} failed. See ${debugging_path} for details." >&2
+			exit 1
+		fi
 	fi
 
 
@@ -102,7 +105,6 @@ fi
 if [ "${scheduler}" == "unscheduled" ]; then
 	bash > ${debugging_path}/../../compute_kdts_output.txt 2> ${debugging_path}/../../compute_kdts_error.txt ${job_script_compute_kdts} ${compute_kdts_n_procs} ${compute_kdts_script} ${runs_root} ${graph_kernel} ${slicing_policy} ${paths_dir}
 fi
-
 
 
 

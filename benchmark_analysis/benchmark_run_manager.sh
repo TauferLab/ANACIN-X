@@ -24,6 +24,19 @@ source ${paths_dir}/anacin_paths.config
 
 extract_slices_n_procs=${n_procs}
 
+run_stage() {
+	stage_name=$1
+	output_file=$2
+	error_file=$3
+	shift 3
+	"$@" > "${output_file}" 2> "${error_file}"
+	status=$?
+	if [ ${status} -ne 0 ]; then
+		echo "Error: ${stage_name} failed for run_${run_idx}. See ${error_file}" >&2
+		exit ${status}
+	fi
+}
+
 cd ${run_dir}
 debugging_path=${run_dir}/debug
 mkdir -p ${debugging_path}
@@ -60,26 +73,26 @@ if [ "${comm_pattern}" == "mcb_grid" ]; then
 fi
 if [ ! -f "$app_config" ]; then
 	if [ "${comm_pattern}" == "unstructured_mesh" ]; then
-		${python_bin} > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "unstructured_mesh" ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} ${msg_size} ${n_iters} "${run_root}/" ${nd_start} ${nd_iter} ${nd_end}
+		run_stage "create_json" ${debugging_path}/create_json_output.txt ${debugging_path}/create_json_error.txt ${python_bin} ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "unstructured_mesh" ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} ${msg_size} ${n_iters} "${run_root}/" ${nd_start} ${nd_iter} ${nd_end}
 	fi
 	if [ "${comm_pattern}" == "amg2013" ]; then
-		${python_bin} > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "amg2013" ${msg_size} ${n_iters} "${run_root}/" ${nd_start} ${nd_iter} ${nd_end}
+		run_stage "create_json" ${debugging_path}/create_json_output.txt ${debugging_path}/create_json_error.txt ${python_bin} ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "amg2013" ${msg_size} ${n_iters} "${run_root}/" ${nd_start} ${nd_iter} ${nd_end}
 	fi
 	if [ "${comm_pattern}" == "message_race" ]; then
-        ${python_bin} > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "naive_reduce" ${msg_size} ${n_iters} "${run_root}/" ${nd_start} ${nd_iter} ${nd_end}
+		run_stage "create_json" ${debugging_path}/create_json_output.txt ${debugging_path}/create_json_error.txt ${python_bin} ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "naive_reduce" ${msg_size} ${n_iters} "${run_root}/" ${nd_start} ${nd_iter} ${nd_end}
 	fi
 	if [ "${comm_pattern}" == "mcb_grid" ]; then
-		${python_bin} > ${debugging_path}/create_json_output.txt 2> ${debugging_path}/create_json_error.txt ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "mini_mcb" ${interleaving} ${n_iters} "${anacin_x_root}/apps/comm_pattern_generator/" ${nd_start} ${nd_iter} ${nd_end}
+		run_stage "create_json" ${debugging_path}/create_json_output.txt ${debugging_path}/create_json_error.txt ${python_bin} ${anacin_x_root}/apps/comm_pattern_generator/config/json_gen.py "mini_mcb" ${interleaving} ${n_iters} "${anacin_x_root}/apps/comm_pattern_generator/" ${nd_start} ${nd_iter} ${nd_end}
 	fi
 fi
 
 
 # Trace execution
-bash > ${debugging_path}/trace_exec_output.txt 2> ${debugging_path}/trace_exec_error.txt ${job_script_trace_pack_procs} ${n_procs} ${app_bin} ${app_config} ${paths_dir}
+run_stage "trace_exec" ${debugging_path}/trace_exec_output.txt ${debugging_path}/trace_exec_error.txt bash ${job_script_trace_pack_procs} ${n_procs} ${app_bin} ${app_config} ${paths_dir}
 
 # Build event graph
-bash > ${debugging_path}/build_graph_output.txt 2> ${debugging_path}/build_graph_error.txt ${job_script_build_graph} ${n_procs} ${dumpi_to_graph_bin} ${dumpi_to_graph_config} ${run_dir}
+run_stage "build_graph" ${debugging_path}/build_graph_output.txt ${debugging_path}/build_graph_error.txt bash ${job_script_build_graph} ${n_procs} ${dumpi_to_graph_bin} ${dumpi_to_graph_config} ${run_dir}
 event_graph=${run_dir}/event_graph.graphml
 
 # Extract slices
-bash > ${debugging_path}/extract_slices_output.txt 2> ${debugging_path}/extract_slices_error.txt ${job_script_extract_slices} ${extract_slices_n_procs} ${extract_slices_script} ${event_graph} ${slicing_policy}
+run_stage "extract_slices" ${debugging_path}/extract_slices_output.txt ${debugging_path}/extract_slices_error.txt bash ${job_script_extract_slices} ${extract_slices_n_procs} ${extract_slices_script} ${event_graph} ${slicing_policy}
