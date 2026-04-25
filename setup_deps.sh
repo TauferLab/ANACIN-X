@@ -10,7 +10,10 @@ echo "Before we can start installing the software, we'll need to determine which
 
 # Verify user has ssh set up.s
 while true; do
-	read -p "Do you have an ssh key pair set up in github? (yes/no) " user_has_ssh
+	read -p "Do you have an ssh key pair set up in github? (yes/no) " user_has_ssh || {
+		echo "Error: no input received."
+		return 1 2>/dev/null || exit 1
+	}
 	case ${user_has_ssh} in
                 [yY] | [yY][eE][sS] ) has_ssh_key="yes"; break ;;
                 [nN] | [nN][oO] ) echo "You will need to set up an ssh key with github prior to installation."
@@ -23,7 +26,10 @@ done
 
 # Set up for Environment (C Compiler, OS, and MPI)
 while true; do
-	read -p "Do you already have a c compiler installed? (yes/no) " user_has_comp
+	read -p "Do you already have a c compiler installed? (yes/no) " user_has_comp || {
+		echo "Error: no input received."
+		return 1 2>/dev/null || exit 1
+	}
 	case ${user_has_comp} in
 		[yY] | [yY][eE][sS] ) has_c_comp="yes"; break ;;
 		[nN] | [nN][oO] ) has_c_comp="no"
@@ -36,10 +42,16 @@ done
 
 
 while true; do
-    read -p "Do you already have a version of mpi installed? (yes/no) " user_has_mpi
+    read -p "Do you already have a version of mpi installed? (yes/no) " user_has_mpi || {
+		echo "Error: no input received."
+		return 1 2>/dev/null || exit 1
+	}
 	case ${user_has_mpi} in
         [yY] | [yY][eE][sS] ) has_mpi="yes"; while true; do
-            read -p "Which mpi installation do you have? Input is case sensitive. (openmpi, mvapich2, mpich) " user_mpi_name
+            read -p "Which mpi installation do you have? Input is case sensitive. (openmpi, mvapich2, mpich) " user_mpi_name || {
+				echo "Error: no input received."
+				return 1 2>/dev/null || exit 1
+			}
                 case ${user_mpi_name} in
                     "openmpi" | "mvapich2" | "mpich" ) break ;;
                     * ) echo "Please respond with one of the listed options. Input is case sensitive. (openmpi, mvapich2, mpich) " ;;
@@ -65,7 +77,10 @@ done
 
 # Set up for Package Management
 while true; do
-    read -p "Do you already have the Spack package manager installed? (yes/no) " user_has_spack
+    read -p "Do you already have the Spack package manager installed? (yes/no) " user_has_spack || {
+		echo "Error: no input received."
+		return 1 2>/dev/null || exit 1
+	}
     case ${user_has_spack} in
         [yY] | [yY][eE][sS] ) has_spack="yes"; break ;;
         [nN] | [nN][oO] ) has_spack="no";
@@ -80,7 +95,10 @@ done
 
 
 while true; do
-	read -p "Do you already have the Conda package manager installed? (yes/no) " user_has_conda
+	read -p "Do you already have the Conda package manager installed? (yes/no) " user_has_conda || {
+		echo "Error: no input received."
+		return 1 2>/dev/null || exit 1
+	}
     case ${user_has_conda} in
         [yY] | [yY][eE][sS] ) has_conda="yes"; break ;;
         [nN] | [nN][oO] ) has_conda="no";
@@ -120,5 +138,4 @@ spack_env_name="${user_spack_name:="anacin_spack_env"}"
 cd install
 . ./install_anacin_deps.sh ${mpi_name} ${os_for_conda} ${spack_env_name} ${has_spack} ${has_conda} ${has_c_comp} ${has_mpi} ${has_ssh_key} 
 cd ..
-
 

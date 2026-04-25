@@ -57,6 +57,80 @@ Before installing the dependencies, please ensure that you have the following to
 
 Make sure both Spack and Conda are properly installed on your system before proceeding with the installation of dependencies.
 
+### Installing Spack and Conda
+
+If `spack` or `conda` are not already available on your machine, the following minimal setup is a good starting point.
+
+#### Install Spack
+
+See the official Spack getting started guide: https://spack.readthedocs.io/en/latest/getting_started.html
+
+Example installation:
+
+```bash
+git clone --depth=2 https://github.com/spack/spack.git $HOME/spack
+. $HOME/spack/share/spack/setup-env.sh
+spack compiler find
+```
+
+If you want Spack available automatically in future Bash shells, append it to `~/.bashrc` with:
+
+```bash
+grep -qxF '. $HOME/spack/share/spack/setup-env.sh' ~/.bashrc || echo '. $HOME/spack/share/spack/setup-env.sh' >> ~/.bashrc
+source ~/.bashrc
+```
+
+If you prefer to add it manually, place the following line in your shell startup file such as `~/.bashrc` or `~/.zshrc`:
+
+```bash
+. $HOME/spack/share/spack/setup-env.sh
+```
+
+#### Install Conda
+
+We recommend Miniconda as the lightest Conda installation.  See the official Miniconda installation guides:
+* Overview: https://www.anaconda.com/docs/getting-started/miniconda/install
+* Linux terminal install: https://www.anaconda.com/docs/getting-started/miniconda/install/linux-install
+
+Example Linux `x86_64` installation:
+
+```bash
+mkdir -p $HOME/miniconda3
+curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash ./Miniconda3-latest-Linux-x86_64.sh
+source ~/.bashrc
+conda --version
+```
+
+After installing Conda, create and activate an environment for ANACIN-X before running the dependency installer:
+
+```bash
+conda create -n anacin-x python=3.8 -y
+conda activate anacin-x
+```
+
+### Quickstart
+
+The following sequence installs Spack, installs Miniconda, creates a Conda environment, installs ANACIN-X dependencies, and builds the project on a typical Linux system:
+
+```bash
+git clone --depth=2 https://github.com/spack/spack.git $HOME/spack
+grep -qxF '. $HOME/spack/share/spack/setup-env.sh' ~/.bashrc || echo '. $HOME/spack/share/spack/setup-env.sh' >> ~/.bashrc
+. $HOME/spack/share/spack/setup-env.sh
+spack compiler find
+
+curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash ./Miniconda3-latest-Linux-x86_64.sh
+source ~/.bashrc
+conda create -n anacin-x python=3.8 -y
+conda activate anacin-x
+
+git clone https://github.com/TauferLab/ANACIN-X.git
+cd ANACIN-X
+. setup_deps.sh
+. setup.sh -c
+```
+
 
 ### Dependencies
 
@@ -65,10 +139,21 @@ Once you have cloned the ANACIN-X repository to your local machine, be sure to e
 If you're using the  [Jetstream cloud computer](https://jetstream-cloud.org) image for Anacin-X titled ["Ubuntu20.04_Anacin-X"](https://use.jetstream-cloud.org/application/images/1056), you can skip this next command.  Otherwise, we strongly recommend installing the dependencies for the project with the following command.  
 
 ```
+. /path/to/spack/share/spack/setup-env.sh
+conda activate <your-conda-environment>
 . setup_deps.sh
 ``` 
 
-If you will use this command to install dependencies, be sure to have the Spack and Conda package managers set up beforehand.  If there is a specific C compiler that you wish to use on your machine, please see the ['Special Case' section](https://github.com/TauferLab/ANACIN-X/wiki/Installation#special-case) of the ANACIN-X wiki.
+If you will use this command to install dependencies, be sure to have the Spack and Conda package managers set up beforehand and available in your current shell.  If there is a specific C compiler that you wish to use on your machine, please see the ['Special Case' section](https://github.com/TauferLab/ANACIN-X/wiki/Installation#special-case) of the ANACIN-X wiki.
+
+The dependency installer assumes that:
+* `spack` is already available in `PATH`
+* `conda` is already available in `PATH`
+* the active Conda environment is the one where ANACIN-X Python packages should be installed
+
+If Spack also provides a `python` executable on your system, keep the Conda environment active while running the installer and build steps.  The ANACIN-X scripts now prefer `${CONDA_PREFIX}/bin/python` automatically when a Conda environment is active.
+
+Recent Spack releases may mark some versions required by ANACIN-X as deprecated.  The installer handles this automatically with `spack concretize -f --deprecated` and `spack install --deprecated`.
 
 Follow the prompts at the beginning, and then the installation will run on its own.  The installation of dependencies may take some time to complete.
 
@@ -90,6 +175,7 @@ If you will install the dependencies of ANACIN-X manually, see the following lis
 * mpi4py
 * graphkernels
 * ipyfilechooser
+* psutil
 * [PnMPI](https://github.com/LLNL/PnMPI/tree/f6fcc801ab9305352c510420c6439b7d48a248dc)
 * [sst-dumpi](https://github.com/TauferLab/sst-dumpi/tree/b47bb77ccbe3b87d585e3701e1a5c2f8d3626176)
 * [Pluto](https://github.com/TauferLab/Pluto/tree/main)
@@ -105,6 +191,8 @@ Once all dependenices are installed and loaded, build ANACIN-X and its submodule
 ```
 
 If you do not wish to build ANACIN-X with callstack tracing functionality, remove the '-c' in the above command.
+
+`setup.sh` writes machine-specific settings such as the Python interpreter and optional runtime library overrides to `anacin-x/config/anacin_paths.local.config`.  This file is generated locally so the tracked repository config remains portable across systems.
 
 
 ## **Running ANACIN-X**:
@@ -410,6 +498,3 @@ Copyright (c) 2021, Global Computing Lab
 ANACIN-X is distributed under terms of the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0) with LLVM Exceptions.
 
 See [LICENSE](https://github.com/TauferLab/ANACIN-X/blob/master/LICENSE) for more details.
-
-
-

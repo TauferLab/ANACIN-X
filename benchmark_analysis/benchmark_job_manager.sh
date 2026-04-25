@@ -25,6 +25,11 @@ in_option=${21}
 
 source ${paths_dir}/anacin_paths.config
 
+compute_kdts_n_procs=${n_procs_compute_kdts}
+if [ "${scheduler}" == "unscheduled" ]; then
+	compute_kdts_n_procs=${n_procs}
+fi
+
 if [ "${scheduler}" == "slurm" ]; then
 	function join_by { local IFS="$1"; shift; echo "$*"; }
 fi
@@ -73,7 +78,10 @@ for run_idx in `seq -f "%03g" ${run_idx_low} ${run_idx_high}`; do
 	fi
 	
 	if [ "${scheduler}" == "unscheduled" ]; then
-		bash ${comm_pattern_run_script} ${n_procs} ${msg_size} ${n_iters} ${proc_placement} ${run_idx} ${run_dir} ${paths_dir} ${nd_start} ${nd_iter} ${nd_end} ${impl} ${comm_pattern} ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} ${in_option}
+		if ! bash ${comm_pattern_run_script} ${n_procs} ${msg_size} ${n_iters} ${proc_placement} ${run_idx} ${run_dir} ${paths_dir} ${nd_start} ${nd_iter} ${nd_end} ${impl} ${comm_pattern} ${nd_neighbor_fraction} ${x_procs} ${y_procs} ${z_procs} ${in_option}; then
+			echo "Error: run_${run_idx} failed. See ${debugging_path} for details." >&2
+			exit 1
+		fi
 	fi
 
 
@@ -84,21 +92,19 @@ echo "Submitting job to compute KDTS data for ${comm_pattern} communication patt
 
 if [ "${scheduler}" == "slurm" ]; then
 	kdts_job_dep_str=$( join_by : ${kdts_job_deps[@]} )
-	compute_kdts_stdout=$( sbatch -N ${n_nodes} -p ${queue} -t ${time_limit} -n ${n_procs} --ntasks-per-node=${n_procs_per_node} -o ${debugging_path}/../../compute_kdts_out.txt -e ${debugging_path}/../../compute_kdts_err.txt --dependency=afterok:${kdts_job_dep_str} ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} ${slicing_policy} ${paths_dir} )
+	compute_kdts_stdout=$( sbatch -N ${n_nodes} -p ${queue} -t ${time_limit} -n ${n_procs} --ntasks-per-node=${n_procs_per_node} -o ${debugging_path}/../../compute_kdts_out.txt -e ${debugging_path}/../../compute_kdts_err.txt --dependency=afterok:${kdts_job_dep_str} ${job_script_compute_kdts} ${compute_kdts_n_procs} ${compute_kdts_script} ${runs_root} ${graph_kernel} ${slicing_policy} ${paths_dir} )
 	compute_kdts_job_id=$( echo ${compute_kdts_stdout} | sed 's/[^0-9]*//g' )
 fi
 
 if [ "${scheduler}" == "lsf" ]; then
 	kdts_job_dep_str=$( join_by "&&" ${kdts_job_deps[@]} )
-	compute_kdts_stdout=$(bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -w ${kdts_job_dep_str} -o ${debugging_path}/../../compute_kdts_output.txt -e ${debugging_path}/../../compute_kdts_error.txt -q ${queue} -W ${time_limit} ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} ${slicing_policy} ${paths_dir} )
+	compute_kdts_stdout=$(bsub -n ${n_procs} -R "span[ptile=${n_procs_per_node}]" -w ${kdts_job_dep_str} -o ${debugging_path}/../../compute_kdts_output.txt -e ${debugging_path}/../../compute_kdts_error.txt -q ${queue} -W ${time_limit} ${job_script_compute_kdts} ${compute_kdts_n_procs} ${compute_kdts_script} ${runs_root} ${graph_kernel} ${slicing_policy} ${paths_dir} )
 	compute_kdts_job_id=$( echo ${compute_kdts_stdout} | sed 's/[^0-9]*//g' )
 fi
 
 if [ "${scheduler}" == "unscheduled" ]; then
-	bash > ${debugging_path}/../../compute_kdts_output.txt 2> ${debugging_path}/../../compute_kdts_error.txt ${job_script_compute_kdts} ${n_procs_compute_kdts} ${compute_kdts_script} ${runs_root} ${graph_kernel} ${slicing_policy} ${paths_dir}
+	bash > ${debugging_path}/../../compute_kdts_output.txt 2> ${debugging_path}/../../compute_kdts_error.txt ${job_script_compute_kdts} ${compute_kdts_n_procs} ${compute_kdts_script} ${runs_root} ${graph_kernel} ${slicing_policy} ${paths_dir}
 fi
-
-
 
 
 

@@ -217,10 +217,24 @@ def validate_slice_dirs( slice_dirs ):
     #for sd in slice_dirs:
     #    print(str(sd))
     for sd in slice_dirs:
-        assert( os.path.isdir(str(sd)) )
-        assert( sd.is_dir() )
-        slice_counts.add( len(list(sd.glob("*.graphml"))) )
-    assert( len( slice_counts ) == 1 )
+        if not os.path.isdir(str(sd)) or not sd.is_dir():
+            raise FileNotFoundError(
+                "Missing slice directory: {}. Run slice extraction before "
+                "computing KDTS, and check the corresponding "
+                "debug/extract_slices_error.txt log.".format(sd)
+            )
+        slice_count = len(list(sd.glob("*.graphml")))
+        if slice_count == 0:
+            raise FileNotFoundError(
+                "Slice directory contains no .graphml files: {}. Check the "
+                "corresponding debug/extract_slices_error.txt log.".format(sd)
+            )
+        slice_counts.add( slice_count )
+    if len( slice_counts ) != 1:
+        raise ValueError(
+            "Runs do not contain the same number of slices. Observed slice "
+            "counts: {}".format(sorted(slice_counts))
+        )
     return list(slice_counts)[0]
 
 """
@@ -431,5 +445,4 @@ if __name__ == "__main__":
           args.slice_range_upper,
           args.callstacks_available, 
           args.output_path )
-
 
