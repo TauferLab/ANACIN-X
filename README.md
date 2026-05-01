@@ -68,7 +68,6 @@ grep -qxF '. $HOME/spack/share/spack/setup-env.sh' ~/.bashrc || echo '. $HOME/sp
 2. Install Miniconda.
 
 ```bash
-mkdir -p $HOME/miniconda3
 curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash ./Miniconda3-latest-Linux-x86_64.sh
 ```
