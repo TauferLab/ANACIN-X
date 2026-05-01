@@ -23,9 +23,10 @@ The best way to learn more details on how ANACIN-X works is to see either the [S
 
 This document is organized in the following order:
 * [Installation](#installation)
-  * [Prerequisites](#prerequisites)
-  * [Dependencies](#dependencies)
-  * [Installing ANACIN-X](#building-anacin-x)
+  * [Fresh Linux installation](#fresh-linux-installation)
+  * [Existing environment installation](#existing-environment-installation)
+  * [Ready-to-use options](#ready-to-use-options)
+  * [Troubleshooting](#troubleshooting)
 * [Running ANACIN-X](#running-anacin-x)
   * [Running ANACIN-X on a Benchmark Application](#running-anacin-x-on-a-benchmark-application)
   * [Running ANACIN-X on an External Application](#running-anacin-x-on-an-external-application)
@@ -42,30 +43,15 @@ This document is organized in the following order:
 
 ## **Installation**
 
-Here, we outline the procedure to install ANACIN-X and its dependencies.  
+ANACIN-X is easiest to install on Linux with Spack, Conda, an MPI compiler wrapper, and Python 3.8. The dependency installer is non-interactive by default and provides a preflight check before it starts the long build.
 
-For more details about the information in this section, please see the [wiki page on 'Installation'](https://github.com/TauferLab/ANACIN-X/wiki/Installation).  A complete list of software dependencies for ANACIN-X can be found at the ['Dependencies' wiki page](https://github.com/TauferLab/ANACIN-X/wiki/Dependencies).
+For a complete dependency inventory, see [`requirements.md`](requirements.md). For more background, see the [Installation](https://github.com/TauferLab/ANACIN-X/wiki/Installation) and [Dependencies](https://github.com/TauferLab/ANACIN-X/wiki/Dependencies) wiki pages.
 
+### Fresh Linux installation
 
-### Prerequisites
+Use these steps on a fresh Linux machine. They assume Bash, network access, and a working system C/C++ compiler. On a cluster, load the site-provided compiler/MPI modules instead of installing MPI with Spack.
 
-Before installing the dependencies, please ensure that you have the following tools installed:
-
-- **Spack**: Spack is a flexible package manager for supercomputers, Linux, and macOS. You can find more information about Spack and installation instructions [here](https://spack.io/).
-
-- **Conda**: Conda is an open-source package management and environment management system for installing multiple versions of software packages and their dependencies. You can find more information about Conda and installation instructions [here](https://docs.anaconda.com/).
-
-Make sure both Spack and Conda are properly installed on your system before proceeding with the installation of dependencies.
-
-### Installing Spack and Conda
-
-If `spack` or `conda` are not already available on your machine, the following minimal setup is a good starting point.
-
-#### Install Spack
-
-See the official Spack getting started guide: https://spack.readthedocs.io/en/latest/getting_started.html
-
-Example installation:
+1. Install and activate Spack.
 
 ```bash
 git clone --depth=2 https://github.com/spack/spack.git $HOME/spack
@@ -73,126 +59,98 @@ git clone --depth=2 https://github.com/spack/spack.git $HOME/spack
 spack compiler find
 ```
 
-If you want Spack available automatically in future Bash shells, append it to `~/.bashrc` with:
+To make Spack available automatically in future Bash shells:
 
 ```bash
 grep -qxF '. $HOME/spack/share/spack/setup-env.sh' ~/.bashrc || echo '. $HOME/spack/share/spack/setup-env.sh' >> ~/.bashrc
-source ~/.bashrc
 ```
 
-If you prefer to add it manually, place the following line in your shell startup file such as `~/.bashrc` or `~/.zshrc`:
-
-```bash
-. $HOME/spack/share/spack/setup-env.sh
-```
-
-#### Install Conda
-
-We recommend Miniconda as the lightest Conda installation.  See the official Miniconda installation guides:
-* Overview: https://www.anaconda.com/docs/getting-started/miniconda/install
-* Linux terminal install: https://www.anaconda.com/docs/getting-started/miniconda/install/linux-install
-
-Example Linux `x86_64` installation:
+2. Install Miniconda.
 
 ```bash
 mkdir -p $HOME/miniconda3
 curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash ./Miniconda3-latest-Linux-x86_64.sh
-source ~/.bashrc
-conda --version
 ```
 
-After installing Conda, create and activate an environment for ANACIN-X before running the dependency installer:
+Open a new shell, or source your shell startup file, before continuing.
+
+3. Create and activate the ANACIN-X Conda environment.
 
 ```bash
-conda create -n anacin-x python=3.8 -y
-conda activate anacin-x
-```
-
-### Quickstart
-
-The following sequence installs Spack, installs Miniconda, creates a Conda environment, installs ANACIN-X dependencies, and builds the project on a typical Linux system:
-
-```bash
-git clone --depth=2 https://github.com/spack/spack.git $HOME/spack
-grep -qxF '. $HOME/spack/share/spack/setup-env.sh' ~/.bashrc || echo '. $HOME/spack/share/spack/setup-env.sh' >> ~/.bashrc
 . $HOME/spack/share/spack/setup-env.sh
-spack compiler find
-
-curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-bash ./Miniconda3-latest-Linux-x86_64.sh
-source ~/.bashrc
 conda create -n anacin-x python=3.8 -y
 conda activate anacin-x
+```
+
+4. Install or load MPI.
+
+```bash
+spack install openmpi
+spack load openmpi
+mpicc --version
+```
+
+If your system already provides MPI, load that MPI instead and pass the matching `--mpi` value to `setup_deps.sh`: `openmpi`, `mpich`, or `mvapich2`.
+
+5. Clone ANACIN-X and install its dependencies.
+
+```bash
+git clone https://github.com/TauferLab/ANACIN-X.git
+cd ANACIN-X
+./setup_deps.sh --check
+. ./setup_deps.sh --mpi openmpi
+```
+
+6. Build ANACIN-X.
+
+```bash
+. ./setup.sh -c
+```
+
+The `-c` option enables callstack tracing through CSMPI. To build without callstack tracing, run `. ./setup.sh`.
+
+Source the full dependency install command with `. ./setup_deps.sh` so Spack package loads remain available in the current shell before running `setup.sh`. The `--check` mode can be run normally because it does not install or load packages. Use `--spack-env <name>` if you want a Spack environment name other than `anacin_spack_env`.
+
+### Existing environment installation
+
+Use this shorter path if `spack`, `conda`, and `mpicc` are already available in your shell.
+
+```bash
+. /path/to/spack/share/spack/setup-env.sh
+conda activate anacin-x
+spack load openmpi
 
 git clone https://github.com/TauferLab/ANACIN-X.git
 cd ANACIN-X
-. setup_deps.sh
-. setup.sh -c
+./setup_deps.sh --check
+. ./setup_deps.sh --mpi openmpi
+. ./setup.sh -c
 ```
 
+Use `--mpi mpich` or `--mpi mvapich2` if that is the MPI implementation loaded on your system.
 
-### Dependencies
+`setup.sh` fetches and builds ANACIN-X submodules, patches tracing libraries for PnMPI, builds the communication-pattern generator, and writes local machine settings to `anacin-x/config/anacin_paths.local.config`. It also cleans the `submodules/` directory before fetching; do not run it while you have local submodule edits you need to keep. A safer rebuild flow should replace this cleanup in a future installer update.
 
-Once you have cloned the ANACIN-X repository to your local machine, be sure to enter the project root for setup.
+### Ready-to-use options
 
-If you're using the  [Jetstream cloud computer](https://jetstream-cloud.org) image for Anacin-X titled ["Ubuntu20.04_Anacin-X"](https://use.jetstream-cloud.org/application/images/1056), you can skip this next command.  Otherwise, we strongly recommend installing the dependencies for the project with the following command.  
+If you want to avoid a local dependency build, use one of the ready-to-use environments:
 
-```
-. /path/to/spack/share/spack/setup-env.sh
-conda activate <your-conda-environment>
-. setup_deps.sh
-``` 
+* Open the reproducible capsule from the **Open in Code Ocean** badge at the top of this README.
+* Use the Jetstream image named `Ubuntu20.04_Anacin-X`; it already has the expected ANACIN-X environment.
+* Use the Apptainer/Singularity-ready container linked in the [Reproducibility](#reproducibility) section.
 
-If you will use this command to install dependencies, be sure to have the Spack and Conda package managers set up beforehand and available in your current shell.  If there is a specific C compiler that you wish to use on your machine, please see the ['Special Case' section](https://github.com/TauferLab/ANACIN-X/wiki/Installation#special-case) of the ANACIN-X wiki.
+### Troubleshooting
 
-The dependency installer assumes that:
-* `spack` is already available in `PATH`
-* `conda` is already available in `PATH`
-* the active Conda environment is the one where ANACIN-X Python packages should be installed
+Run `./setup_deps.sh --check` whenever installation fails. It verifies the most common issues without changing the environment.
 
-If Spack also provides a `python` executable on your system, keep the Conda environment active while running the installer and build steps.  The ANACIN-X scripts now prefer `${CONDA_PREFIX}/bin/python` automatically when a Conda environment is active.
-
-Recent Spack releases may mark some versions required by ANACIN-X as deprecated.  The installer handles this automatically with `spack concretize -f --deprecated` and `spack install --deprecated`.
-
-Follow the prompts at the beginning, and then the installation will run on its own.  The installation of dependencies may take some time to complete.
-
-If you will install the dependencies of ANACIN-X manually, see the following list of them here, or see a more detailed list on the [ANACIN-X wiki](https://github.com/TauferLab/ANACIN-X/wiki/Dependencies).
-* C Compiler (ex. GCC)
-* boost
-* cmake
-* igraph
-* nlohmann-json
-* libunwind
-* spdlog
-* ruptures
-* pyelftools
-* pkg-config
-* pkgconfig
-* eigen
-* grakel
-* python-igraph
-* mpi4py
-* graphkernels
-* ipyfilechooser
-* psutil
-* [PnMPI](https://github.com/LLNL/PnMPI/tree/f6fcc801ab9305352c510420c6439b7d48a248dc)
-* [sst-dumpi](https://github.com/TauferLab/sst-dumpi/tree/b47bb77ccbe3b87d585e3701e1a5c2f8d3626176)
-* [Pluto](https://github.com/TauferLab/Pluto/tree/main)
-* [dumpi_to_graph](https://github.com/TauferLab/dumpi_to_graph/tree/3966d25a916ddf0cd5e4e71ce71702798c0f39e1)
-* [CSMPI](https://github.com/TauferLab/CSMPI/tree/367a1c3bdba1511ad5d415daecf714ea01c536c6)
-
-### Building ANACIN-X
-
-Once all dependenices are installed and loaded, build ANACIN-X and its submodules by running
-
-```
-. setup.sh -c
-```
-
-If you do not wish to build ANACIN-X with callstack tracing functionality, remove the '-c' in the above command.
-
-`setup.sh` writes machine-specific settings such as the Python interpreter and optional runtime library overrides to `anacin-x/config/anacin_paths.local.config`.  This file is generated locally so the tracked repository config remains portable across systems.
+* **`spack` was not found**: source Spack first with `. /path/to/spack/share/spack/setup-env.sh`.
+* **`conda` was not found**: initialize Miniconda/Anaconda in the current shell, then reopen the shell or source the updated startup file.
+* **No active Conda environment**: run `conda create -n anacin-x python=3.8 -y` once, then `conda activate anacin-x`.
+* **Wrong Python version**: ANACIN-X currently expects Python 3.8 for its Python dependencies.
+* **`mpicc` was not found**: load your MPI module or install/load MPI with Spack, for example `spack install openmpi && spack load openmpi`, matching the `--mpi` option you pass to `setup_deps.sh`.
+* **Spack reports deprecated package versions**: this is expected for some ANACIN-X dependencies. The installer uses Spack's `--deprecated` flag automatically.
+* **A partial install failed**: fix the reported issue, re-run `./setup_deps.sh --check`, then re-run `. ./setup_deps.sh --mpi <name>`. Re-running the dependency installer refreshes the Spack environment manifest.
 
 
 ## **Running ANACIN-X**:
@@ -238,7 +196,7 @@ If the project is run with settings that are too small, then the communication p
 Below is an example run of the script as one might submit it to run message\_race on an unscheduled system.
 
 ```
-. ./comm_pattern_analysis.sh -p 20 -i 10 -n 1 -v -r 100 -sc unscheduled -cp message_race -o $HOME/message_race_sim_1
+. ./comm_pattern_analysis.sh -p 8 -i 10 -n 1 -v -r 10 -sc unscheduled -cp message_race -o $HOME/message_race_sim_1
 ```
 
 Below is another example run of the script as one might submit it on the Stampede2 cluster computer to analyze the AMG 2013 communication pattern:
@@ -456,13 +414,13 @@ This work partially developed and tested using the following [XSEDE computing re
 ### Project Team
 
 Developers:
+* Dhroov Pandey
+* Jack Marquez
 * Nick Bell
 * Dylan Chapp
 * Kae Suarez
 * Nigel Tan
-* Jack Marquez
 * Befikir Bogale
-* Aashish Pandey
 
 Project Advisors:
 * Dr. Sanjukta Bhowmick

@@ -18,8 +18,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'ANACIN-X'
-copyright = '2021, Kae Suarez, Dylan Chapp, Nick Bell, Nigel Tan, Michela Taufer, Sanjukta Bhowmick'
-author = 'Kae Suarez, Dylan Chapp, Nick Bell, Nigel Tan, Michela Taufer, Sanjukta Bhowmick'
+copyright = '2026, Jack Marquez, Dhroov Pandey, Kae Suarez, Dylan Chapp, Nick Bell, Nigel Tan, Sanjukta Bhowmick, Michela Taufer'
+author = 'Jack Marquez, Dhroov Pandey, Kae Suarez, Dylan Chapp, Nick Bell, Nigel Tan, Sanjukta Bhowmick, Michela Taufer'
 
 
 # -- General configuration ---------------------------------------------------

@@ -1,15 +1,16 @@
-.. ANACIN-X documentation master file, created by
-   sphinx-quickstart on Mon Apr 26 14:04:53 2021.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+ANACIN-X Documentation
+======================
 
-Welcome to ANACIN-X's documentation!
-====================================
+ANACIN-X is a suite of tools for trace-based analysis of non-deterministic
+behavior in MPI applications. Start with the installation guide if you are
+setting up a local environment for the first time.
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+   install
+   troubleshooting
 
 
 Indices and tables
