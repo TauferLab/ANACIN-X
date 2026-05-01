@@ -26,10 +26,17 @@ Common options:
    ./install_all.sh --mpi mpich
    ./install_all.sh --without-callstack
    ./install_all.sh --skip-mpi-install --mpi openmpi
+   ./install_all.sh --accept-conda-tos
 
 Use ``--skip-mpi-install`` on clusters where MPI is provided by modules or the
 system. Load that MPI first so ``mpicc`` is available, then pass the matching
 ``--mpi`` value: ``openmpi``, ``mpich``, or ``mvapich2``.
+
+Use ``--accept-conda-tos`` only if you agree to Anaconda's default channel Terms
+of Service. If you omit this option in an interactive terminal, the installer
+asks before accepting the terms when Conda requires it. In non-interactive runs,
+pass ``--accept-conda-tos`` or run Conda's ``conda tos accept`` commands
+manually before installation.
 
 ``install_all.sh`` calls ``setup.sh`` during the final build. Because
 ``setup.sh`` currently cleans and rebuilds ``submodules/``, the installer stops
@@ -61,6 +68,7 @@ To make Spack available automatically in future Bash shells:
 
 .. code-block:: bash
 
+   mkdir -p $HOME/miniconda3
    curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
    bash ./Miniconda3-latest-Linux-x86_64.sh
 

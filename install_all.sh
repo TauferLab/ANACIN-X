@@ -14,6 +14,7 @@ install_conda="true"
 install_mpi="true"
 with_callstack="true"
 force_submodule_clean="false"
+accept_conda_tos="false"
 
 usage() {
 	cat <<'EOF'
@@ -44,6 +45,9 @@ Options:
                              installing Miniconda if it is missing.
   --skip-mpi-install         Require an existing mpicc instead of installing
                              and loading MPI with Spack.
+  --accept-conda-tos         Run Conda's Terms of Service acceptance commands
+                             for Anaconda's default pkgs/main and pkgs/r
+                             channels before creating/installing packages.
   --without-callstack        Build without CSMPI callstack tracing.
   --force-submodule-clean    Allow setup.sh to clean and rebuild submodules.
                              Required when local submodule changes are present.
@@ -136,6 +140,10 @@ parse_args() {
 				;;
 			--skip-mpi-install)
 				install_mpi="false"
+				shift
+				;;
+			--accept-conda-tos)
+				accept_conda_tos="true"
 				shift
 				;;
 			--without-callstack)
@@ -286,13 +294,84 @@ ensure_conda() {
 	. "${conda_root}/etc/profile.d/conda.sh"
 }
 
+accept_conda_terms() {
+	log "Accepting Conda channel Terms of Service"
+	if ! conda tos --help >/dev/null 2>&1; then
+		info "This Conda version does not provide 'conda tos'; skipping Terms of Service acceptance."
+		return 0
+	fi
+
+	run conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+	run conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+}
+
+accept_conda_terms_if_requested() {
+	[ "${accept_conda_tos}" = "true" ] || return 0
+	accept_conda_terms
+}
+
+conda_tos_error_seen() {
+	grep -Eq 'CondaToSNonInteractiveError|Terms of Service have not been accepted|conda tos accept' "$1"
+}
+
+handle_conda_tos_error() {
+	local response
+
+	if [ "${accept_conda_tos}" = "true" ]; then
+		accept_conda_terms
+		return
+	fi
+
+	if [ ! -t 0 ]; then
+		die "Conda requires Terms of Service acceptance. Re-run with --accept-conda-tos if you agree, or run Conda's 'conda tos accept' commands manually."
+	fi
+
+	printf '\nConda requires acceptance of Anaconda channel Terms of Service before it can continue.\n' >&2
+	printf 'The channels are:\n' >&2
+	printf '  - https://repo.anaconda.com/pkgs/main\n' >&2
+	printf '  - https://repo.anaconda.com/pkgs/r\n' >&2
+	printf 'Accept these Terms of Service now? [y/N] ' >&2
+	read -r response
+
+	case "${response}" in
+		[yY]|[yY][eE][sS])
+			accept_conda_tos="true"
+			accept_conda_terms
+			;;
+		*)
+			die "Conda Terms of Service were not accepted. Run Conda's 'conda tos accept' commands manually, or re-run with --accept-conda-tos if you agree."
+			;;
+	esac
+}
+
+create_conda_env() {
+	local create_log
+
+	create_log="$(mktemp "${TMPDIR:-/tmp}/anacin-conda-create.XXXXXX")"
+	info "conda create -n ${conda_env} python=${python_version} -y"
+	if conda create -n "${conda_env}" "python=${python_version}" -y 2>&1 | tee "${create_log}"; then
+		rm -f "${create_log}"
+		return 0
+	fi
+
+	if conda_tos_error_seen "${create_log}"; then
+		rm -f "${create_log}"
+		handle_conda_tos_error
+		run conda create -n "${conda_env}" "python=${python_version}" -y
+		return
+	fi
+
+	rm -f "${create_log}"
+	die "Conda environment creation failed."
+}
+
 ensure_conda_env() {
 	log "Checking Conda environment"
 
 	if conda env list | awk '{print $1}' | grep -Fxq "${conda_env}"; then
 		info "Using existing Conda environment: ${conda_env}"
 	else
-		run conda create -n "${conda_env}" "python=${python_version}" -y
+		create_conda_env
 	fi
 
 	run conda activate "${conda_env}"
@@ -334,12 +413,26 @@ ensure_submodule_build_is_safe() {
 }
 
 install_anacin_dependencies() {
+	local setup_log
+
 	log "Installing ANACIN-X dependencies"
 
 	cd "${repo_root}"
 	./setup_deps.sh --check
+	setup_log="$(mktemp "${TMPDIR:-/tmp}/anacin-setup-deps.XXXXXX")"
 	# shellcheck disable=SC1091
-	. ./setup_deps.sh --mpi "${mpi_name}" --spack-env "${spack_env_name}"
+	if ! . ./setup_deps.sh --mpi "${mpi_name}" --spack-env "${spack_env_name}" 2> >(tee "${setup_log}" >&2); then
+		if conda_tos_error_seen "${setup_log}"; then
+			rm -f "${setup_log}"
+			handle_conda_tos_error
+			# shellcheck disable=SC1091
+			. ./setup_deps.sh --mpi "${mpi_name}" --spack-env "${spack_env_name}"
+			return
+		fi
+		rm -f "${setup_log}"
+		die "ANACIN-X dependency installation failed."
+	fi
+	rm -f "${setup_log}"
 }
 
 build_anacin() {
@@ -369,6 +462,7 @@ main() {
 
 	ensure_spack
 	ensure_conda
+	accept_conda_terms_if_requested
 	ensure_conda_env
 	ensure_mpi
 	install_anacin_dependencies

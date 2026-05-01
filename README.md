@@ -63,9 +63,12 @@ Common options:
 ./install_all.sh --mpi mpich
 ./install_all.sh --without-callstack
 ./install_all.sh --skip-mpi-install --mpi openmpi
+./install_all.sh --accept-conda-tos
 ```
 
 Use `--skip-mpi-install` on clusters where MPI is provided by modules or the system. Load that MPI first so `mpicc` is available, then pass the matching `--mpi` value: `openmpi`, `mpich`, or `mvapich2`.
+
+Use `--accept-conda-tos` only if you agree to Anaconda's default channel Terms of Service. If you omit this option in an interactive terminal, the installer asks before accepting the terms when Conda requires it. In non-interactive runs, pass `--accept-conda-tos` or run Conda's `conda tos accept` commands manually before installation.
 
 `install_all.sh` calls `setup.sh` during the final build. Because `setup.sh` currently cleans and rebuilds `submodules/`, the installer stops if local submodule changes are present. Re-run with `--force-submodule-clean` only if those local submodule changes can be discarded.
 
@@ -92,6 +95,7 @@ grep -qxF '. $HOME/spack/share/spack/setup-env.sh' ~/.bashrc || echo '. $HOME/sp
 2. Install Miniconda.
 
 ```bash
+mkdir -p $HOME/miniconda3
 curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash ./Miniconda3-latest-Linux-x86_64.sh
 ```
@@ -168,6 +172,7 @@ Run `./setup_deps.sh --check` whenever installation fails. It verifies the most 
 * **`spack` was not found**: source Spack first with `. /path/to/spack/share/spack/setup-env.sh`.
 * **`conda` was not found**: initialize Miniconda/Anaconda in the current shell, then reopen the shell or source the updated startup file.
 * **No active Conda environment**: run `conda create -n anacin-x python=3.8 -y` once, then `conda activate anacin-x`.
+* **Conda asks for Terms of Service acceptance**: answer `yes` when `install_all.sh` asks, re-run `./install_all.sh --accept-conda-tos` if you agree to those terms, or run the `conda tos accept --override-channels --channel ...` commands shown by Conda manually.
 * **Wrong Python version**: ANACIN-X currently expects Python 3.8 for its Python dependencies.
 * **`mpicc` was not found**: load your MPI module or install/load MPI with Spack, for example `spack install openmpi && spack load openmpi`, matching the `--mpi` option you pass to `setup_deps.sh`.
 * **Spack reports deprecated package versions**: this is expected for some ANACIN-X dependencies. The installer uses Spack's `--deprecated` flag automatically.
