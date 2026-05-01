@@ -49,7 +49,31 @@ For a complete dependency inventory, see [`requirements.md`](requirements.md). F
 
 ### Fresh Linux installation
 
-Use these steps on a fresh Linux machine. They assume Bash, network access, and a working system C/C++ compiler. On a cluster, load the site-provided compiler/MPI modules instead of installing MPI with Spack.
+Use this path on a fresh Linux machine with Bash, network access, and a working system C/C++ compiler. The installer script installs Spack, installs Miniconda, creates the Python 3.8 Conda environment, installs/loads MPI, installs ANACIN-X dependencies, and builds ANACIN-X from this checkout.
+
+```bash
+git clone https://github.com/TauferLab/ANACIN-X.git
+cd ANACIN-X
+./install_all.sh
+```
+
+Common options:
+
+```bash
+./install_all.sh --mpi mpich
+./install_all.sh --without-callstack
+./install_all.sh --skip-mpi-install --mpi openmpi
+```
+
+Use `--skip-mpi-install` on clusters where MPI is provided by modules or the system. Load that MPI first so `mpicc` is available, then pass the matching `--mpi` value: `openmpi`, `mpich`, or `mvapich2`.
+
+`install_all.sh` calls `setup.sh` during the final build. Because `setup.sh` currently cleans and rebuilds `submodules/`, the installer stops if local submodule changes are present. Re-run with `--force-submodule-clean` only if those local submodule changes can be discarded.
+
+The script follows the manual steps below.
+
+### Manual fresh installation
+
+Use these commands if you want to run each step yourself.
 
 1. Install and activate Spack.
 
@@ -122,9 +146,7 @@ spack load openmpi
 
 git clone https://github.com/TauferLab/ANACIN-X.git
 cd ANACIN-X
-./setup_deps.sh --check
-. ./setup_deps.sh --mpi openmpi
-. ./setup.sh -c
+./install_all.sh --skip-spack-install --skip-conda-install --skip-mpi-install --mpi openmpi
 ```
 
 Use `--mpi mpich` or `--mpi mvapich2` if that is the MPI implementation loaded on your system.
