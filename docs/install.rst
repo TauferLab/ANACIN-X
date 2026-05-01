@@ -26,10 +26,16 @@ Common options:
    ./install_all.sh --mpi mpich
    ./install_all.sh --without-callstack
    ./install_all.sh --skip-mpi-install --mpi openmpi
+   ./install_all.sh --accept-conda-tos
 
 Use ``--skip-mpi-install`` on clusters where MPI is provided by modules or the
 system. Load that MPI first so ``mpicc`` is available, then pass the matching
 ``--mpi`` value: ``openmpi``, ``mpich``, or ``mvapich2``.
+
+Use ``--accept-conda-tos`` only if you agree to Anaconda's default channel Terms
+of Service. Without that option, Conda may ask you to run the ``conda tos
+accept`` commands manually before it can create or install packages from the
+default channels.
 
 ``install_all.sh`` calls ``setup.sh`` during the final build. Because
 ``setup.sh`` currently cleans and rebuilds ``submodules/``, the installer stops
