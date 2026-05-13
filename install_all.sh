@@ -203,19 +203,26 @@ source_spack() {
 	if [ -f "${spack_root}/share/spack/setup-env.sh" ]; then
 		# shellcheck disable=SC1091
 		. "${spack_root}/share/spack/setup-env.sh"
+		return 0
+	elif [ -n "${SPACK_ROOT:-}" ] && [ -f "${SPACK_ROOT}/share/spack/setup-env.sh" ]; then
+		spack_root="${SPACK_ROOT}"
+		# shellcheck disable=SC1091
+		. "${spack_root}/share/spack/setup-env.sh"
+		return 0
 	elif have_command spack; then
 		spack_command="$(command -v spack)"
 		if [ "${spack_command#/}" != "${spack_command}" ]; then
 			spack_guess="$(cd -- "$(dirname -- "${spack_command}")/.." && pwd)"
 			if [ -f "${spack_guess}/share/spack/setup-env.sh" ]; then
+				spack_root="${spack_guess}"
 				# shellcheck disable=SC1090
 				. "${spack_guess}/share/spack/setup-env.sh"
+				return 0
 			fi
 		fi
-		info "Using existing spack at $(command -v spack)"
-	else
-		return 1
 	fi
+
+	return 1
 }
 
 ensure_spack() {
@@ -377,6 +384,16 @@ ensure_conda_env() {
 	run conda activate "${conda_env}"
 }
 
+refresh_spack_after_conda_activation() {
+	log "Refreshing Spack after Conda activation"
+
+	if source_spack; then
+		info "Spack is available at $(command -v spack)"
+	else
+		die "spack was not available after activating Conda. Expected ${spack_root}/share/spack/setup-env.sh to exist."
+	fi
+}
+
 ensure_mpi() {
 	log "Checking MPI"
 
@@ -449,6 +466,48 @@ build_anacin() {
 	fi
 }
 
+write_activation_script() {
+	local activation_script="${repo_root}/activate_anacin_x.sh"
+
+	log "Writing ANACIN-X runtime activation script"
+	cat > "${activation_script}" <<EOF
+#!/usr/bin/env bash
+
+# Source this file before running ANACIN-X workflows:
+#   . ${activation_script}
+
+if [ -f "${spack_root}/share/spack/setup-env.sh" ]; then
+	. "${spack_root}/share/spack/setup-env.sh"
+else
+	echo "ERROR: Spack setup script was not found at ${spack_root}/share/spack/setup-env.sh" >&2
+	return 1 2>/dev/null || exit 1
+fi
+
+if [ -f "${conda_root}/etc/profile.d/conda.sh" ]; then
+	. "${conda_root}/etc/profile.d/conda.sh"
+else
+	echo "ERROR: Conda setup script was not found at ${conda_root}/etc/profile.d/conda.sh" >&2
+	return 1 2>/dev/null || exit 1
+fi
+
+conda activate "${conda_env}" || return 1 2>/dev/null || exit 1
+
+spack load "${mpi_name}" || return 1 2>/dev/null || exit 1
+spack load boost libunwind nlohmann-json spdlog igraph eigen || return 1 2>/dev/null || exit 1
+
+cd "${repo_root}" || return 1 2>/dev/null || exit 1
+EOF
+	chmod +x "${activation_script}"
+	info "Activation script: ${activation_script}"
+}
+
+print_runtime_instructions() {
+	log "Before running ANACIN-X workflows in a new shell"
+	info ". ${repo_root}/activate_anacin_x.sh"
+	info "Then run comm_pattern_analysis.sh or other ANACIN-X workflow scripts."
+	info "This activation is shell-local; source the script in each new terminal session."
+}
+
 main() {
 	parse_args "$@"
 
@@ -464,11 +523,14 @@ main() {
 	ensure_conda
 	accept_conda_terms_if_requested
 	ensure_conda_env
+	refresh_spack_after_conda_activation
 	ensure_mpi
 	install_anacin_dependencies
 	build_anacin
+	write_activation_script
 
 	log "ANACIN-X installation completed"
+	print_runtime_instructions
 }
 
 main "$@"

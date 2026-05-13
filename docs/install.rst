@@ -45,6 +45,21 @@ only if those local submodule changes can be discarded.
 
 The script follows the manual steps below.
 
+After installation, dependency loads are still local to the shell that ran the
+installer. ``install_all.sh`` writes an activation helper at
+``activate_anacin_x.sh``. In every new terminal session, source it before
+running workflow scripts:
+
+.. code-block:: bash
+
+   cd $HOME/ANACIN-X
+   . ./activate_anacin_x.sh
+
+The helper sources Spack and Conda, activates the ``anacin-x`` Conda
+environment, loads the same MPI implementation passed to ``install_all.sh``
+with ``--mpi``, loads the ANACIN-X Spack dependencies, and changes to the
+repository root.
+
 Manual Fresh Installation
 -------------------------
 

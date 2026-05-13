@@ -74,6 +74,15 @@ Use `--accept-conda-tos` only if you agree to Anaconda's default channel Terms o
 
 The script follows the manual steps below.
 
+After installation, dependency loads are still local to the shell that ran the installer. `install_all.sh` writes an activation helper at `activate_anacin_x.sh`. In every new terminal session, source it before running workflow scripts:
+
+```bash
+cd $HOME/ANACIN-X
+. ./activate_anacin_x.sh
+```
+
+The helper sources Spack and Conda, activates the `anacin-x` Conda environment, loads the same MPI implementation passed to `install_all.sh` with `--mpi`, loads the ANACIN-X Spack dependencies, and changes to the repository root.
+
 ### Manual fresh installation
 
 Use these commands if you want to run each step yourself.
@@ -175,6 +184,8 @@ Run `./setup_deps.sh --check` whenever installation fails. It verifies the most 
 * **Conda asks for Terms of Service acceptance**: answer `yes` when `install_all.sh` asks, re-run `./install_all.sh --accept-conda-tos` if you agree to those terms, or run the `conda tos accept --override-channels --channel ...` commands shown by Conda manually.
 * **Wrong Python version**: ANACIN-X currently expects Python 3.8 for its Python dependencies.
 * **`mpicc` was not found**: load your MPI module or install/load MPI with Spack, for example `spack install openmpi && spack load openmpi`, matching the `--mpi` option you pass to `setup_deps.sh`.
+* **`mpirun` was not found while running a workflow**: run `. ./activate_anacin_x.sh` from the ANACIN-X repository root. The installer's environment changes do not persist into new terminal sessions.
+* **`libpnmpi.so` or `comm_pattern_generator` was not found**: the final ANACIN-X build did not finish. Re-run `./install_all.sh --skip-spack-install --skip-conda-install --mpi <name> --force-submodule-clean` after loading Spack, Conda, and MPI. Use `--skip-mpi-install` too only when MPI is already provided and loaded outside Spack.
 * **Spack reports deprecated package versions**: this is expected for some ANACIN-X dependencies. The installer uses Spack's `--deprecated` flag automatically.
 * **A partial install failed**: fix the reported issue, re-run `./setup_deps.sh --check`, then re-run `. ./setup_deps.sh --mpi <name>`. Re-running the dependency installer refreshes the Spack environment manifest.
 

@@ -32,6 +32,16 @@ Wrong Python version
    ``spack install openmpi && spack load openmpi``. Match the loaded MPI
    implementation with the ``--mpi`` option passed to ``setup_deps.sh``.
 
+``mpirun`` was not found while running a workflow
+   Run ``. ./activate_anacin_x.sh`` from the ANACIN-X repository root. The
+   installer's environment changes do not persist into new terminal sessions.
+
+``libpnmpi.so`` or ``comm_pattern_generator`` was not found
+   The final ANACIN-X build did not finish. Re-run
+   ``./install_all.sh --skip-spack-install --skip-conda-install --mpi <name> --force-submodule-clean``
+   after loading Spack, Conda, and MPI. Use ``--skip-mpi-install`` too only
+   when MPI is already provided and loaded outside Spack.
+
 Spack reports deprecated package versions
    This is expected for some ANACIN-X dependencies. The installer uses Spack's
    ``--deprecated`` flag automatically.
