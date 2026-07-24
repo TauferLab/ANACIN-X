@@ -1,6 +1,7 @@
 [submodule "submodules/sst-dumpi"]
 	path = submodules/sst-dumpi
 	url = https://github.com/TauferLab/sst-dumpi.git
+	branch = master
 [submodule "submodules/PnMPI"]
 	path = submodules/PnMPI
 	url = https://github.com/LLNL/PnMPI.git
